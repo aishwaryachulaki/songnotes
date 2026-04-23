@@ -38,7 +38,7 @@ body {
     var(--stamp);
   padding: calc(var(--r) + 10px) calc(var(--r) + 12px);
   position: relative;
-  filter: drop-shadow(0 3px 10px rgba(58,36,24,0.18));
+  box-shadow: 0 4px 14px rgba(58,36,24,0.18);
 }
 
 /* inner frame */
