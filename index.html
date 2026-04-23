@@ -5,37 +5,38 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>SongNotes — Leave a note inside the music</title>
   <style>
+    /* Tangerine #F08C21 · Butter #F2D88F · Blush #E36888 · Sea #6698CC · Matcha #B4B534 */
     :root {
-      --yellow:  #f2c94c;
-      --cream:   #faf5e0;
-      --pink:    #e8447c;
-      --blue:    #5b8ed4;
-      --olive:   #8a9c28;
-      --orange:  #f08020;
-      --ink:     #2a1c0f;
-      --ink-mid: #7a5040;
-      --ink-lt:  #b09878;
-      --r: 8px;
-      --sp: 18px;
+      --butter:    #F2D88F;
+      --blush:     #E36888;
+      --tangerine: #F08C21;
+      --sea:       #6698CC;
+      --matcha:    #B4B534;
+      --cream:     #FFFBF4;
+      --ink:       #3a2418;
+      --ink-mid:   #8a5a48;
+      --r:  10px;   /* perforation radius — big & visible */
+      --sp: 20px;   /* perforation spacing */
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      background: var(--yellow);
+      background: var(--butter);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
       color: var(--ink);
       min-height: 100vh;
     }
 
-    /* ── Navbar ───────────────────────────────────────── */
+    /* ── Navbar ────────────────────────────────────────────── */
     nav {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 18px 32px;
+      padding: 20px 36px;
+      max-width: 1140px;
+      margin: 0 auto;
     }
-
     .nav-logo {
       display: flex;
       align-items: center;
@@ -45,38 +46,32 @@
       color: var(--ink);
       text-decoration: none;
     }
-
-    .logo-icon {
-      width: 36px;
-      height: 36px;
-      background: var(--pink);
+    .logo-mark {
+      width: 38px; height: 38px;
+      background: var(--blush);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 16px;
-      color: #fff;
-      flex-shrink: 0;
+      font-size: 17px;
+      filter: drop-shadow(0 3px 8px rgba(227,104,136,0.4));
     }
-
-    .nav-btn {
-      background: var(--orange);
+    .nav-cta {
+      background: var(--tangerine);
       color: #fff;
       border: none;
       border-radius: 24px;
-      padding: 10px 22px;
+      padding: 11px 24px;
       font-size: 14px;
       font-weight: 700;
       cursor: pointer;
       text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      box-shadow: 0 4px 14px rgba(240,140,33,0.38);
       transition: opacity 0.15s;
     }
-    .nav-btn:hover { opacity: 0.88; }
+    .nav-cta:hover { opacity: 0.88; }
 
-    /* ── Stamp base ───────────────────────────────────── */
+    /* ── Stamp base ─────────────────────────────────────────── */
     .stamp {
       --sc: var(--cream);
       background:
@@ -86,87 +81,95 @@
         radial-gradient(circle at 100% 50%,transparent calc(var(--r) - .5px), var(--sc) var(--r)) right  / calc(var(--r)*2) var(--sp) repeat-y,
         var(--sc);
       position: relative;
-      filter: drop-shadow(0 4px 16px rgba(42,28,15,0.14));
+      filter: drop-shadow(0 6px 20px rgba(58,36,24,0.13));
     }
-
+    /* inner frame */
     .stamp::after {
       content: '';
       position: absolute;
-      inset: calc(var(--r) + 5px);
-      border: 1px solid rgba(42,28,15,0.1);
+      inset: calc(var(--r) + 6px);
+      border: 1.5px solid rgba(58,36,24,0.1);
+      border-radius: 2px;
       pointer-events: none;
     }
+    .stamp-blush  { --sc: var(--blush);  }
+    .stamp-sea    { --sc: var(--sea);    }
+    .stamp-matcha { --sc: var(--matcha); }
 
-    /* ── Bento grid ───────────────────────────────────── */
+    .stamp-blush::after,
+    .stamp-sea::after,
+    .stamp-matcha::after { border-color: rgba(255,251,244,0.2); }
+
+    /* ── Bento grid ─────────────────────────────────────────── */
     .bento {
       display: grid;
-      grid-template-columns: 1fr 320px;
+      grid-template-columns: 1.6fr 1fr;
       grid-template-rows: auto auto;
-      gap: 14px;
-      padding: 0 32px 32px;
-      max-width: 1100px;
+      gap: 16px;
+      padding: 0 36px 20px;
+      max-width: 1140px;
       margin: 0 auto;
     }
 
-    /* ── Letter stamp (hero) ──────────────────────────── */
+    /* ── Letter hero stamp ──────────────────────────────────── */
     .stamp-letter {
       grid-column: 1;
       grid-row: 1;
-      padding: calc(var(--r) + 32px) calc(var(--r) + 36px);
+      padding: calc(var(--r) + 36px) calc(var(--r) + 40px);
       overflow: hidden;
+      min-height: 360px;
     }
 
-    /* ruled paper lines */
+    /* ruled paper lines behind content */
     .stamp-letter::before {
       content: '';
       position: absolute;
-      inset: calc(var(--r) + 5px);
+      inset: calc(var(--r) + 6px);
       background: repeating-linear-gradient(
         to bottom,
         transparent,
-        transparent 31px,
-        rgba(42,28,15,0.07) 31px,
-        rgba(42,28,15,0.07) 32px
+        transparent 35px,
+        rgba(58,36,24,0.06) 35px,
+        rgba(58,36,24,0.06) 36px
       );
       pointer-events: none;
+      z-index: 0;
     }
+
+    .letter-content { position: relative; z-index: 1; }
 
     .letter-tag {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: rgba(232,68,124,0.1);
-      color: var(--pink);
+      background: rgba(227,104,136,0.12);
+      color: var(--blush);
       border-radius: 20px;
-      padding: 5px 12px;
+      padding: 5px 13px;
       font-size: 12px;
       font-weight: 600;
-      margin-bottom: 24px;
-      position: relative;
+      margin-bottom: 22px;
+      border: 1px solid rgba(227,104,136,0.2);
     }
 
-    .letter-headline {
-      font-size: clamp(36px, 5vw, 52px);
+    .letter-h1 {
+      font-size: clamp(34px, 4.5vw, 52px);
       font-weight: 800;
       line-height: 1.15;
       color: var(--ink);
-      margin-bottom: 20px;
-      position: relative;
+      margin-bottom: 18px;
     }
-
-    .letter-headline em {
+    .letter-h1 em {
       font-style: italic;
-      color: var(--pink);
-      font-weight: 800;
+      color: var(--blush);
     }
 
-    .letter-body {
-      font-size: 16px;
+    .letter-p {
+      font-size: 15px;
       color: var(--ink-mid);
-      line-height: 1.65;
-      max-width: 480px;
-      margin-bottom: 32px;
-      position: relative;
+      line-height: 1.7;
+      max-width: 440px;
+      margin-bottom: 30px;
     }
 
     .letter-actions {
@@ -174,15 +177,13 @@
       align-items: center;
       gap: 16px;
       flex-wrap: wrap;
-      position: relative;
     }
-
-    .btn-primary {
-      background: var(--orange);
+    .btn-dl {
+      background: var(--tangerine);
       color: #fff;
       border: none;
       border-radius: 28px;
-      padding: 14px 26px;
+      padding: 14px 28px;
       font-size: 15px;
       font-weight: 700;
       cursor: pointer;
@@ -190,31 +191,26 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      box-shadow: 0 6px 20px rgba(240,128,32,0.3);
+      box-shadow: 0 6px 20px rgba(240,140,33,0.36);
       transition: opacity 0.15s;
     }
-    .btn-primary:hover { opacity: 0.88; }
-
-    .letter-sub {
-      font-size: 12px;
-      color: var(--ink-lt);
-    }
+    .btn-dl:hover { opacity: 0.88; }
+    .letter-fine { font-size: 12px; color: var(--ink-mid); opacity: 0.75; }
 
     /* postmark decoration */
     .postmark {
       position: absolute;
-      top: calc(var(--r) + 18px);
-      right: calc(var(--r) + 22px);
-      width: 72px;
-      height: 72px;
-      border: 2.5px solid rgba(42,28,15,0.12);
+      top: calc(var(--r) + 16px);
+      right: calc(var(--r) + 20px);
+      width: 68px; height: 68px;
+      border: 2px solid rgba(58,36,24,0.1);
       border-radius: 50%;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 2px;
-      opacity: 0.5;
+      gap: 3px;
+      z-index: 1;
     }
     .postmark span {
       font-size: 7px;
@@ -222,261 +218,244 @@
       letter-spacing: 0.1em;
       color: var(--ink-mid);
       font-weight: 700;
-      line-height: 1;
+      opacity: 0.5;
     }
-    .postmark .pm-lines {
+    .pm-wave {
       display: flex;
       flex-direction: column;
       gap: 3px;
-      margin-top: 2px;
     }
-    .postmark .pm-lines i {
+    .pm-wave i {
       display: block;
-      width: 28px;
-      height: 1.5px;
+      width: 26px; height: 1.5px;
       background: var(--ink-mid);
       border-radius: 2px;
+      opacity: 0.35;
     }
 
-    /* ── Right column ─────────────────────────────────── */
+    /* denomination */
+    .denom {
+      position: absolute;
+      bottom: calc(var(--r) + 10px);
+      right: calc(var(--r) + 16px);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--matcha);
+      letter-spacing: 0.05em;
+      z-index: 1;
+    }
+
+    /* ── Right column ───────────────────────────────────────── */
     .right-col {
       grid-column: 2;
       grid-row: 1;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 16px;
     }
 
-    /* vinyl stamp */
-    .stamp-vinyl {
-      --sc: #2a1c0f;
-      padding: calc(var(--r) + 20px);
-      min-height: 180px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .stamp-vinyl::after { border-color: rgba(255,255,255,0.1); }
-
-    .vinyl {
-      width: 110px;
-      height: 110px;
-      border-radius: 50%;
-      background:
-        radial-gradient(circle at 50% 50%, #3a2c20 0%, #3a2c20 14%, transparent 14%),
-        repeating-radial-gradient(circle at 50% 50%, #2a1c0f 0px, #2a1c0f 2px, #3d2e22 2px, #3d2e22 4px);
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .vinyl::after {
-      content: '';
-      position: absolute;
-      width: 18px;
-      height: 18px;
-      background: #f2c94c;
-      border-radius: 50%;
-    }
-    .vinyl-label {
-      position: absolute;
-      top: -8px;
-      right: -8px;
-      background: var(--pink);
-      color: #fff;
-      font-size: 9px;
-      font-weight: 700;
-      padding: 4px 8px;
-      border-radius: 10px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    /* pink note stamp */
+    /* Note preview stamp — blush */
     .stamp-note {
-      --sc: var(--pink);
-      padding: calc(var(--r) + 20px) calc(var(--r) + 22px);
+      padding: calc(var(--r) + 22px) calc(var(--r) + 24px);
+      flex: 1;
     }
-    .stamp-note::after { border-color: rgba(255,255,255,0.18); }
-
     .note-for {
       font-size: 10px;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: rgba(255,255,255,0.65);
-      margin-bottom: 10px;
+      letter-spacing: 0.13em;
+      color: rgba(255,251,244,0.6);
+      margin-bottom: 12px;
     }
-    .note-text {
-      font-size: 15px;
+    .note-body {
+      font-size: 16px;
       color: #fff;
-      line-height: 1.6;
+      line-height: 1.65;
       font-style: italic;
     }
     .note-sig {
-      margin-top: 14px;
+      margin-top: 16px;
       font-size: 11px;
-      color: rgba(255,255,255,0.6);
+      color: rgba(255,251,244,0.55);
     }
 
-    /* ── Feature row ──────────────────────────────────── */
+    /* music motif stamp */
+    .stamp-music {
+      padding: calc(var(--r) + 20px) calc(var(--r) + 24px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .music-notes {
+      font-size: 36px;
+      line-height: 1;
+      opacity: 0.85;
+      letter-spacing: 4px;
+    }
+    .music-label {
+      text-align: right;
+    }
+    .music-label strong {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 3px;
+    }
+    .music-label span {
+      font-size: 11px;
+      color: rgba(255,251,244,0.65);
+    }
+
+    /* ── Feature row ────────────────────────────────────────── */
     .feature-row {
       grid-column: 1 / -1;
       grid-row: 2;
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
-      gap: 14px;
+      gap: 16px;
     }
 
-    .stamp-feature {
-      padding: calc(var(--r) + 22px) calc(var(--r) + 24px);
+    .stamp-feat {
+      padding: calc(var(--r) + 24px) calc(var(--r) + 26px);
     }
 
-    .stamp-blue  { --sc: var(--blue); }
-    .stamp-olive { --sc: var(--olive); }
-
-    .stamp-blue::after,
-    .stamp-olive::after { border-color: rgba(255,255,255,0.18); }
-
-    .feature-icon {
-      font-size: 22px;
+    .feat-icon {
+      font-size: 26px;
       margin-bottom: 14px;
       display: block;
+      line-height: 1;
     }
-
-    .feature-title {
-      font-size: 17px;
+    .feat-title {
+      font-size: 18px;
       font-weight: 700;
       margin-bottom: 8px;
-      line-height: 1.25;
+      color: var(--ink);
+      line-height: 1.2;
     }
-
-    .stamp-blue  .feature-title,
-    .stamp-olive .feature-title { color: #fff; }
-    .stamp-blue  .feature-body,
-    .stamp-olive .feature-body  { color: rgba(255,255,255,0.8); }
-
-    .feature-body {
+    .feat-body {
       font-size: 13px;
-      line-height: 1.6;
+      line-height: 1.65;
       color: var(--ink-mid);
     }
+    /* coloured feature stamps flip text */
+    .stamp-sea   .feat-title,
+    .stamp-matcha .feat-title  { color: #fff; }
+    .stamp-sea   .feat-body,
+    .stamp-matcha .feat-body   { color: rgba(255,251,244,0.82); }
 
-    /* ── Footer ───────────────────────────────────────── */
+    /* ── Footer ─────────────────────────────────────────────── */
     footer {
       text-align: center;
-      padding: 24px 32px 40px;
+      padding: 28px 36px 44px;
       font-size: 12px;
       color: var(--ink-mid);
-      opacity: 0.7;
+      opacity: 0.65;
     }
 
-    /* ── Responsive ───────────────────────────────────── */
-    @media (max-width: 800px) {
-      .bento {
-        grid-template-columns: 1fr;
-        padding: 0 16px 24px;
-      }
+    /* ── Responsive ─────────────────────────────────────────── */
+    @media (max-width: 820px) {
+      .bento { grid-template-columns: 1fr; padding: 0 18px 18px; gap: 14px; }
       .right-col { grid-column: 1; grid-row: 2; flex-direction: row; }
+      .stamp-note, .stamp-music { flex: 1; }
       .feature-row { grid-column: 1; grid-row: 3; grid-template-columns: 1fr; }
-      nav { padding: 16px; }
+      nav { padding: 18px; }
     }
   </style>
 </head>
 <body>
 
-  <nav>
-    <a class="nav-logo" href="#">
-      <div class="logo-icon">♪</div>
-      SongNotes
-    </a>
-    <a class="nav-btn" href="https://chromewebstore.google.com" target="_blank">
-      ↓ Download
-    </a>
-  </nav>
+<nav>
+  <a class="nav-logo" href="#">
+    <div class="logo-mark">♪</div>
+    SongNotes
+  </a>
+  <a class="nav-cta" href="#">↓ Download</a>
+</nav>
 
-  <div class="bento">
+<div class="bento">
 
-    <!-- LETTER HERO STAMP -->
-    <div class="stamp stamp-letter">
-      <div class="postmark">
-        <span>SongNotes</span>
-        <div class="pm-lines">
-          <i></i><i></i><i></i>
-        </div>
-        <span>2025</span>
-      </div>
+  <!-- LETTER HERO STAMP -->
+  <div class="stamp stamp-letter">
+    <div class="postmark">
+      <span>SongNotes</span>
+      <div class="pm-wave"><i></i><i></i><i></i></div>
+      <span>2025</span>
+    </div>
 
+    <div class="letter-content">
       <div class="letter-tag">✧ a love letter, embedded in a song</div>
 
-      <h1 class="letter-headline">
+      <h1 class="letter-h1">
         Leave a note<br/>
         <em>inside the music.</em>
       </h1>
 
-      <p class="letter-body">
+      <p class="letter-p">
         Attach a private message to any Spotify song — at a specific second,
-        or the very first note. Share a song-letter with one link.
+        or the very first note. Share a song-letter with one quiet link.
       </p>
 
       <div class="letter-actions">
-        <a class="btn-primary" href="https://chromewebstore.google.com" target="_blank">
-          ↓ Download for Chrome
-        </a>
-        <span class="letter-sub">Works on open.spotify.com · No account needed</span>
+        <a class="btn-dl" href="#">↓ Download for Chrome</a>
+        <span class="letter-fine">Works on open.spotify.com · No account</span>
       </div>
     </div>
 
-    <!-- RIGHT COLUMN -->
-    <div class="right-col">
+    <div class="denom">♪ 01</div>
+  </div>
 
-      <!-- Vinyl art stamp -->
-      <div class="stamp stamp-vinyl">
-        <div class="vinyl">
-          <span class="vinyl-label">now playing</span>
-        </div>
+  <!-- RIGHT COLUMN -->
+  <div class="right-col">
+
+    <!-- Note preview — blush -->
+    <div class="stamp stamp-blush stamp-note">
+      <div class="note-for">For Sam · 1:24</div>
+      <div class="note-body">
+        this part — every time I hear it,
+        I think of that night in october.
       </div>
-
-      <!-- Example note stamp -->
-      <div class="stamp stamp-note">
-        <div class="note-for">For Sam · 1:24</div>
-        <div class="note-text">
-          this part — every time I hear it,<br/>
-          I think of that night in october.
-        </div>
-        <div class="note-sig">— a note from you</div>
-      </div>
-
+      <div class="note-sig">— a note from you</div>
     </div>
 
-    <!-- FEATURE ROW -->
-    <div class="feature-row">
-
-      <div class="stamp stamp-feature stamp-blue">
-        <span class="feature-icon">✉</span>
-        <div class="feature-title">A note in music</div>
-        <p class="feature-body">Pin a private message to any track. Arrives exactly when you choose.</p>
+    <!-- Music motif — sea -->
+    <div class="stamp stamp-sea stamp-music">
+      <div class="music-notes">♪ ♫</div>
+      <div class="music-label">
+        <strong>now playing</strong>
+        <span>open.spotify.com</span>
       </div>
-
-      <div class="stamp stamp-feature">
-        <span class="feature-icon">◷</span>
-        <div class="feature-title">At the right moment</div>
-        <p class="feature-body">The note fades in at the second you chose. The chorus, the drop, the silence before.</p>
-      </div>
-
-      <div class="stamp stamp-feature stamp-olive">
-        <span class="feature-icon">↗</span>
-        <div class="feature-title">Send to someone</div>
-        <p class="feature-body">Group notes across multiple songs and share them with one quiet link.</p>
-      </div>
-
     </div>
 
   </div>
 
-  <footer>
-    SongNotes · Works on Spotify Web Player · No account required
-  </footer>
+  <!-- FEATURE ROW -->
+  <div class="feature-row">
+
+    <div class="stamp stamp-sea stamp-feat">
+      <span class="feat-icon">✉</span>
+      <div class="feat-title">A note in music</div>
+      <p class="feat-body">Pin a private message to any track. Arrives exactly when you choose.</p>
+    </div>
+
+    <div class="stamp stamp-feat">
+      <span class="feat-icon">◷</span>
+      <div class="feat-title">At the right moment</div>
+      <p class="feat-body">The note fades in at the second you chose. The chorus, the drop, the silence before.</p>
+    </div>
+
+    <div class="stamp stamp-matcha stamp-feat">
+      <span class="feat-icon">↗</span>
+      <div class="feat-title">Send to someone</div>
+      <p class="feat-body">Group notes across multiple songs and share them with one quiet link.</p>
+    </div>
+
+  </div>
+
+</div>
+
+<footer>SongNotes · Works on Spotify Web Player · No account required</footer>
 
 </body>
 </html>
