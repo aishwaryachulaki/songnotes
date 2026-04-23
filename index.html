@@ -93,51 +93,48 @@
     /* ── Envelope ── */
     .envelope {
       background: var(--blush);
-      border-radius: 22px;
-      padding: 0 18px 18px;
-      box-shadow: 0 8px 36px rgba(58,36,24,0.15);
+      border-radius: 12px;
+      padding: 0 16px 16px;
+      box-shadow:
+        0 12px 48px rgba(58,36,24,0.22),
+        0 2px 8px rgba(58,36,24,0.12);
       display: flex;
       flex-direction: column;
       overflow: hidden;
       position: relative;
     }
 
-    /* Open flap area at top of envelope */
+    /* Open flap area — the envelope V-fold */
     .env-flap {
-      height: 120px;
+      height: 160px;
       position: relative;
       flex-shrink: 0;
-      margin: 0 -18px;
+      margin: 0 -16px;
+      overflow: hidden;
     }
+    /* SVG handles the fold drawing, no pseudo-elements needed */
 
-    /* The open flap V-fold — darker triangle showing inside of envelope */
-    .env-flap::before {
-      content: '';
+    .env-flap svg {
       position: absolute;
       inset: 0;
-      background: rgba(0,0,0,0.08);
-      clip-path: polygon(0 0, 100% 0, 50% 100%);
-    }
-
-    /* Subtle fold crease lines */
-    .env-flap::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background:
-        linear-gradient(to bottom right, transparent calc(50% - 0.5px), rgba(0,0,0,0.12) 50%, transparent calc(50% + 0.5px)),
-        linear-gradient(to bottom left,  transparent calc(50% - 0.5px), rgba(0,0,0,0.12) 50%, transparent calc(50% + 0.5px));
+      width: 100%; height: 100%;
     }
 
     /* The cream letter paper */
     .letter {
-      background: var(--cream);
-      border-radius: 12px;
+      background:
+        radial-gradient(ellipse at 8% 12%, rgba(255,252,240,0.9) 0%, transparent 55%),
+        radial-gradient(ellipse at 92% 88%, rgba(220,190,155,0.35) 0%, transparent 50%),
+        var(--cream);
+      border-radius: 8px;
       padding: 40px 48px 48px;
       position: relative;
       flex: 1;
-      margin-top: -32px;
+      margin-top: -40px;
       z-index: 1;
+      box-shadow:
+        0 -4px 16px rgba(0,0,0,0.1),
+        0 8px 24px rgba(0,0,0,0.06);
     }
 
     /* Postmark */
@@ -375,7 +372,14 @@
 
   <!-- ENVELOPE -->
   <div class="envelope">
-    <div class="env-flap"></div>
+    <div class="env-flap">
+      <!-- SVG fold: lines always go from corners to exact center-bottom -->
+      <svg preserveAspectRatio="none" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="0,0 100,0 50,100" fill="rgba(255,255,255,0.13)"/>
+        <line x1="0" y1="0" x2="50" y2="100" stroke="rgba(58,36,24,0.18)" stroke-width="0.6"/>
+        <line x1="100" y1="0" x2="50" y2="100" stroke="rgba(58,36,24,0.18)" stroke-width="0.6"/>
+      </svg>
+    </div>
     <div class="letter">
       <!-- Postmark stamp -->
       <div class="postmark">
@@ -497,6 +501,16 @@
 
 <!-- FOOTER -->
 <footer>SongNotes &nbsp;·&nbsp; Works on Spotify Web Player &nbsp;·&nbsp; No account required</footer>
+
+<!-- Paper grain overlay — gives the vintage/analog texture -->
+<svg id="grain" xmlns="http://www.w3.org/2000/svg"
+  style="position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:9999;mix-blend-mode:multiply;opacity:0.072">
+  <filter id="gf">
+    <feTurbulence type="fractalNoise" baseFrequency="0.72" numOctaves="4" stitchTiles="stitch"/>
+    <feColorMatrix type="saturate" values="0"/>
+  </filter>
+  <rect width="100%" height="100%" filter="url(#gf)"/>
+</svg>
 
 </body>
 </html>
