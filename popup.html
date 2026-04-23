@@ -1,0 +1,83 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <div class="wrap">
+
+      <!-- Postmark mode banner -->
+      <div id="modeBanner" class="mode-banner mode-editing">
+        <span id="modeLabel">Editing — popups will play on this song</span>
+      </div>
+
+      <!-- Featured track stamp (orange hero) -->
+      <div class="stamp stamp-track track">
+        <div class="stamp-eyebrow">♪ now playing</div>
+        <div id="trackTitle" class="title">Loading…</div>
+        <div id="trackArtist" class="artist"></div>
+        <div class="stamp-denomination">SongNotes</div>
+      </div>
+
+      <!-- Name setup stamp -->
+      <div id="nameBlock" class="stamp stamp-compose name-block hidden">
+        <label>Your name (shown to friends)</label>
+        <div class="row">
+          <input id="senderName" type="text" placeholder="e.g. Sam" />
+          <button id="saveName" class="btn primary">Save</button>
+        </div>
+      </div>
+
+      <!-- Note composer stamp -->
+      <div id="composer" class="stamp stamp-compose composer hidden">
+        <div class="hello">writing as <strong id="whoami">—</strong> · <a href="#" id="changeName">change</a></div>
+        <textarea id="note" placeholder="Write a note for this song…" rows="3"></textarea>
+        <div class="row">
+          <input id="ts" type="text" placeholder="Timestamp (e.g. 1:24) — optional" />
+          <button id="useCurrent" class="btn ghost">Now</button>
+        </div>
+        <div class="row">
+          <button id="save" class="btn primary">Save note</button>
+          <span id="status" class="status"></span>
+        </div>
+      </div>
+
+      <!-- Notes bento grid -->
+      <div class="notes-section-header">
+        <span>Notes for this song</span>
+      </div>
+      <div id="notes" class="notes"></div>
+
+      <!-- Share stamp -->
+      <div class="stamp stamp-share share">
+        <div id="shareSummary" class="share-summary">No notes yet — write one above to start a shared experience.</div>
+        <details class="playlist-details">
+          <summary>Optional: paste a Spotify playlist URL</summary>
+          <input id="playlistUrl" type="text" placeholder="https://open.spotify.com/playlist/…" style="margin-top:6px" />
+        </details>
+        <button id="copyShare" class="btn share-btn">✉ Send all notes</button>
+        <div id="shareInfo" class="share-info"></div>
+        <div class="row" style="gap:6px">
+          <button id="resetShare" class="btn ghost" style="flex:1">New share</button>
+        </div>
+      </div>
+
+      <!-- Import block -->
+      <div class="import-block">
+        <details>
+          <summary>Import a shared letter</summary>
+          <div class="row" style="margin-top:8px">
+            <input id="importId" type="text" placeholder="Paste share link" />
+            <button id="importBtn" class="btn">Import</button>
+          </div>
+          <div id="importStatus" class="status"></div>
+        </details>
+        <div id="previousList" class="previous-list"></div>
+      </div>
+
+    </div>
+    <script src="config.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>

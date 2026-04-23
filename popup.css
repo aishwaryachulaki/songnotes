@@ -1,0 +1,405 @@
+/* SongNotes — Stamp Bento UI (warm yellow/cream/pink palette) */
+* { box-sizing: border-box; }
+
+:root {
+  --r: 6px;
+  --sp: 14px;
+  --stamp: #faf5e0;     /* warm cream paper */
+  --sheet: #f2c94c;     /* golden yellow sheet */
+  --ink: #2a1c0f;
+  --ink-mid: #7a5040;
+  --ink-light: #b09070;
+  --pink: #e8447c;
+  --orange: #f08020;
+  --blue: #5b8ed4;
+  --olive: #8a9c28;
+  --muted: #9a7850;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  background: var(--sheet);
+  color: var(--ink);
+  width: 340px;
+}
+
+.wrap {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.hidden { display: none !important; }
+
+/* ============================================================
+   STAMP BASE
+   ============================================================ */
+
+.stamp {
+  background:
+    radial-gradient(circle at 50% 0,   transparent calc(var(--r) - .5px), var(--stamp) var(--r)) top    / var(--sp) calc(var(--r)*2) repeat-x,
+    radial-gradient(circle at 50% 100%,transparent calc(var(--r) - .5px), var(--stamp) var(--r)) bottom / var(--sp) calc(var(--r)*2) repeat-x,
+    radial-gradient(circle at 0   50%, transparent calc(var(--r) - .5px), var(--stamp) var(--r)) left   / calc(var(--r)*2) var(--sp) repeat-y,
+    radial-gradient(circle at 100% 50%,transparent calc(var(--r) - .5px), var(--stamp) var(--r)) right  / calc(var(--r)*2) var(--sp) repeat-y,
+    var(--stamp);
+  padding: calc(var(--r) + 10px) calc(var(--r) + 12px);
+  position: relative;
+  filter: drop-shadow(0 3px 10px rgba(42,28,15,0.18));
+}
+
+.stamp::after {
+  content: '';
+  position: absolute;
+  inset: calc(var(--r) + 4px);
+  border: 1px solid rgba(42,28,15,0.1);
+  pointer-events: none;
+}
+
+/* ============================================================
+   MODE BANNER — postmark style
+   ============================================================ */
+
+.mode-banner {
+  align-self: center;
+  padding: 5px 14px;
+  border: 2px solid currentColor;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.mode-editing  { color: var(--orange); }
+.mode-inactive { color: var(--blue); }
+.mode-preview  { color: var(--blue); }
+
+/* ============================================================
+   TRACK STAMP — pink hero
+   ============================================================ */
+
+.stamp-track {
+  --stamp: #e8447c;
+}
+
+.stamp-track::after {
+  border-color: rgba(255,255,255,0.2);
+}
+
+.stamp-eyebrow {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: rgba(255,255,255,0.65);
+  margin-bottom: 8px;
+}
+
+.stamp-track .title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.3;
+}
+
+.stamp-track .artist {
+  font-size: 11px;
+  color: rgba(255,255,255,0.72);
+  margin-top: 3px;
+}
+
+.stamp-denomination {
+  margin-top: 12px;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(255,255,255,0.38);
+  text-align: right;
+}
+
+/* ============================================================
+   COMPOSE / NAME STAMP
+   ============================================================ */
+
+.stamp-compose {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hello { font-size: 11px; color: var(--ink-mid); font-style: italic; }
+.hello strong { color: var(--ink); font-style: normal; font-weight: 700; }
+.hello a { color: var(--orange); text-decoration: none; font-weight: 600; }
+.hello a:hover { text-decoration: underline; }
+
+label {
+  font-size: 10px;
+  color: var(--ink-mid);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  display: block;
+  margin-bottom: 3px;
+}
+
+textarea, input[type="text"] {
+  width: 100%;
+  background: rgba(255,252,245,0.9);
+  border: 1px solid rgba(42,28,15,0.14);
+  color: var(--ink);
+  border-radius: 4px;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 13px;
+  resize: vertical;
+}
+textarea:focus, input:focus {
+  outline: none;
+  border-color: var(--orange);
+  box-shadow: 0 0 0 2px rgba(240,128,32,0.18);
+}
+
+.row { display: flex; gap: 8px; align-items: center; }
+.row input { flex: 1; }
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+
+.btn {
+  background: rgba(42,28,15,0.08);
+  border: 1px solid rgba(42,28,15,0.16);
+  color: var(--ink);
+  border-radius: 4px;
+  padding: 8px 12px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.14s ease;
+  white-space: nowrap;
+}
+.btn:hover { background: rgba(42,28,15,0.14); }
+
+.btn.primary { background: var(--orange); color: #fff; border-color: var(--orange); }
+.btn.primary:hover { background: #f89030; }
+
+.btn.ghost { background: transparent; border-color: transparent; color: var(--ink-mid); }
+.btn.ghost:hover { background: rgba(42,28,15,0.07); }
+
+.status { font-size: 11px; color: var(--ink-mid); }
+
+/* ============================================================
+   SHARE STAMP
+   ============================================================ */
+
+.stamp-share {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.share-summary {
+  font-size: 12px;
+  color: var(--ink-mid);
+  line-height: 1.55;
+  font-style: italic;
+}
+
+.share-info {
+  font-size: 11px;
+  color: var(--ink-mid);
+  word-break: break-all;
+  line-height: 1.5;
+}
+.share-info a { color: var(--orange); font-weight: 600; }
+
+.playlist-details summary {
+  font-size: 11px;
+  color: var(--ink-mid);
+  cursor: pointer;
+}
+
+.btn.share-btn {
+  width: 100%;
+  background: linear-gradient(135deg, var(--orange), #e06010);
+  color: #fff;
+  border: none;
+  font-weight: 700;
+  padding: 12px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 12px;
+  box-shadow: 0 4px 16px rgba(240,128,32,0.3);
+}
+.btn.share-btn:hover { opacity: 0.9; }
+
+/* ============================================================
+   NOTES SECTION HEADER
+   ============================================================ */
+
+.notes-section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.notes-section-header span {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--ink-mid);
+  font-weight: 700;
+  white-space: nowrap;
+  opacity: 0.7;
+}
+.notes-section-header::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(42,28,15,0.15);
+}
+
+/* ============================================================
+   NOTES — 2-column bento grid of mini stamps
+   ============================================================ */
+
+#notes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  align-items: start;
+  max-height: 220px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(42,28,15,0.2) transparent;
+}
+
+.note {
+  --r: 5px;
+  --sp: 12px;
+  --stamp: #faf5e0;
+  background:
+    radial-gradient(circle at 50% 0,   transparent calc(var(--r) - .5px), var(--stamp) var(--r)) top    / var(--sp) calc(var(--r)*2) repeat-x,
+    radial-gradient(circle at 50% 100%,transparent calc(var(--r) - .5px), var(--stamp) var(--r)) bottom / var(--sp) calc(var(--r)*2) repeat-x,
+    radial-gradient(circle at 0   50%, transparent calc(var(--r) - .5px), var(--stamp) var(--r)) left   / calc(var(--r)*2) var(--sp) repeat-y,
+    radial-gradient(circle at 100% 50%,transparent calc(var(--r) - .5px), var(--stamp) var(--r)) right  / calc(var(--r)*2) var(--sp) repeat-y,
+    var(--stamp);
+  padding: calc(var(--r) + 7px) calc(var(--r) + 8px);
+  padding-right: calc(var(--r) + 22px);
+  position: relative;
+  filter: drop-shadow(0 2px 6px rgba(42,28,15,0.18));
+  font-size: 11px;
+  color: var(--ink);
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.note .meta {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--pink);
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+.note .del {
+  position: absolute;
+  top: calc(var(--r) + 3px);
+  right: calc(var(--r) + 3px);
+  background: none;
+  border: none;
+  color: rgba(42,28,15,0.28);
+  cursor: pointer;
+  font-size: 15px;
+  width: 17px;
+  height: 17px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  line-height: 1;
+}
+.note .del:hover { color: var(--pink); background: rgba(232,68,124,0.1); }
+
+.empty {
+  font-size: 11px;
+  color: var(--muted);
+  padding: 6px 0;
+  grid-column: 1 / -1;
+  font-style: italic;
+  text-align: center;
+  opacity: 0.7;
+}
+
+/* ============================================================
+   IMPORT BLOCK — sits on yellow sheet
+   ============================================================ */
+
+.import-block summary {
+  font-size: 11px;
+  color: var(--ink-mid);
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  opacity: 0.8;
+}
+.import-block summary:hover { opacity: 1; }
+.import-block .status { color: var(--ink-mid); }
+
+.import-block input[type="text"] {
+  background: rgba(42,28,15,0.07);
+  border-color: rgba(42,28,15,0.16);
+  color: var(--ink);
+}
+.import-block input[type="text"]::placeholder { color: var(--muted); }
+.import-block .btn {
+  background: rgba(42,28,15,0.08);
+  border-color: rgba(42,28,15,0.16);
+  color: var(--ink);
+}
+.import-block .btn:hover { background: rgba(42,28,15,0.14); }
+
+.previous-list {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.prev-header {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
+  color: var(--ink-mid);
+  font-weight: 700;
+  margin-top: 4px;
+  opacity: 0.6;
+}
+
+.prev-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: rgba(42,28,15,0.07);
+  border: 1px solid rgba(42,28,15,0.14);
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+.prev-meta { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.prev-title { font-size: 11px; color: var(--ink); font-weight: 500; }
+.prev-sub { font-size: 10px; color: var(--muted); }
+.prev-activate {
+  font-size: 10px;
+  padding: 4px 10px;
+  background: transparent;
+  border-color: rgba(42,28,15,0.18);
+  color: var(--ink-mid);
+}
+.prev-activate:hover {
+  background: rgba(42,28,15,0.1);
+  color: var(--ink);
+}

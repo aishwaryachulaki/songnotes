@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SongNotes — A letter for you</title>
+  <style>
+    /* ── Palette matches extension ── */
+    :root {
+      --sheet:      #1a0f1f;
+      --panel:      #2a1a30;
+      --border:     #3d2740;
+      --text:       #f5ede4;
+      --muted:      #b9a8a0;
+      --peach:      #e8a87c;
+      --peach-dark: #c97b63;
+      --ink:        #2a1c0f;
+      --stamp:      #f5ede4;
+      --r: 7px;
+      --sp: 16px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--sheet);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      min-height: 100vh;
+      padding: 40px 16px 60px;
+    }
+
+    /* ── Layout ── */
+    .page { max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+
+    /* ── Stamp base ── */
+    .stamp {
+      background:
+        radial-gradient(circle at 50% 0,   transparent calc(var(--r) - .5px), var(--stamp) var(--r)) top    / var(--sp) calc(var(--r)*2) repeat-x,
+        radial-gradient(circle at 50% 100%,transparent calc(var(--r) - .5px), var(--stamp) var(--r)) bottom / var(--sp) calc(var(--r)*2) repeat-x,
+        radial-gradient(circle at 0   50%, transparent calc(var(--r) - .5px), var(--stamp) var(--r)) left   / calc(var(--r)*2) var(--sp) repeat-y,
+        radial-gradient(circle at 100% 50%,transparent calc(var(--r) - .5px), var(--stamp) var(--r)) right  / calc(var(--r)*2) var(--sp) repeat-y,
+        var(--stamp);
+      padding: calc(var(--r) + 14px) calc(var(--r) + 18px);
+      position: relative;
+      filter: drop-shadow(0 6px 20px rgba(0,0,0,0.5));
+      color: var(--ink);
+    }
+    .stamp::after {
+      content: '';
+      position: absolute;
+      inset: calc(var(--r) + 5px);
+      border: 1px solid rgba(42,28,15,0.12);
+      pointer-events: none;
+    }
+
+    /* ── Header stamp ── */
+    .header-stamp { --stamp: #e8a87c; }
+    .header-stamp::after { border-color: rgba(42,28,15,0.14); }
+
+    .eyebrow {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: rgba(42,28,15,0.5);
+      margin-bottom: 10px;
+    }
+    .sender-name {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.2;
+    }
+    .sender-sub {
+      font-size: 13px;
+      color: rgba(42,28,15,0.6);
+      margin-top: 6px;
+    }
+    .denomination {
+      margin-top: 16px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: rgba(42,28,15,0.32);
+      text-align: right;
+    }
+
+    /* ── Song group ── */
+    .song-group { display: flex; flex-direction: column; gap: 10px; }
+
+    .song-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.13em;
+      color: var(--muted);
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .song-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .song-title-block {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 2px;
+    }
+    .song-title-block strong { font-size: 14px; color: var(--text); }
+    .song-title-block span  { font-size: 12px; color: var(--muted); }
+
+    /* ── Note stamps — 2-col bento ── */
+    .notes-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .note-stamp {
+      --stamp: #f5ede4;
+      --r: 6px;
+      --sp: 13px;
+      background:
+        radial-gradient(circle at 50% 0,   transparent calc(var(--r) - .5px), var(--stamp) var(--r)) top    / var(--sp) calc(var(--r)*2) repeat-x,
+        radial-gradient(circle at 50% 100%,transparent calc(var(--r) - .5px), var(--stamp) var(--r)) bottom / var(--sp) calc(var(--r)*2) repeat-x,
+        radial-gradient(circle at 0   50%, transparent calc(var(--r) - .5px), var(--stamp) var(--r)) left   / calc(var(--r)*2) var(--sp) repeat-y,
+        radial-gradient(circle at 100% 50%,transparent calc(var(--r) - .5px), var(--stamp) var(--r)) right  / calc(var(--r)*2) var(--sp) repeat-y,
+        var(--stamp);
+      padding: calc(var(--r) + 10px) calc(var(--r) + 12px);
+      filter: drop-shadow(0 3px 10px rgba(0,0,0,0.42));
+      color: var(--ink);
+    }
+
+    .note-ts {
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--peach-dark);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 6px;
+    }
+    .note-text {
+      font-size: 13px;
+      line-height: 1.55;
+      color: #2a1c0f;
+      white-space: pre-wrap;
+    }
+
+    /* ── Import button ── */
+    .import-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      padding: 20px 0 4px;
+    }
+
+    .btn-import {
+      background: linear-gradient(135deg, var(--peach), var(--peach-dark));
+      color: var(--sheet);
+      border: none;
+      border-radius: 6px;
+      padding: 14px 28px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.06em;
+      box-shadow: 0 6px 20px rgba(232,168,124,0.3);
+      transition: opacity 0.15s;
+    }
+    .btn-import:hover { opacity: 0.88; }
+    .btn-import:disabled { opacity: 0.45; cursor: default; }
+
+    .import-note {
+      font-size: 11px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.6;
+    }
+    .import-note strong { color: var(--text); }
+
+    /* ── States ── */
+    .state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .state strong { color: var(--text); display: block; font-size: 18px; margin-bottom: 8px; }
+
+    .imported-banner {
+      background: rgba(232,168,124,0.12);
+      border: 1px solid rgba(232,168,124,0.3);
+      border-radius: 8px;
+      padding: 14px 18px;
+      font-size: 13px;
+      color: var(--peach);
+      text-align: center;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+<div class="page" id="page">
+  <div class="state" id="loading">
+    <strong>Opening your letter…</strong>
+    Fetching notes from the cloud
+  </div>
+</div>
+
+<script>
+  // ── Config (keep in sync with config.js) ──────────────────
+  const SUPABASE_URL = "https://earyrktanwypmffzxedd.supabase.co";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVhcnlya3Rhbnd5cG1mZnp4ZWRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MDA5OTEsImV4cCI6MjA5MTk3Njk5MX0.QjUyEDkvSJh7olYe2Aij-s9j4d7ch8Fvyn2UPtTLnrg";
+
+  // ── Helpers ───────────────────────────────────────────────
+  function getShareId() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("id")) return params.get("id");
+    // fallback: /share/SHARE_ID path segment
+    const m = window.location.pathname.match(/\/share\/([a-z0-9_-]+)/i);
+    return m ? m[1] : null;
+  }
+
+  function formatTs(sec) {
+    if (sec == null) return "Song start";
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${m}:${String(s).padStart(2, "0")}`;
+  }
+
+  function escHtml(s) {
+    return String(s).replace(/[&<>"']/g, c =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  }
+
+  async function fetchJson(url) {
+    const res = await fetch(url, {
+      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }
+    });
+    if (!res.ok) return null;
+    return res.json();
+  }
+
+  // ── Render ────────────────────────────────────────────────
+  function render(shareId, meta, notes) {
+    const page = document.getElementById("page");
+    const sender = meta?.sender_name || notes[0]?.sender_name || "someone";
+
+    // Group notes by track
+    const byTrack = {};
+    notes.forEach(n => {
+      const key = n.track_id;
+      if (!byTrack[key]) byTrack[key] = { title: n.track_title, artist: n.track_artist, notes: [] };
+      byTrack[key].notes.push(n);
+    });
+    Object.values(byTrack).forEach(g =>
+      g.notes.sort((a, b) => (a.timestamp ?? -1) - (b.timestamp ?? -1))
+    );
+
+    let html = `
+      <div class="stamp header-stamp">
+        <div class="eyebrow">✉ a letter from</div>
+        <div class="sender-name">${escHtml(sender)}</div>
+        <div class="sender-sub">chose ${notes.length} moment${notes.length === 1 ? "" : "s"} across ${Object.keys(byTrack).length} song${Object.keys(byTrack).length === 1 ? "" : "s"} just for you</div>
+        <div class="denomination">SongNotes</div>
+      </div>
+    `;
+
+    Object.values(byTrack).forEach(group => {
+      html += `<div class="song-group">`;
+      html += `<div class="song-label">Song</div>`;
+      html += `<div class="song-title-block">
+        <strong>${escHtml(group.title || "Unknown track")}</strong>
+        <span>${escHtml(group.artist || "")}</span>
+      </div>`;
+      html += `<div class="notes-grid">`;
+      group.notes.forEach(n => {
+        html += `
+          <div class="note-stamp">
+            <div class="note-ts">${escHtml(formatTs(n.timestamp))}</div>
+            <div class="note-text">${escHtml(n.note)}</div>
+          </div>
+        `;
+      });
+      html += `</div></div>`;
+    });
+
+    // Import section
+    html += `
+      <div class="import-area">
+        <button class="btn-import" id="importBtn">
+          ♫ Import into SongNotes extension
+        </button>
+        <div class="import-note" id="importNote">
+          Opens in your Spotify — notes will pop up as you listen.<br/>
+          <strong>Requires the SongNotes Chrome extension.</strong>
+        </div>
+      </div>
+    `;
+
+    page.innerHTML = html;
+
+    // Set the payload for share-bridge.js (if extension is installed)
+    window.__SN_PAYLOAD = { share_id: shareId, share: meta || {}, notes };
+    window.dispatchEvent(new CustomEvent("songnotes:import", { detail: window.__SN_PAYLOAD }));
+
+    // Manual import button
+    document.getElementById("importBtn").addEventListener("click", () => {
+      window.__SN_PAYLOAD = { share_id: shareId, share: meta || {}, notes };
+      window.dispatchEvent(new CustomEvent("songnotes:import", { detail: window.__SN_PAYLOAD }));
+
+      window.addEventListener("songnotes:imported", (e) => {
+        const btn = document.getElementById("importBtn");
+        const note = document.getElementById("importNote");
+        if (btn) btn.disabled = true;
+        if (note) note.innerHTML = `<span style="color:var(--peach)">✓ Imported! Open Spotify and hit play.</span>`;
+      }, { once: true });
+
+      // If no response in 2s, extension probably not installed
+      setTimeout(() => {
+        const btn = document.getElementById("importBtn");
+        if (btn && !btn.disabled) {
+          document.getElementById("importNote").innerHTML =
+            `SongNotes extension not detected. <strong>Install it, then paste this link in the Import field.</strong>`;
+        }
+      }, 2000);
+    });
+  }
+
+  // ── Main ──────────────────────────────────────────────────
+  (async () => {
+    const shareId = getShareId();
+    const page = document.getElementById("page");
+
+    if (!shareId) {
+      page.innerHTML = `<div class="state"><strong>No letter here</strong>You need a share link to open a letter.</div>`;
+      return;
+    }
+
+    const [meta, notes] = await Promise.all([
+      fetchJson(`${SUPABASE_URL}/rest/v1/shares?id=eq.${encodeURIComponent(shareId)}&select=*`)
+        .then(r => (Array.isArray(r) ? r[0] : null)),
+      fetchJson(`${SUPABASE_URL}/rest/v1/annotations?share_id=eq.${encodeURIComponent(shareId)}&select=*`)
+        .then(r => Array.isArray(r) ? r : []),
+    ]);
+
+    if (!notes.length && !meta) {
+      page.innerHTML = `<div class="state"><strong>Letter not found</strong>This link may be invalid or the notes were removed.</div>`;
+      return;
+    }
+
+    document.title = `SongNotes — a letter from ${meta?.sender_name || "someone"}`;
+    render(shareId, meta, notes);
+  })();
+</script>
+</body>
+</html>
