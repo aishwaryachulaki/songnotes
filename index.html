@@ -87,6 +87,7 @@
       max-width: 1240px;
       margin: 0 auto;
       align-items: stretch;
+      min-height: 560px;
     }
 
     /* ── Envelope ── */
@@ -103,7 +104,7 @@
 
     /* Open flap area at top of envelope */
     .env-flap {
-      height: 80px;
+      height: 120px;
       position: relative;
       flex-shrink: 0;
       margin: 0 -18px;
@@ -132,10 +133,10 @@
     .letter {
       background: var(--cream);
       border-radius: 12px;
-      padding: 32px 36px 36px;
+      padding: 40px 48px 48px;
       position: relative;
       flex: 1;
-      margin-top: -24px;
+      margin-top: -32px;
       z-index: 1;
     }
 
@@ -186,11 +187,11 @@
     }
 
     .letter-h1 {
-      font-size: clamp(34px, 3.8vw, 50px);
+      font-size: clamp(38px, 4.2vw, 56px);
       font-weight: 800;
-      line-height: 1.14;
+      line-height: 1.12;
       color: var(--ink);
-      margin-bottom: 16px;
+      margin-bottom: 18px;
     }
     .letter-h1 em {
       font-style: italic;
@@ -199,11 +200,11 @@
     }
 
     .letter-p {
-      font-size: 15px;
+      font-size: 16px;
       color: var(--ink-mid);
       line-height: 1.72;
-      max-width: 400px;
-      margin-bottom: 34px;
+      max-width: 420px;
+      margin-bottom: 40px;
     }
 
     .btn-dl {
