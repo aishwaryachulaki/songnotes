@@ -79,7 +79,7 @@
         radial-gradient(circle at 50% 100%,transparent calc(var(--r) - .5px), var(--sc) var(--r)) bottom / var(--sp) calc(var(--r)*2) repeat-x,
         radial-gradient(circle at 0   50%, transparent calc(var(--r) - .5px), var(--sc) var(--r)) left   / calc(var(--r)*2) var(--sp) repeat-y,
         radial-gradient(circle at 100% 50%,transparent calc(var(--r) - .5px), var(--sc) var(--r)) right  / calc(var(--r)*2) var(--sp) repeat-y,
-        var(--sc);
+        linear-gradient(var(--sc), var(--sc)) var(--r) var(--r) / calc(100% - 2 * var(--r)) calc(100% - 2 * var(--r)) no-repeat;
       position: relative;
       box-shadow: 0 6px 20px rgba(58,36,24,0.13);
     }

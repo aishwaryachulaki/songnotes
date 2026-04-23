@@ -35,7 +35,7 @@ body {
     radial-gradient(circle at 50% 100%,transparent calc(var(--r) - .5px), var(--stamp) var(--r)) bottom / var(--sp) calc(var(--r)*2) repeat-x,
     radial-gradient(circle at 0   50%, transparent calc(var(--r) - .5px), var(--stamp) var(--r)) left   / calc(var(--r)*2) var(--sp) repeat-y,
     radial-gradient(circle at 100% 50%,transparent calc(var(--r) - .5px), var(--stamp) var(--r)) right  / calc(var(--r)*2) var(--sp) repeat-y,
-    var(--stamp);
+    linear-gradient(var(--stamp), var(--stamp)) var(--r) var(--r) / calc(100% - 2 * var(--r)) calc(100% - 2 * var(--r)) no-repeat;
   padding: calc(var(--r) + 10px) calc(var(--r) + 12px);
   position: relative;
   box-shadow: 0 4px 14px rgba(58,36,24,0.18);
@@ -232,11 +232,11 @@ label {
     radial-gradient(circle at 50% 100%,transparent calc(var(--r) - .5px), var(--stamp) var(--r)) bottom / var(--sp) calc(var(--r)*2) repeat-x,
     radial-gradient(circle at 0   50%, transparent calc(var(--r) - .5px), var(--stamp) var(--r)) left   / calc(var(--r)*2) var(--sp) repeat-y,
     radial-gradient(circle at 100% 50%,transparent calc(var(--r) - .5px), var(--stamp) var(--r)) right  / calc(var(--r)*2) var(--sp) repeat-y,
-    var(--stamp);
+    linear-gradient(var(--stamp), var(--stamp)) var(--r) var(--r) / calc(100% - 2 * var(--r)) calc(100% - 2 * var(--r)) no-repeat;
   padding: calc(var(--r) + 7px) calc(var(--r) + 8px);
   padding-right: calc(var(--r) + 22px);
   position: relative;
-  filter: drop-shadow(0 2px 6px rgba(58,36,24,0.14));
+  box-shadow: 0 2px 6px rgba(58,36,24,0.14);
   font-size: 11px;
   color: var(--ink);
   line-height: 1.5;
