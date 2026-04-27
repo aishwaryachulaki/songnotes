@@ -61,6 +61,12 @@
       color: #fff;
       line-height: 1.15;
     }
+    .recipient-line {
+      font-size: 13px;
+      color: rgba(255,251,244,0.72);
+      margin-top: 4px;
+    }
+    .recipient-line strong { color: #fff; font-weight: 700; }
     .sender-sub {
       font-size: 13px;
       color: rgba(255,251,244,0.72);
@@ -354,11 +360,13 @@
     );
 
     const trackCount = Object.keys(byTrack).length;
+    const recipient = meta?.recipient_name || null;
 
     let html = `
       <div class="header-card">
         <div class="eyebrow">✉ a letter from</div>
         <div class="sender-name">${escHtml(sender)}</div>
+        ${recipient ? `<div class="recipient-line">for <strong>${escHtml(recipient)}</strong></div>` : ""}
         <div class="sender-sub">chose ${notes.length} moment${notes.length === 1 ? "" : "s"} across ${trackCount} song${trackCount === 1 ? "" : "s"} just for you</div>
         <div class="denomination">SongNotes</div>
       </div>

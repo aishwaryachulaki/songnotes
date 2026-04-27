@@ -214,6 +214,7 @@ async function pushShareMeta(share) {
         playlist_id: share.playlist_id,
         playlist_url: share.playlist_url,
         sender_name: share.sender_name || senderName || "someone",
+        recipient_name: share.recipient_name || null,
       }),
     });
   } catch {}
