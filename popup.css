@@ -1,5 +1,6 @@
-/* SongNotes — Official Palette
-   Tangerine #F08C21 · Butter #F2D88F · Blush #E36888 · Sea #6698CC · Matcha #B4B534 */
+/* SongNotes — Simplified UI
+   Palette: Tangerine #F08C21 · Butter #F2D88F · Blush #E36888 · Sea #6698CC · Cream #FFFBF4 */
+
 * { box-sizing: border-box; }
 
 :root {
@@ -12,9 +13,6 @@
   --ink:       #3a2418;
   --ink-mid:   #8a5a48;
   --ink-lt:    #c4977a;
-  --r:  7px;   /* perforation radius */
-  --sp: 15px;  /* perforation spacing */
-  --stamp: var(--blush); /* default stamp colour */
 }
 
 body {
@@ -25,95 +23,34 @@ body {
   width: 340px;
 }
 
-.wrap { padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+.wrap { padding: 12px; display: flex; flex-direction: column; gap: 8px; }
 .hidden { display: none !important; }
 
-/* ── Stamp base with scalloped perforations ─────────────── */
+/* ── Stamp → plain card ── */
 .stamp {
-  background:
-    radial-gradient(circle at 50% 0,   transparent calc(var(--r) - .5px), var(--stamp) var(--r)) top    / var(--sp) calc(var(--r)*2) repeat-x,
-    radial-gradient(circle at 50% 100%,transparent calc(var(--r) - .5px), var(--stamp) var(--r)) bottom / var(--sp) calc(var(--r)*2) repeat-x,
-    radial-gradient(circle at 0   50%, transparent calc(var(--r) - .5px), var(--stamp) var(--r)) left   / calc(var(--r)*2) var(--sp) repeat-y,
-    radial-gradient(circle at 100% 50%,transparent calc(var(--r) - .5px), var(--stamp) var(--r)) right  / calc(var(--r)*2) var(--sp) repeat-y,
-    linear-gradient(var(--stamp), var(--stamp)) var(--r) var(--r) / calc(100% - 2 * var(--r)) calc(100% - 2 * var(--r)) no-repeat;
-  padding: calc(var(--r) + 10px) calc(var(--r) + 12px);
-  position: relative;
-  box-shadow: 0 4px 14px rgba(58,36,24,0.18);
+  background: var(--blush);
+  border-radius: 10px;
+  padding: 12px 14px;
 }
 
-/* inner frame */
-.stamp::after {
-  content: '';
-  position: absolute;
-  inset: calc(var(--r) + 4px);
-  border: 1.5px solid rgba(255,251,244,0.25);
-  border-radius: 2px;
-  pointer-events: none;
-}
-
-/* inputs + textareas on blush stamps */
-.stamp textarea,
-.stamp input[type="text"] {
-  background: rgba(255,251,244,0.92);
-  border: 1.5px solid rgba(255,251,244,0.35);
-  color: var(--ink);
-  border-radius: 12px;
-  width: 100%;
-  padding: 8px 11px;
-  font: inherit;
-  font-size: 13px;
-  resize: vertical;
-}
-.stamp textarea:focus,
-.stamp input[type="text"]:focus {
-  outline: none;
-  border-color: var(--tangerine);
-  box-shadow: 0 0 0 3px rgba(240,140,33,0.2);
-}
-
-/* ── Mode banner — postmark ring ────────────────────────── */
-.mode-banner {
-  align-self: center;
-  padding: 5px 16px;
-  border: 2px solid currentColor;
-  border-radius: 20px;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
-  text-align: center;
-  background: rgba(255,251,244,0.45);
-}
-.mode-editing  { color: var(--tangerine); border-color: var(--tangerine); }
-.mode-inactive { color: var(--sea);       border-color: var(--sea);       }
-.mode-preview  { color: var(--sea);       border-color: var(--sea);       }
-
-/* ── Track stamp — blush hero ───────────────────────────── */
-.stamp-track { --stamp: var(--blush); }
-
+/* track card */
+.stamp-track { background: var(--blush); }
 .stamp-eyebrow {
   font-size: 9px;
   text-transform: uppercase;
-  letter-spacing: 0.15em;
-  color: rgba(255,251,244,0.6);
-  margin-bottom: 8px;
+  letter-spacing: 0.14em;
+  color: rgba(255,251,244,0.65);
+  margin-bottom: 5px;
 }
-.stamp-track .title  { font-size: 16px; font-weight: 700; color: #fff; line-height: 1.3; }
-.stamp-track .artist { font-size: 11px; color: rgba(255,251,244,0.72); margin-top: 3px; }
-.stamp-denomination  {
-  margin-top: 10px;
-  font-size: 9px;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: rgba(255,251,244,0.38);
-  text-align: right;
-}
+.stamp-track .title  { font-size: 15px; font-weight: 700; color: #fff; line-height: 1.3; }
+.stamp-track .artist { font-size: 11px; color: rgba(255,251,244,0.7); margin-top: 2px; }
+.stamp-denomination  { display: none; } /* too decorative for work mode */
 
-/* ── Compose / Name stamp — blush ───────────────────────── */
+/* compose / name card */
 .stamp-compose { display: flex; flex-direction: column; gap: 8px; }
 
-.hello { font-size: 11px; color: rgba(255,251,244,0.82); font-style: italic; }
-.hello strong { color: #fff; font-style: normal; font-weight: 700; }
+.hello { font-size: 11px; color: rgba(255,251,244,0.85); }
+.hello strong { color: #fff; font-weight: 700; }
 .hello a { color: var(--butter); text-decoration: none; font-weight: 600; }
 .hello a:hover { text-decoration: underline; }
 
@@ -126,22 +63,88 @@ label {
   margin-bottom: 3px;
 }
 
-.row { display: flex; gap: 8px; align-items: center; }
-.row input { flex: 1; }
+/* inputs inside blush cards */
+.stamp textarea,
+.stamp input[type="text"] {
+  background: rgba(255,251,244,0.92);
+  border: 1.5px solid rgba(255,251,244,0.3);
+  color: var(--ink);
+  border-radius: 8px;
+  width: 100%;
+  padding: 7px 10px;
+  font: inherit;
+  font-size: 13px;
+  resize: vertical;
+}
+.stamp textarea:focus,
+.stamp input[type="text"]:focus {
+  outline: none;
+  border-color: var(--tangerine);
+  box-shadow: 0 0 0 3px rgba(240,140,33,0.2);
+}
 
-/* ── Buttons ─────────────────────────────────────────────── */
+.row { display: flex; gap: 8px; align-items: stretch; }
+.row input { flex: 1; }
+/* Button in a row stretches to match input height; text stays centred */
+.row > .btn { display: flex; align-items: center; justify-content: center; }
+
+/* ── Timestamp row ── */
+.timestamp-row {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+}
+.timestamp-input {
+  flex: 1;
+  height: 44px;
+  padding: 0 12px !important;
+  line-height: 1;
+}
+.now-btn {
+  flex: 1;
+  height: 44px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  background: var(--tangerine);
+  border-color: var(--tangerine);
+  box-shadow: 0 3px 10px rgba(240,140,33,0.3);
+}
+.now-btn:hover { background: #f09a30; border-color: #f09a30; }
+
+/* ── Mode banner ── */
+.mode-banner {
+  align-self: center;
+  padding: 4px 14px;
+  border: 1.5px solid currentColor;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: rgba(255,251,244,0.4);
+}
+.mode-editing  { color: var(--tangerine); }
+.mode-inactive { color: var(--sea); }
+.mode-preview  { color: var(--sea); }
+
+/* ── Buttons ── */
 .btn {
   background: rgba(255,251,244,0.18);
   border: 1.5px solid rgba(255,251,244,0.3);
   color: #fff;
-  border-radius: 20px;
-  padding: 8px 14px;
+  border-radius: 8px;
+  padding: 7px 13px;
   font: inherit;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease;
   white-space: nowrap;
+  transition: background 0.12s;
 }
 .btn:hover { background: rgba(255,251,244,0.28); }
 
@@ -149,7 +152,6 @@ label {
   background: var(--tangerine);
   color: #fff;
   border-color: var(--tangerine);
-  box-shadow: 0 4px 12px rgba(240,140,33,0.35);
 }
 .btn.primary:hover { background: #f09a30; }
 
@@ -162,18 +164,16 @@ label {
 
 .status { font-size: 11px; color: rgba(255,251,244,0.65); }
 
-/* ── Share stamp ─────────────────────────────────────────── */
-.stamp-share { display: flex; flex-direction: column; gap: 10px; }
+/* ── Share card ── */
+.stamp-share { display: flex; flex-direction: column; gap: 8px; }
 
 .share-summary {
   font-size: 12px;
   color: rgba(255,251,244,0.8);
-  line-height: 1.55;
-  font-style: italic;
+  line-height: 1.5;
 }
 .share-info { font-size: 11px; color: rgba(255,251,244,0.7); word-break: break-all; line-height: 1.5; }
 .share-info a { color: var(--butter); font-weight: 600; }
-.playlist-details summary { font-size: 11px; color: rgba(255,251,244,0.7); cursor: pointer; }
 
 .btn.share-btn {
   width: 100%;
@@ -181,15 +181,13 @@ label {
   color: #fff;
   border: none;
   font-weight: 700;
-  padding: 12px;
-  border-radius: 20px;
-  letter-spacing: 0.08em;
+  padding: 10px;
+  border-radius: 8px;
   font-size: 12px;
-  box-shadow: 0 6px 18px rgba(240,140,33,0.38);
 }
 .btn.share-btn:hover { background: #f09a30; }
 
-/* ── Notes section header ───────────────────────────────── */
+/* ── Notes section header ── */
 .notes-section-header {
   display: flex;
   align-items: center;
@@ -198,7 +196,7 @@ label {
 .notes-section-header span {
   font-size: 9px;
   text-transform: uppercase;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.13em;
   color: var(--ink-mid);
   font-weight: 700;
   white-space: nowrap;
@@ -208,14 +206,14 @@ label {
   content: '';
   flex: 1;
   height: 1px;
-  background: rgba(58,36,24,0.15);
+  background: rgba(58,36,24,0.18);
 }
 
-/* ── Notes bento grid — cream mini stamps ───────────────── */
+/* ── Notes grid — simple cream cards ── */
 #notes {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  gap: 6px;
   align-items: start;
   max-height: 220px;
   overflow-y: auto;
@@ -224,19 +222,10 @@ label {
 }
 
 .note {
-  --r: 5px;
-  --sp: 12px;
-  --stamp: var(--cream);
-  background:
-    radial-gradient(circle at 50% 0,   transparent calc(var(--r) - .5px), var(--stamp) var(--r)) top    / var(--sp) calc(var(--r)*2) repeat-x,
-    radial-gradient(circle at 50% 100%,transparent calc(var(--r) - .5px), var(--stamp) var(--r)) bottom / var(--sp) calc(var(--r)*2) repeat-x,
-    radial-gradient(circle at 0   50%, transparent calc(var(--r) - .5px), var(--stamp) var(--r)) left   / calc(var(--r)*2) var(--sp) repeat-y,
-    radial-gradient(circle at 100% 50%,transparent calc(var(--r) - .5px), var(--stamp) var(--r)) right  / calc(var(--r)*2) var(--sp) repeat-y,
-    linear-gradient(var(--stamp), var(--stamp)) var(--r) var(--r) / calc(100% - 2 * var(--r)) calc(100% - 2 * var(--r)) no-repeat;
-  padding: calc(var(--r) + 7px) calc(var(--r) + 8px);
-  padding-right: calc(var(--r) + 22px);
+  background: var(--cream);
+  border-radius: 8px;
+  padding: 8px 28px 8px 10px;
   position: relative;
-  box-shadow: 0 2px 6px rgba(58,36,24,0.14);
   font-size: 11px;
   color: var(--ink);
   line-height: 1.5;
@@ -247,27 +236,27 @@ label {
   font-weight: 700;
   color: var(--tangerine);
   letter-spacing: 0.05em;
-  margin-bottom: 4px;
+  margin-bottom: 3px;
   text-transform: uppercase;
 }
 .note .del {
   position: absolute;
-  top: calc(var(--r) + 3px);
-  right: calc(var(--r) + 3px);
+  top: 6px;
+  right: 6px;
   background: none;
   border: none;
   color: rgba(58,36,24,0.25);
   cursor: pointer;
-  font-size: 15px;
-  width: 17px; height: 17px;
+  font-size: 14px;
+  width: 18px; height: 18px;
   padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 3px;
+  border-radius: 4px;
   line-height: 1;
 }
-.note .del:hover { color: var(--blush); background: rgba(227,104,136,0.1); }
+.note .del:hover { color: var(--blush); background: rgba(227,104,136,0.12); }
 
 .empty {
   font-size: 11px;
@@ -279,18 +268,18 @@ label {
   opacity: 0.6;
 }
 
-/* ── Import block — sits on butter sheet ────────────────── */
+/* ── Import block ── */
 .import-block summary { font-size: 11px; color: var(--ink-mid); cursor: pointer; opacity: 0.75; }
 .import-block summary:hover { opacity: 1; }
 .import-block .status { color: var(--ink-mid); font-size: 11px; }
 
 .import-block input[type="text"] {
   width: 100%;
-  background: rgba(58,36,24,0.07);
+  background: rgba(58,36,24,0.06);
   border: 1.5px solid rgba(58,36,24,0.14);
   color: var(--ink);
-  border-radius: 12px;
-  padding: 8px 11px;
+  border-radius: 8px;
+  padding: 7px 10px;
   font: inherit;
   font-size: 13px;
 }
@@ -302,12 +291,12 @@ label {
 }
 .import-block .btn {
   background: rgba(58,36,24,0.08);
-  border-color: rgba(58,36,24,0.16);
+  border-color: rgba(58,36,24,0.14);
   color: var(--ink);
 }
 .import-block .btn:hover { background: rgba(58,36,24,0.14); }
 
-.previous-list { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
+.previous-list { margin-top: 6px; display: flex; flex-direction: column; gap: 5px; }
 
 .prev-header {
   font-size: 9px;
@@ -323,13 +312,48 @@ label {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  background: rgba(58,36,24,0.07);
-  border: 1.5px solid rgba(58,36,24,0.12);
-  border-radius: 14px;
-  padding: 8px 10px;
+  background: rgba(58,36,24,0.06);
+  border: 1.5px solid rgba(58,36,24,0.1);
+  border-radius: 8px;
+  padding: 7px 10px;
 }
 .prev-meta { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .prev-title { font-size: 11px; color: var(--ink); font-weight: 500; }
 .prev-sub { font-size: 10px; color: var(--ink-mid); }
-.prev-activate { font-size: 10px; padding: 4px 12px; border-radius: 14px; color: var(--ink-mid); border-color: rgba(58,36,24,0.16); background: transparent; }
+.prev-activate {
+  font-size: 10px; padding: 4px 10px; border-radius: 8px;
+  color: var(--ink-mid); border: 1.5px solid rgba(58,36,24,0.14);
+  background: transparent; cursor: pointer;
+}
 .prev-activate:hover { background: rgba(58,36,24,0.08); color: var(--ink); }
+
+.prev-more {
+  font-size: 10px;
+  color: rgba(58,36,24,0.6);
+  text-align: center;
+  margin-top: 4px;
+  cursor: pointer;
+}
+.prev-more:hover { text-decoration: underline; }
+
+/* ── Auth bar ── */
+.auth-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  background: rgba(58,36,24,0.06);
+  border-radius: 8px;
+  gap: 8px;
+}
+.auth-email { font-size: 10px; color: var(--ink-mid); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.auth-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.credits-badge {
+  font-size: 10px; font-weight: 700;
+  background: var(--tangerine); color: #fff;
+  border-radius: 10px; padding: 2px 7px;
+  white-space: nowrap;
+}
+.credits-badge.empty { background: var(--blush); }
+.auth-link { font-size: 10px; color: var(--ink-mid); text-decoration: none; cursor: pointer; }
+.auth-link:hover { color: var(--ink); text-decoration: underline; }

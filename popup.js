@@ -1,6 +1,94 @@
 const $ = (id) => document.getElementById(id);
 const { SUPABASE_URL, SUPABASE_KEY, SHARE_ORIGIN: CONFIGURED_ORIGIN } = window.SN_CONFIG;
 
+// ---------- auth ----------
+let _session = null; // cached session from chrome.storage
+
+async function getSession() {
+  if (_session && _session.expires_at > Date.now() / 1000 + 30) return _session;
+  const data = await chrome.storage.local.get("sn_session");
+  if (!data.sn_session) return null;
+  const s = data.sn_session;
+  // If expired, attempt silent refresh via Supabase token endpoint
+  if (s.expires_at && s.expires_at < Date.now() / 1000 + 30) {
+    try {
+      const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
+        method: "POST",
+        headers: { apikey: SUPABASE_KEY, "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh_token: s.refresh_token }),
+      });
+      if (res.ok) {
+        const fresh = await res.json();
+        const updated = {
+          access_token: fresh.access_token,
+          refresh_token: fresh.refresh_token,
+          expires_at: Math.floor(Date.now() / 1000) + fresh.expires_in,
+          user: s.user,
+        };
+        await chrome.storage.local.set({ sn_session: updated });
+        _session = updated;
+        return updated;
+      }
+    } catch {}
+    // Refresh failed — session is dead
+    await chrome.storage.local.remove("sn_session");
+    return null;
+  }
+  _session = s;
+  return s;
+}
+
+async function supabaseRpc(fnName, params, accessToken) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fnName}`, {
+    method: "POST",
+    headers: {
+      apikey: SUPABASE_KEY,
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(params),
+  });
+  if (!res.ok) return { data: null, error: await res.text() };
+  const data = await res.json();
+  return { data, error: null };
+}
+
+async function fetchCredits(accessToken, userId) {
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/user_credits?user_id=eq.${encodeURIComponent(userId)}&select=*`,
+    { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${accessToken}` } }
+  );
+  if (!res.ok) return null;
+  const rows = await res.json();
+  return rows[0] || { paid_credits: 0, lifetime: false, monthly_free_used_at: null };
+}
+
+function creditsFreeAvailable(c) {
+  if (!c || !c.monthly_free_used_at) return true;
+  const used = new Date(c.monthly_free_used_at);
+  const now = new Date();
+  return used.getFullYear() < now.getFullYear() ||
+    (used.getFullYear() === now.getFullYear() && used.getMonth() < now.getMonth());
+}
+
+function creditsLabel(c) {
+  if (!c) return "0 letters";
+  if (c.lifetime) return "∞ Lifetime";
+  const free = creditsFreeAvailable(c) ? 1 : 0;
+  const total = c.paid_credits + free;
+  return `${total} letter${total !== 1 ? "s" : ""}`;
+}
+
+function openAuthPage() {
+  const url = `https://aishwaryachulaki.github.io/songnotes/auth.html`;
+  chrome.tabs.create({ url });
+}
+
+function openAccountPage() {
+  const url = `https://aishwaryachulaki.github.io/songnotes/account.html`;
+  chrome.tabs.create({ url });
+}
+
 // ---------- helpers ----------
 function uuid() {
   if (crypto && crypto.randomUUID) return crypto.randomUUID();
@@ -342,7 +430,6 @@ async function activateShare(id) {
 async function init() {
   const { store, sender } = await loadStore();
   senderName = sender;
-  // Clear any stale Lovable origin saved in storage from old versions
   chrome.storage.local.remove("sn_share_origin");
   shareOrigin = CONFIGURED_ORIGIN || "";
 
@@ -366,9 +453,37 @@ async function init() {
   renderNotes();
   renderSummary();
   renderPrevious();
+
+  // ── Auth UI ──
+  const session = await getSession();
+  if (session) {
+    $("authGate").classList.add("hidden");
+    $("authBar").classList.remove("hidden");
+    $("authEmail").textContent = session.user?.email || "";
+    // Fetch and show credits
+    const c = await fetchCredits(session.access_token, session.user.id);
+    const badge = $("creditsBadge");
+    badge.textContent = creditsLabel(c);
+    if (c && !c.lifetime && c.paid_credits === 0 && !creditsFreeAvailable(c)) badge.classList.add("empty");
+  } else {
+    $("authGate").classList.remove("hidden");
+    $("authBar").classList.add("hidden");
+  }
 }
 
 // ---------- handlers ----------
+
+// Auth button handlers
+$("signInBtn").addEventListener("click", openAuthPage);
+$("accountLink").addEventListener("click", (e) => { e.preventDefault(); openAccountPage(); });
+$("signOutLink").addEventListener("click", async (e) => {
+  e.preventDefault();
+  await chrome.storage.local.remove("sn_session");
+  _session = null;
+  $("authGate").classList.remove("hidden");
+  $("authBar").classList.add("hidden");
+});
+
 $("saveName").addEventListener("click", async () => {
   const v = $("senderName").value.trim();
   if (!v) return;
@@ -453,6 +568,23 @@ $("copyShare").addEventListener("click", async () => {
   const shareBtn = $("copyShare");
   if (shareBtn.disabled) return;
   shareBtn.disabled = true;
+
+  // ── Auth + credit check ──
+  const session = await getSession();
+  if (!session) {
+    $("shareInfo").innerHTML = `Sign in to send letters. <a href="#" id="signInLink" style="color:var(--tangerine);font-weight:600">Sign in</a>`;
+    document.getElementById("signInLink")?.addEventListener("click", (e) => { e.preventDefault(); openAuthPage(); });
+    shareBtn.disabled = false;
+    return;
+  }
+  const { data: creditResult, error: creditErr } = await supabaseRpc("use_credit", { p_user_id: session.user.id }, session.access_token);
+  if (creditErr || !creditResult?.ok) {
+    $("shareInfo").innerHTML = `No letters left. <a href="#" id="buyLink" style="color:var(--tangerine);font-weight:600">Buy more →</a>`;
+    document.getElementById("buyLink")?.addEventListener("click", (e) => { e.preventDefault(); openAccountPage(); });
+    shareBtn.disabled = false;
+    return;
+  }
+
   if (!activeShare.notes.length) {
     $("shareInfo").textContent = "Write at least one note before sending.";
     shareBtn.disabled = false;

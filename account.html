@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SongNotes — My Account</title>
+  <style>
+    :root {
+      --butter:    #F2D88F;
+      --blush:     #E36888;
+      --tangerine: #F08C21;
+      --sea:       #6698CC;
+      --cream:     #FFFBF4;
+      --ink:       #3a2418;
+      --ink-mid:   #8a5a48;
+      --ink-lt:    #c4977a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--butter);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      min-height: 100vh;
+      color: var(--ink);
+      padding: 32px 16px 64px;
+    }
+    .page { max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+
+    /* ── Nav ── */
+    .nav {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo { font-size: 13px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--tangerine); }
+    .nav-right { display: flex; align-items: center; gap: 12px; }
+    .nav-email { font-size: 11px; color: var(--ink-mid); }
+    .btn-signout {
+      font-size: 11px; padding: 5px 10px; border-radius: 6px;
+      background: rgba(58,36,24,0.08); border: 1px solid rgba(58,36,24,0.14);
+      color: var(--ink-mid); cursor: pointer; font: inherit; font-size: 11px;
+    }
+    .btn-signout:hover { background: rgba(58,36,24,0.14); color: var(--ink); }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--cream);
+      border-radius: 14px;
+      padding: 20px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .card-blush { background: var(--blush); color: #fff; }
+
+    .eyebrow {
+      font-size: 9px; text-transform: uppercase; letter-spacing: 0.13em;
+      font-weight: 700; opacity: 0.6;
+    }
+    .card-blush .eyebrow { color: rgba(255,251,244,0.7); opacity: 1; }
+
+    /* ── Credits display ── */
+    .credits-row { display: flex; align-items: baseline; gap: 10px; }
+    .credits-num { font-size: 48px; font-weight: 900; color: #fff; line-height: 1; }
+    .credits-label { font-size: 14px; color: rgba(255,251,244,0.75); }
+    .credits-sub { font-size: 12px; color: rgba(255,251,244,0.6); line-height: 1.5; }
+    .lifetime-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255,251,244,0.2); border-radius: 20px;
+      padding: 4px 12px; font-size: 12px; font-weight: 700; color: #fff;
+    }
+
+    /* ── Section divider ── */
+    .section-label {
+      font-size: 9px; text-transform: uppercase; letter-spacing: 0.13em;
+      color: var(--ink-mid); font-weight: 700; opacity: 0.6;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: rgba(58,36,24,0.14); }
+
+    /* ── Bundle grid ── */
+    .bundle-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .bundle {
+      background: var(--cream); border: 1.5px solid rgba(58,36,24,0.1);
+      border-radius: 12px; padding: 14px 14px 12px;
+      display: flex; flex-direction: column; gap: 6px; cursor: pointer;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .bundle:hover { border-color: var(--tangerine); box-shadow: 0 0 0 3px rgba(240,140,33,0.12); }
+    .bundle-letters { font-size: 22px; font-weight: 900; color: var(--ink); line-height: 1; }
+    .bundle-letters span { font-size: 13px; font-weight: 500; color: var(--ink-mid); }
+    .bundle-price { font-size: 17px; font-weight: 800; color: var(--tangerine); }
+    .bundle-per { font-size: 10px; color: var(--ink-lt); }
+
+    /* ── Lifetime card ── */
+    .lifetime-card {
+      border: 2px solid var(--tangerine);
+      background: rgba(240,140,33,0.05);
+      border-radius: 12px; padding: 16px 18px;
+      display: flex; align-items: center; justify-content: space-between;
+      cursor: pointer; transition: background 0.15s;
+    }
+    .lifetime-card:hover { background: rgba(240,140,33,0.1); }
+    .lifetime-card-left { display: flex; flex-direction: column; gap: 3px; }
+    .lifetime-title { font-size: 15px; font-weight: 800; color: var(--ink); }
+    .lifetime-sub { font-size: 12px; color: var(--ink-mid); }
+    .lifetime-price { font-size: 22px; font-weight: 900; color: var(--tangerine); }
+
+    /* ── Purchase button ── */
+    .btn-buy {
+      background: var(--tangerine); color: #fff; border: none; border-radius: 9px;
+      padding: 12px; font: inherit; font-size: 14px; font-weight: 700;
+      cursor: pointer; width: 100%; transition: opacity 0.15s;
+    }
+    .btn-buy:hover { opacity: 0.88; }
+    .btn-buy:disabled { opacity: 0.5; cursor: default; }
+
+    /* ── Purchase history ── */
+    .purchase-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 0; border-bottom: 1px solid rgba(58,36,24,0.08);
+      font-size: 13px;
+    }
+    .purchase-row:last-child { border-bottom: none; }
+    .purchase-desc { color: var(--ink); }
+    .purchase-date { font-size: 11px; color: var(--ink-lt); margin-top: 2px; }
+    .purchase-amount { font-weight: 700; color: var(--tangerine); }
+
+    .empty-state { font-size: 12px; color: var(--ink-lt); text-align: center; padding: 12px 0; font-style: italic; }
+
+    /* ── Loading / redirect states ── */
+    .state { text-align: center; padding: 60px 20px; color: var(--ink-mid); font-size: 14px; line-height: 1.6; }
+    .state strong { display: block; font-size: 20px; color: var(--ink); margin-bottom: 8px; }
+
+    .msg { font-size: 12px; padding: 10px 12px; border-radius: 8px; text-align: center; }
+    .msg.error { background: rgba(227,104,136,0.12); color: var(--blush); }
+    .msg.success { background: rgba(240,140,33,0.1); color: var(--tangerine); font-weight: 600; }
+
+    /* ── Razorpay note ── */
+    .payment-note { font-size: 10px; color: var(--ink-lt); text-align: center; line-height: 1.5; }
+  </style>
+</head>
+<body>
+<div class="page" id="page">
+  <div class="state"><strong>Loading…</strong></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+  const SUPABASE_URL = "https://earyrktanwypmffzxedd.supabase.co";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVhcnlya3Rhbnd5cG1mZnp4ZWRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MDA5OTEsImV4cCI6MjA5MTk3Njk5MX0.QjUyEDkvSJh7olYe2Aij-s9j4d7ch8Fvyn2UPtTLnrg";
+  // ── Razorpay key — swap for live key when going live ──
+  const RAZORPAY_KEY = "rzp_test_REPLACE_WITH_YOUR_KEY";
+
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  const BUNDLES = [
+    { letters: 1,   price_paise: 4900,  label: "₹49",  per: "₹49 per letter" },
+    { letters: 3,   price_paise: 12900, label: "₹129", per: "₹43 per letter" },
+    { letters: 5,   price_paise: 19900, label: "₹199", per: "₹39.80 per letter" },
+    { letters: 10,  price_paise: 34900, label: "₹349", per: "₹34.90 per letter" },
+  ];
+
+  let currentUser = null;
+  let credits = null;
+
+  // ── Init ──
+  (async () => {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) {
+      window.location.href = "auth.html";
+      return;
+    }
+    currentUser = session.user;
+    await loadAndRender();
+  })();
+
+  async function loadAndRender() {
+    const [creditsData, purchasesData] = await Promise.all([
+      sb.from("user_credits").select("*").eq("user_id", currentUser.id).single(),
+      sb.from("purchases").select("*").eq("user_id", currentUser.id).order("created_at", { ascending: false }).limit(20),
+    ]);
+    credits = creditsData.data || { paid_credits: 0, lifetime: false, monthly_free_used_at: null };
+    render(credits, purchasesData.data || []);
+  }
+
+  function freeAvailable(c) {
+    if (!c.monthly_free_used_at) return true;
+    const used = new Date(c.monthly_free_used_at);
+    const now = new Date();
+    return used.getFullYear() < now.getFullYear() ||
+      (used.getFullYear() === now.getFullYear() && used.getMonth() < now.getMonth());
+  }
+
+  function render(c, purchases) {
+    const name = currentUser.user_metadata?.full_name || currentUser.email;
+    const free = freeAvailable(c);
+
+    let creditsBlock;
+    if (c.lifetime) {
+      creditsBlock = `
+        <div class="lifetime-badge">∞ Lifetime — unlimited letters</div>
+      `;
+    } else {
+      const total = c.paid_credits + (free ? 1 : 0);
+      creditsBlock = `
+        <div class="credits-row">
+          <div class="credits-num">${total}</div>
+          <div class="credits-label">letter${total !== 1 ? "s" : ""} remaining</div>
+        </div>
+        <div class="credits-sub">
+          ${c.paid_credits} purchased · ${free ? "1 free this month" : "free letter used this month"}
+        </div>
+      `;
+    }
+
+    const bundleCards = BUNDLES.map((b, i) => `
+      <div class="bundle" data-bundle="${i}">
+        <div class="bundle-letters">${b.letters} <span>letter${b.letters > 1 ? "s" : ""}</span></div>
+        <div class="bundle-price">${b.label}</div>
+        <div class="bundle-per">${b.per}</div>
+      </div>
+    `).join("");
+
+    const purchaseRows = purchases.length
+      ? purchases.map(p => `
+          <div class="purchase-row">
+            <div>
+              <div class="purchase-desc">${p.is_lifetime ? "Lifetime plan" : `${p.credits_added} letter${p.credits_added > 1 ? "s" : ""} bundle`}</div>
+              <div class="purchase-date">${new Date(p.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</div>
+            </div>
+            <div class="purchase-amount">₹${Math.round(p.amount_paise / 100)}</div>
+          </div>
+        `).join("")
+      : `<div class="empty-state">No purchases yet</div>`;
+
+    document.getElementById("page").innerHTML = `
+      <div class="nav">
+        <div class="nav-logo">♪ SongNotes</div>
+        <div class="nav-right">
+          <span class="nav-email">${currentUser.email}</span>
+          <button class="btn-signout" id="signoutBtn">Sign out</button>
+        </div>
+      </div>
+
+      <div class="card card-blush">
+        <div class="eyebrow">Your credits</div>
+        ${creditsBlock}
+      </div>
+
+      <div class="section-label">Buy more letters</div>
+
+      <div class="card">
+        <div class="bundle-grid" id="bundleGrid">${bundleCards}</div>
+
+        <div class="lifetime-card" id="lifetimeCard">
+          <div class="lifetime-card-left">
+            <div class="lifetime-title">Lifetime</div>
+            <div class="lifetime-sub">Unlimited letters, forever</div>
+          </div>
+          <div class="lifetime-price">₹999</div>
+        </div>
+
+        <div id="paymentMsg"></div>
+        <div class="payment-note">Payments are processed securely by Razorpay · UPI, cards & netbanking accepted</div>
+      </div>
+
+      <div class="section-label">Purchase history</div>
+      <div class="card">${purchaseRows}</div>
+    `;
+
+    document.getElementById("signoutBtn").addEventListener("click", async () => {
+      await sb.auth.signOut();
+      window.dispatchEvent(new CustomEvent("songnotes:signout"));
+      window.location.href = "auth.html";
+    });
+
+    document.getElementById("bundleGrid").addEventListener("click", (e) => {
+      const el = e.target.closest("[data-bundle]");
+      if (!el) return;
+      const b = BUNDLES[parseInt(el.dataset.bundle)];
+      openRazorpay(b.price_paise, b.letters, false, `${b.letters} Letter${b.letters > 1 ? "s" : ""} Bundle`);
+    });
+
+    document.getElementById("lifetimeCard").addEventListener("click", () => {
+      openRazorpay(99900, 0, true, "Lifetime Plan");
+    });
+  }
+
+  // ── Razorpay checkout ──
+  // TODO (production): create order_id server-side via Supabase Edge Function
+  // and verify razorpay_signature before calling add_credits.
+  function openRazorpay(amountPaise, credits, isLifetime, description) {
+    const options = {
+      key: RAZORPAY_KEY,
+      amount: amountPaise,
+      currency: "INR",
+      name: "SongNotes",
+      description,
+      prefill: { email: currentUser.email },
+      theme: { color: "#F08C21" },
+      handler: async function (response) {
+        const msg = document.getElementById("paymentMsg");
+        msg.innerHTML = `<div class="msg">Processing…</div>`;
+        const { error } = await sb.rpc("add_credits", {
+          p_user_id: currentUser.id,
+          p_credits: credits,
+          p_lifetime: isLifetime,
+          p_razorpay_id: response.razorpay_payment_id,
+          p_amount_paise: amountPaise,
+        });
+        if (error) {
+          msg.innerHTML = `<div class="msg error">Payment recorded but credit update failed — contact support with payment ID: ${response.razorpay_payment_id}</div>`;
+        } else {
+          msg.innerHTML = `<div class="msg success">✓ ${isLifetime ? "Lifetime plan activated!" : `${credits} letter${credits > 1 ? "s" : ""} added!`}</div>`;
+          await loadAndRender(); // refresh credits display
+        }
+      },
+      modal: { ondismiss: () => {} }
+    };
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+  }
+</script>
+</body>
+</html>

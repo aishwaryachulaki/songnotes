@@ -7,17 +7,27 @@
   <body>
     <div class="wrap">
 
-      <!-- Postmark mode banner -->
-      <div id="modeBanner" class="mode-banner mode-editing">
-        <span id="modeLabel">Editing — popups will play on this song</span>
+      <!-- Auth gate — shown when not signed in -->
+      <div id="authGate" class="stamp stamp-compose hidden">
+        <div class="hello">Sign in to send letters and manage credits.</div>
+        <button id="signInBtn" class="btn primary">Sign in / Create account</button>
       </div>
 
-      <!-- Featured track stamp (orange hero) -->
+      <!-- Auth bar — shown when signed in -->
+      <div id="authBar" class="auth-bar hidden">
+        <span id="authEmail" class="auth-email"></span>
+        <div class="auth-right">
+          <span id="creditsBadge" class="credits-badge"></span>
+          <a id="accountLink" href="#" class="auth-link">Account</a>
+          <a id="signOutLink" href="#" class="auth-link">Sign out</a>
+        </div>
+      </div>
+
+      <!-- Featured track stamp -->
       <div class="stamp stamp-track track">
         <div class="stamp-eyebrow">♪ now playing</div>
         <div id="trackTitle" class="title">Loading…</div>
         <div id="trackArtist" class="artist"></div>
-        <div class="stamp-denomination">SongNotes</div>
       </div>
 
       <!-- Name setup stamp -->
@@ -32,10 +42,11 @@
       <!-- Note composer stamp -->
       <div id="composer" class="stamp stamp-compose composer hidden">
         <div class="hello">writing as <strong id="whoami">—</strong> · <a href="#" id="changeName">change</a></div>
+        <input id="recipientName" class="receiver-input" type="text" placeholder="Recipient name" />
         <textarea id="note" placeholder="Write a note for this song…" rows="3"></textarea>
-        <div class="row">
-          <input id="ts" type="text" placeholder="Timestamp (e.g. 1:24) — optional" />
-          <button id="useCurrent" class="btn ghost">Now</button>
+        <div class="timestamp-row">
+          <input id="ts" class="timestamp-input" type="text" placeholder="Timestamp (e.g. 1:24) — optional" />
+          <button id="useCurrent" class="btn now-btn">Now</button>
         </div>
         <div class="row">
           <button id="save" class="btn primary">Save note</button>
@@ -52,10 +63,7 @@
       <!-- Share stamp -->
       <div class="stamp stamp-share share">
         <div id="shareSummary" class="share-summary">No notes yet — write one above to start a shared experience.</div>
-        <details class="playlist-details">
-          <summary>Optional: paste a Spotify playlist URL</summary>
-          <input id="playlistUrl" type="text" placeholder="https://open.spotify.com/playlist/…" style="margin-top:6px" />
-        </details>
+        <input id="playlistUrl" class="playlist-input" type="text" placeholder="Add playlist link" />
         <button id="copyShare" class="btn share-btn">✉ Send all notes</button>
         <div id="shareInfo" class="share-info"></div>
         <div class="row" style="gap:6px">

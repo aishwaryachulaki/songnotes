@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "SongNotes",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Attach personal notes to Spotify songs and share them as a link.",
   "permissions": ["storage", "activeTab", "tabs"],
   "host_permissions": [
@@ -24,6 +24,11 @@
     {
       "matches": ["https://*.github.io/*/share.html*"],
       "js": ["share-bridge.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://*.github.io/*/auth.html*"],
+      "js": ["auth-bridge.js"],
       "run_at": "document_idle"
     }
   ]

@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SongNotes — Sign in</title>
+  <style>
+    :root {
+      --butter:    #F2D88F;
+      --blush:     #E36888;
+      --tangerine: #F08C21;
+      --sea:       #6698CC;
+      --cream:     #FFFBF4;
+      --ink:       #3a2418;
+      --ink-mid:   #8a5a48;
+      --ink-lt:    #c4977a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--butter);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      color: var(--ink);
+    }
+    .card {
+      background: var(--cream);
+      border-radius: 16px;
+      padding: 32px 28px;
+      width: 100%;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      box-shadow: 0 8px 32px rgba(58,36,24,0.12);
+    }
+    .logo {
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--tangerine);
+    }
+    h1 { font-size: 22px; font-weight: 800; color: var(--ink); line-height: 1.2; }
+    .sub { font-size: 13px; color: var(--ink-mid); line-height: 1.5; }
+
+    /* ── Tab switcher ── */
+    .tabs { display: flex; gap: 4px; background: rgba(58,36,24,0.07); border-radius: 10px; padding: 4px; }
+    .tab {
+      flex: 1; padding: 7px 6px; border: none; border-radius: 7px;
+      font: inherit; font-size: 12px; font-weight: 600; cursor: pointer;
+      background: transparent; color: var(--ink-mid); transition: all 0.15s;
+    }
+    .tab.active { background: #fff; color: var(--ink); box-shadow: 0 1px 4px rgba(58,36,24,0.1); }
+
+    /* ── Forms ── */
+    .panel { display: flex; flex-direction: column; gap: 12px; }
+    .panel.hidden { display: none; }
+
+    label { font-size: 11px; font-weight: 600; color: var(--ink-mid); text-transform: uppercase; letter-spacing: 0.08em; display: block; margin-bottom: 4px; }
+    input[type="email"], input[type="password"] {
+      width: 100%; padding: 10px 12px; border-radius: 9px;
+      border: 1.5px solid rgba(58,36,24,0.15); font: inherit; font-size: 14px;
+      background: #fff; color: var(--ink);
+    }
+    input:focus { outline: none; border-color: var(--tangerine); box-shadow: 0 0 0 3px rgba(240,140,33,0.15); }
+
+    .btn {
+      width: 100%; padding: 12px; border: none; border-radius: 9px;
+      font: inherit; font-size: 14px; font-weight: 700; cursor: pointer;
+      transition: opacity 0.15s, transform 0.12s;
+    }
+    .btn:hover { opacity: 0.88; transform: translateY(-1px); }
+    .btn:disabled { opacity: 0.5; cursor: default; transform: none; }
+    .btn-primary { background: var(--tangerine); color: #fff; }
+    .btn-google {
+      background: #fff; color: var(--ink);
+      border: 1.5px solid rgba(58,36,24,0.15);
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+    }
+    .btn-google:hover { background: #fafafa; }
+
+    .divider { display: flex; align-items: center; gap: 10px; color: var(--ink-lt); font-size: 11px; }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: rgba(58,36,24,0.12); }
+
+    .toggle-link { font-size: 12px; text-align: center; color: var(--ink-mid); }
+    .toggle-link a { color: var(--tangerine); font-weight: 600; cursor: pointer; text-decoration: none; }
+    .toggle-link a:hover { text-decoration: underline; }
+
+    .msg { font-size: 12px; padding: 10px 12px; border-radius: 8px; text-align: center; }
+    .msg.error { background: rgba(227,104,136,0.12); color: var(--blush); }
+    .msg.success { background: rgba(240,140,33,0.1); color: var(--tangerine); font-weight: 600; }
+
+    /* ── Success state ── */
+    .success-state { text-align: center; display: flex; flex-direction: column; gap: 14px; align-items: center; }
+    .success-icon { font-size: 48px; }
+    .success-state h2 { font-size: 20px; font-weight: 800; }
+    .success-state p { font-size: 13px; color: var(--ink-mid); line-height: 1.5; }
+  </style>
+</head>
+<body>
+<div class="card" id="card">
+  <div class="logo">♪ SongNotes</div>
+  <div>
+    <h1>Sign in</h1>
+    <p class="sub" style="margin-top:6px">to send letters and manage your credits</p>
+  </div>
+
+  <!-- Tab switcher -->
+  <div class="tabs">
+    <button class="tab active" data-tab="google">Google</button>
+    <button class="tab" data-tab="email">Email</button>
+    <button class="tab" data-tab="magic">Magic link</button>
+  </div>
+
+  <!-- Google panel -->
+  <div class="panel" id="panel-google">
+    <button class="btn btn-google" id="googleBtn">
+      <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+        <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615Z" fill="#4285F4"/>
+        <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18Z" fill="#34A853"/>
+        <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332Z" fill="#FBBC05"/>
+        <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58Z" fill="#EA4335"/>
+      </svg>
+      Continue with Google
+    </button>
+    <p class="sub" style="font-size:11px;text-align:center;color:var(--ink-lt)">Fastest — no password needed</p>
+  </div>
+
+  <!-- Email panel -->
+  <div class="panel hidden" id="panel-email">
+    <div id="emailMsg"></div>
+    <div>
+      <label>Email</label>
+      <input type="email" id="emailInput" placeholder="you@example.com" autocomplete="email" />
+    </div>
+    <div>
+      <label id="pwLabel">Password</label>
+      <input type="password" id="pwInput" placeholder="••••••••" autocomplete="current-password" />
+    </div>
+    <button class="btn btn-primary" id="emailBtn">Sign in</button>
+    <div class="toggle-link">
+      <span id="toggleText">Don't have an account?</span>
+      <a id="toggleMode"> Sign up</a>
+    </div>
+  </div>
+
+  <!-- Magic link panel -->
+  <div class="panel hidden" id="panel-magic">
+    <div id="magicMsg"></div>
+    <div>
+      <label>Email</label>
+      <input type="email" id="magicInput" placeholder="you@example.com" autocomplete="email" />
+    </div>
+    <button class="btn btn-primary" id="magicBtn">Send magic link</button>
+    <p class="sub" style="font-size:11px;text-align:center;color:var(--ink-lt)">We'll email you a one-click sign-in link</p>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+  const SUPABASE_URL = "https://earyrktanwypmffzxedd.supabase.co";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVhcnlya3Rhbnd5cG1mZnp4ZWRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MDA5OTEsImV4cCI6MjA5MTk3Njk5MX0.QjUyEDkvSJh7olYe2Aij-s9j4d7ch8Fvyn2UPtTLnrg";
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // ── Auth state change — fires after OAuth redirect returns or sign-in ──
+  sb.auth.onAuthStateChange((event, session) => {
+    if (session && (event === "SIGNED_IN" || event === "TOKEN_REFRESHED" || event === "INITIAL_SESSION")) {
+      // Broadcast to auth-bridge.js content script
+      window.dispatchEvent(new CustomEvent("songnotes:auth", {
+        detail: {
+          access_token: session.access_token,
+          refresh_token: session.refresh_token,
+          expires_at: session.expires_at,
+          user: {
+            id: session.user.id,
+            email: session.user.email,
+            name: session.user.user_metadata?.full_name || session.user.email,
+            avatar: session.user.user_metadata?.avatar_url || null,
+          }
+        }
+      }));
+      showSuccess(session.user);
+    }
+  });
+
+  function showSuccess(user) {
+    const name = user.user_metadata?.full_name || user.email;
+    document.getElementById("card").innerHTML = `
+      <div class="success-state">
+        <div class="success-icon">✉</div>
+        <h2>You're in, ${name.split(" ")[0]}!</h2>
+        <p>Your SongNotes account is connected.<br/>You can close this tab and go back to the extension.</p>
+        <button class="btn btn-primary" style="max-width:200px" onclick="
+          if(window.opener) { window.close(); }
+          else { window.location.href = 'account.html'; }
+        ">Go to my account</button>
+      </div>
+    `;
+  }
+
+  // ── Tab switching ──
+  document.querySelectorAll(".tab").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".panel").forEach(p => p.classList.add("hidden"));
+      btn.classList.add("active");
+      document.getElementById("panel-" + btn.dataset.tab).classList.remove("hidden");
+    });
+  });
+
+  // ── Google ──
+  document.getElementById("googleBtn").addEventListener("click", async () => {
+    const { error } = await sb.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: window.location.href }
+    });
+    if (error) showMsg("googleMsg", error.message, "error");
+  });
+
+  // ── Email / Password ──
+  let emailMode = "signin"; // or "signup"
+  document.getElementById("toggleMode").addEventListener("click", () => {
+    emailMode = emailMode === "signin" ? "signup" : "signin";
+    document.getElementById("emailBtn").textContent = emailMode === "signin" ? "Sign in" : "Create account";
+    document.getElementById("toggleText").textContent = emailMode === "signin" ? "Don't have an account?" : "Already have an account?";
+    document.getElementById("toggleMode").textContent = emailMode === "signin" ? " Sign up" : " Sign in";
+    document.getElementById("pwLabel").textContent = emailMode === "signin" ? "Password" : "Choose a password";
+    document.getElementById("pwInput").autocomplete = emailMode === "signin" ? "current-password" : "new-password";
+  });
+
+  document.getElementById("emailBtn").addEventListener("click", async (e) => {
+    e.target.disabled = true;
+    const email = document.getElementById("emailInput").value.trim();
+    const password = document.getElementById("pwInput").value;
+    document.getElementById("emailMsg").innerHTML = "";
+    if (!email || !password) {
+      showMsg("emailMsg", "Please enter your email and password.", "error");
+      e.target.disabled = false; return;
+    }
+    const fn = emailMode === "signin"
+      ? sb.auth.signInWithPassword({ email, password })
+      : sb.auth.signUp({ email, password });
+    const { error } = await fn;
+    if (error) { showMsg("emailMsg", error.message, "error"); e.target.disabled = false; return; }
+    if (emailMode === "signup") showMsg("emailMsg", "Account created! Check your email to confirm.", "success");
+    e.target.disabled = false;
+  });
+
+  // ── Magic link ──
+  document.getElementById("magicBtn").addEventListener("click", async (e) => {
+    e.target.disabled = true;
+    const email = document.getElementById("magicInput").value.trim();
+    document.getElementById("magicMsg").innerHTML = "";
+    if (!email) { showMsg("magicMsg", "Please enter your email.", "error"); e.target.disabled = false; return; }
+    const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.href } });
+    if (error) { showMsg("magicMsg", error.message, "error"); e.target.disabled = false; return; }
+    showMsg("magicMsg", `Magic link sent to ${email} — check your inbox.`, "success");
+    e.target.disabled = false;
+  });
+
+  function showMsg(id, text, type) {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = `<div class="msg ${type}">${text}</div>`;
+  }
+</script>
+</body>
+</html>
