@@ -628,11 +628,11 @@ $("copyShare").addEventListener("click", async () => {
   store.shares[newId] = activeShare;
   store.active = newId;
 
-  // Push fresh rows under the new ID.
+  // Push share meta FIRST (annotations has a FK → shares.id).
+  await pushShareMeta(activeShare);
   for (const note of activeShare.notes) {
     await pushNote(activeShare, note);
   }
-  await pushShareMeta(activeShare);
 
   await saveStore(store);
   shareBtn.disabled = false;
