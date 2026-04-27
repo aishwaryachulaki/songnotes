@@ -167,9 +167,12 @@
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   // ── Auth state change — fires after OAuth redirect returns or sign-in ──
+  let redirecting = false;
   sb.auth.onAuthStateChange((event, session) => {
+    if (redirecting) return;
     if (session && (event === "SIGNED_IN" || event === "TOKEN_REFRESHED" || event === "INITIAL_SESSION")) {
-      // Broadcast to auth-bridge.js content script
+      redirecting = true;
+      // Broadcast to auth-bridge.js content script so extension picks up the session
       window.dispatchEvent(new CustomEvent("songnotes:auth", {
         detail: {
           access_token: session.access_token,
@@ -183,24 +186,19 @@
           }
         }
       }));
-      showSuccess(session.user);
+      // Show brief confirmation then go straight to account page
+      document.getElementById("card").innerHTML = `
+        <div class="success-state">
+          <div class="success-icon">✉</div>
+          <h2>You're in!</h2>
+          <p style="color:var(--ink-mid)">Taking you to your account…</p>
+        </div>
+      `;
+      setTimeout(() => {
+        window.location.href = "https://aishwaryachulaki.github.io/songnotes/account.html";
+      }, 1000);
     }
   });
-
-  function showSuccess(user) {
-    const name = user.user_metadata?.full_name || user.email;
-    document.getElementById("card").innerHTML = `
-      <div class="success-state">
-        <div class="success-icon">✉</div>
-        <h2>You're in, ${name.split(" ")[0]}!</h2>
-        <p>Your SongNotes account is connected.<br/>You can close this tab and go back to the extension.</p>
-        <button class="btn btn-primary" style="max-width:200px" onclick="
-          if(window.opener) { window.close(); }
-          else { window.location.href = 'account.html'; }
-        ">Go to my account</button>
-      </div>
-    `;
-  }
 
   // ── Tab switching ──
   document.querySelectorAll(".tab").forEach(btn => {
