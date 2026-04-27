@@ -4,25 +4,28 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>SongNotes — Leave a note inside the music</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --butter:   #F4D9A6;
-      --cream:    #F7E9D3;
-      --blush:    #E48A8A;
-      --rose:     #D96B7C;
-      --tangerine:#F08C21;
-      --tan-hov:  #E57E1C;
-      --blue:     #7FA7C6;
-      --olive:    #B6BE5A;
-      --ink:      #3A2E2A;
-      --ink-mid:  #6B5A52;
-      --border:   #EAD7B8;
-      --overlay:  rgba(90,46,46,0.86);
-      --r:  10px;
-      --sp: 20px;
+      --butter:    #F4D9A6;
+      --cream:     #F7E9D3;
+      --blush:     #E48A8A;
+      --rose:      #D96B7C;
+      --tangerine: #F08C21;
+      --tan-hov:   #E57E1C;
+      --blue:      #7FA7C6;
+      --olive:     #B6BE5A;
+      --ink:       #3A2E2A;
+      --ink-mid:   #6B5A52;
+      --ink-lt:    #A08878;
+      --border:    #E0C9A8;
+      --overlay:   rgba(90,46,46,0.84);
+      --r:  7px;
+      --sp: 16px;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       background: var(--butter);
@@ -36,7 +39,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 20px 48px;
+      padding: 22px 52px;
       max-width: 1240px;
       margin: 0 auto;
     }
@@ -44,312 +47,397 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 700;
       color: var(--ink);
       text-decoration: none;
     }
     .logo-mark {
-      width: 40px; height: 40px;
+      width: 36px; height: 36px;
       background: var(--blush);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
+      font-size: 17px;
       color: #fff;
-      box-shadow: 0 3px 12px rgba(228,138,138,0.45);
+      box-shadow: 0 3px 10px rgba(228,138,138,0.4);
     }
     .nav-cta {
       background: var(--tangerine);
       color: #fff;
       border: none;
-      border-radius: 28px;
-      padding: 12px 26px;
-      font-size: 14px;
+      border-radius: 24px;
+      padding: 10px 22px;
+      font-size: 13px;
       font-weight: 700;
       cursor: pointer;
       text-decoration: none;
-      box-shadow: 0 4px 16px rgba(240,140,33,0.38);
+      box-shadow: 0 4px 14px rgba(240,140,33,0.35);
       transition: background 0.15s;
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
     }
     .nav-cta:hover { background: var(--tan-hov); }
 
-    /* ── Hero grid ── */
-    .hero {
+    /* ── Page top: asymmetric two-column editorial ── */
+    .page-top {
       display: grid;
-      grid-template-columns: 1.12fr 1fr;
-      gap: 20px;
-      padding: 0 48px 24px;
+      /*
+        1.8fr left gives the envelope ~709px at 1240px content width.
+        At the image's 1.248 aspect ratio that renders 568px tall —
+        ~20% taller than before, matching the illustration's presence.
+      */
+      grid-template-columns: 1.8fr 1fr;
+      gap: 32px;
+      padding: 0 52px 52px;
       max-width: 1240px;
       margin: 0 auto;
-      align-items: stretch;
-      min-height: 560px;
+      align-items: start;
     }
 
-    /* ── Envelope ── */
-    .envelope {
-      background: var(--blush);
-      border-radius: 12px;
-      padding: 0 16px 16px;
-      box-shadow:
-        0 12px 48px rgba(58,36,24,0.22),
-        0 2px 8px rgba(58,36,24,0.12);
+    /* ─────────────────────────────────────────────────────────
+       LEFT COLUMN
+       The envelope image fills the column.
+       A single absolutely-positioned overlay carries all text —
+       transparent background, no border, no shadow.
+       Text appears printed on the letter already inside the image.
+    ───────────────────────────────────────────────────────── */
+    .env-col {
+      /* height driven by the envelope image */
+    }
+
+    /* Positioning context for the text overlay */
+    .env-wrap {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      min-height: 580px;
+    }
+
+    .env-img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /*
+      Single transparent text overlay.
+      All four sides are percentage-constrained to the image container,
+      so the box maps directly onto the letter's paper area.
+      overflow: hidden is the hard guardrail — nothing exits the box.
+      NO background. NO border. NO shadow. NO card styling.
+    */
+    .env-overlay {
+  position: absolute;
+
+  top: 20%;
+  left: 22%;
+  width: 52%;
+
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  /* allow natural height */
+}
+    }
+    .env-overlay > * { max-width: 100%; }
+
+    /* Top row: label flush left, stamp seal flush right */
+    .env-top-row {
       display: flex;
-      flex-direction: column;
-      overflow: hidden;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+
+    /* Pill label */
+    .letter-label {
+      display: inline-flex;
+      align-items: center;
+      font-size: 7.5px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--rose);
+      background: rgba(217,107,124,0.12);
+      border: 1px solid rgba(217,107,124,0.24);
+      border-radius: 20px;
+      padding: 3px 8px;
+      white-space: nowrap;
+    }
+
+    /* Circular stamp seal */
+    .letter-stamp {
       position: relative;
-    }
-
-    /* Open flap area — the envelope V-fold */
-    .env-flap {
-      height: 160px;
-      position: relative;
-      flex-shrink: 0;
-      margin: 0 -16px;
-      overflow: hidden;
-    }
-    /* SVG handles the fold drawing, no pseudo-elements needed */
-
-    .env-flap svg {
-      position: absolute;
-      inset: 0;
-      width: 100%; height: 100%;
-    }
-
-    /* The cream letter paper */
-    .letter {
-      background:
-        radial-gradient(ellipse at 8% 12%, rgba(255,252,240,0.9) 0%, transparent 55%),
-        radial-gradient(ellipse at 92% 88%, rgba(220,190,155,0.35) 0%, transparent 50%),
-        var(--cream);
-      border-radius: 8px;
-      padding: 40px 48px 48px;
-      position: relative;
-      flex: 1;
-      margin-top: -40px;
-      z-index: 1;
-      box-shadow:
-        0 -4px 16px rgba(0,0,0,0.1),
-        0 8px 24px rgba(0,0,0,0.06);
-    }
-
-    /* Postmark */
-    .postmark {
-      position: absolute;
-      top: 26px;
-      right: 30px;
-      width: 62px; height: 62px;
-      border: 1.5px solid rgba(58,46,42,0.2);
+      width: 34px;
+      height: 34px;
       border-radius: 50%;
+      border: 1.5px solid rgba(58,46,42,0.2);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 3px;
+      gap: 2px;
+      flex-shrink: 0;
     }
-    .postmark span {
-      font-size: 6px;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--ink-mid);
-      font-weight: 700;
-      opacity: 0.65;
+    .letter-stamp::before {
+      content: '';
+      position: absolute;
+      inset: 3px;
+      border-radius: 50%;
+      border: 1px dashed rgba(58,46,42,0.15);
     }
-    .pm-waves { display: flex; flex-direction: column; gap: 3px; }
-    .pm-waves i {
-      display: block;
-      width: 24px; height: 1.5px;
-      background: var(--ink-mid);
-      border-radius: 2px;
-      opacity: 0.35;
-    }
-
-    /* Letter tag pill */
-    .letter-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(217,107,124,0.1);
-      color: var(--rose);
-      border-radius: 20px;
-      padding: 5px 14px;
-      font-size: 12px;
-      font-weight: 500;
-      margin-bottom: 26px;
-      border: 1px solid rgba(217,107,124,0.22);
-    }
-
-    .letter-h1 {
-      font-size: clamp(38px, 4.2vw, 56px);
+    .letter-stamp .stamp-name {
+      font-size: 4.5px;
       font-weight: 800;
-      line-height: 1.12;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-mid);
+      opacity: 0.65;
+      position: relative;
+    }
+    .letter-stamp .stamp-year {
+      font-size: 7px;
+      font-weight: 600;
+      color: var(--ink-mid);
+      opacity: 0.5;
+      letter-spacing: 0.04em;
+      position: relative;
+    }
+
+    /* Heading — serif, sized to fit the letter area */
+    .letter-h1 {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 2rem;
+      font-weight: 700;
+      line-height: 1.2;
       color: var(--ink);
-      margin-bottom: 18px;
+      word-break: break-word;
+      max-width: 90%;
+      margin: 0;
     }
     .letter-h1 em {
       font-style: italic;
       color: var(--rose);
       display: block;
+      margin-top: 4px;
     }
 
+    /* Body paragraph */
     .letter-p {
-      font-size: 16px;
+      font-size: 0.95rem;
+      line-height: 1.5;
       color: var(--ink-mid);
-      line-height: 1.72;
-      max-width: 420px;
-      margin-bottom: 40px;
+      max-width: 85%;
+      margin-top: 8px;
     }
 
-    .btn-dl {
+    /* CTA button */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      align-self: center;
+      margin-top: 12px;
       background: var(--tangerine);
       color: #fff;
       border: none;
-      border-radius: 28px;
-      padding: 14px 28px;
-      font-size: 15px;
+      border-radius: 20px;
+      padding: 7px 16px;
+      font: inherit;
+      font-size: 11px;
       font-weight: 700;
       cursor: pointer;
       text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      box-shadow: 0 6px 20px rgba(240,140,33,0.36);
+      box-shadow: 0 4px 12px rgba(240,140,33,0.34);
       transition: background 0.15s;
     }
-    .btn-dl:hover { background: var(--tan-hov); }
+    .btn-primary:hover { background: var(--tan-hov); }
 
-    /* ── Illustration panel ── */
-    .illustration {
+    /* ── Right column: illustration frame ── */
+    .illus-col {
+      display: flex;
+      align-items: stretch;
+    }
+    .illus-frame {
       position: relative;
       border-radius: 22px;
       overflow: hidden;
-      box-shadow: 0 8px 36px rgba(58,36,24,0.13);
+      width: 100%;
+      flex: 1;
+      /* Match the envelope's rendered height (~568px at desktop).
+         At narrower viewports the envelope shrinks and this scales too. */
+      min-height: 568px;
+      box-shadow: 0 8px 40px rgba(58,36,24,0.14);
     }
-    .illustration img {
+    .illus-frame > img {
+      position: absolute;
+      inset: 0;
       width: 100%;
       height: 100%;
       object-fit: cover;
       display: block;
     }
 
-    /* Note overlay */
+    /* Note UI overlay inside illustration */
     .note-overlay {
       position: absolute;
-      bottom: 28px;
-      right: 26px;
+      bottom: 26px;
+      right: 22px;
       background: var(--overlay);
       border-radius: 14px;
-      padding: 18px 22px;
-      max-width: 290px;
-      backdrop-filter: blur(2px);
+      padding: 16px 20px;
+      max-width: 270px;
+      backdrop-filter: blur(3px);
     }
-    .note-overlay .n-meta {
-      font-size: 10px;
+    .note-meta {
+      font-size: 9.5px;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.14em;
-      color: rgba(255,255,255,0.55);
-      margin-bottom: 10px;
+      letter-spacing: 0.15em;
+      color: rgba(255,255,255,0.52);
+      margin-bottom: 9px;
     }
-    .note-overlay .n-body {
-      font-size: 16px;
+    .note-body {
+      font-size: 15px;
       color: #fff;
       line-height: 1.62;
       font-style: italic;
-      margin-bottom: 10px;
+      margin-bottom: 9px;
     }
-    .note-overlay .n-sig {
+    .note-sig {
       font-size: 11px;
       color: var(--rose);
       font-style: italic;
     }
 
-    /* ── Feature cards ── */
-    .feature-row {
+    /* ── Features section ── */
+    .features {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 64px 52px 72px;
+    }
+    .features-header {
+      text-align: center;
+      margin-bottom: 44px;
+    }
+    .features-eyebrow {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--rose);
+      margin-bottom: 10px;
+    }
+    .features-title {
+      font-family: 'Lora', Georgia, serif;
+      font-size: clamp(22px, 3vw, 34px);
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    /* ── Stamp bento grid ── */
+    .stamp-grid {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
-      gap: 20px;
-      padding: 0 48px 52px;
-      max-width: 1240px;
-      margin: 0 auto;
+      gap: 24px;
+      align-items: start;
     }
 
-    /* Stamp with working scalloped perforations */
-    .stamp {
-      --sc: var(--cream);
-      background:
-        radial-gradient(circle at 50% 0,   transparent calc(var(--r) - .5px), var(--sc) var(--r)) top    / var(--sp) calc(var(--r)*2) repeat-x,
-        radial-gradient(circle at 50% 100%,transparent calc(var(--r) - .5px), var(--sc) var(--r)) bottom / var(--sp) calc(var(--r)*2) repeat-x,
-        radial-gradient(circle at 0   50%, transparent calc(var(--r) - .5px), var(--sc) var(--r)) left   / calc(var(--r)*2) var(--sp) repeat-y,
-        radial-gradient(circle at 100% 50%,transparent calc(var(--r) - .5px), var(--sc) var(--r)) right  / calc(var(--r)*2) var(--sp) repeat-y,
-        linear-gradient(var(--sc), var(--sc)) var(--r) var(--r) / calc(100% - 2 * var(--r)) calc(100% - 2 * var(--r)) no-repeat;
-      padding: calc(var(--r) + 28px) calc(var(--r) + 28px);
-      box-shadow: 0 4px 18px rgba(58,36,24,0.1);
-      position: relative;
+    .stamp-card {
+      background: var(--cream);
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: 0 4px 20px rgba(58,36,24,0.11);
     }
-    .stamp-blue  { --sc: var(--blue); }
-    .stamp-olive { --sc: var(--olive); }
+    .stamp-card.blue  { background: var(--blue);  }
+    .stamp-card.olive { background: var(--olive); }
 
-    .feat-icon {
-      display: block;
-      margin-bottom: 16px;
-      color: var(--ink-mid);
+    .stamp-inner {
+      border: 1px solid rgba(255,255,255,0.28);
+      border-radius: 2px;
+      overflow: hidden;
     }
-    .stamp-blue  .feat-icon,
-    .stamp-olive .feat-icon { color: rgba(255,255,255,0.85); }
+    .stamp-card:not(.blue):not(.olive) .stamp-inner { border-color: rgba(58,46,42,0.14); }
 
-    .feat-title {
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 10px;
-      color: var(--ink);
-      line-height: 1.2;
-    }
-    .stamp-blue  .feat-title,
-    .stamp-olive .feat-title { color: #fff; }
+    .stamp-visual { position: relative; overflow: hidden; }
+    .stamp-visual img { width: 100%; height: 160px; object-fit: cover; display: block; }
 
-    .feat-body {
-      font-size: 14px;
-      line-height: 1.68;
-      color: var(--ink-mid);
-      max-width: 240px;
-    }
-    .stamp-blue  .feat-body,
-    .stamp-olive .feat-body { color: rgba(255,255,255,0.82); }
-
-    /* Floral decoration */
-    .floral {
+    .stamp-series {
       position: absolute;
-      bottom: 14px;
-      right: 16px;
-      width: 96px;
-      height: 96px;
-      pointer-events: none;
+      top: 8px; left: 8px;
+      font-size: 7.5px; font-weight: 700;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: rgba(255,255,255,0.9);
+      background: rgba(0,0,0,0.28);
+      padding: 2px 6px; border-radius: 3px;
+      backdrop-filter: blur(3px);
     }
-    .stamp-blue  .floral { opacity: 0.22; color: #fff; }
-    .stamp        .floral { opacity: 0.18; color: var(--ink-mid); }
-    .stamp-olive .floral { opacity: 0.25; color: #fff; }
+    .stamp-card:not(.blue):not(.olive) .stamp-series {
+      color: rgba(58,46,42,0.75);
+      background: rgba(255,255,255,0.55);
+    }
+
+    .stamp-content { padding: 14px 15px 15px; }
+
+    .stamp-icon {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 30px; height: 30px; border-radius: 50%; margin-bottom: 10px;
+    }
+    .stamp-card.blue  .stamp-icon,
+    .stamp-card.olive .stamp-icon { background: rgba(255,255,255,0.2); color: #fff; }
+    .stamp-card:not(.blue):not(.olive) .stamp-icon { background: rgba(58,46,42,0.08); color: var(--ink-mid); }
+
+    .stamp-title { font-size: 15.5px; font-weight: 700; line-height: 1.25; margin-bottom: 7px; }
+    .stamp-card.blue  .stamp-title,
+    .stamp-card.olive .stamp-title { color: #fff; }
+    .stamp-card:not(.blue):not(.olive) .stamp-title { color: var(--ink); }
+
+    .stamp-desc { font-size: 12.5px; line-height: 1.65; }
+    .stamp-card.blue  .stamp-desc,
+    .stamp-card.olive .stamp-desc { color: rgba(255,255,255,0.84); }
+    .stamp-card:not(.blue):not(.olive) .stamp-desc { color: var(--ink-mid); }
+
+    .stamp-denom {
+      font-size: 7.5px; font-weight: 700;
+      letter-spacing: 0.13em; text-transform: uppercase;
+      text-align: right; margin-top: 14px; opacity: 0.38;
+    }
+    .stamp-card.blue  .stamp-denom,
+    .stamp-card.olive .stamp-denom { color: #fff; }
 
     /* ── Footer ── */
     footer {
       text-align: center;
-      padding: 16px 36px 44px;
-      font-size: 12.5px;
+      padding: 8px 24px 44px;
+      font-size: 12px;
       color: var(--ink-mid);
-      opacity: 0.65;
-      letter-spacing: 0.02em;
+      opacity: 0.58;
+      letter-spacing: 0.03em;
     }
 
     /* ── Responsive ── */
-    @media (max-width: 860px) {
-      nav, .hero, .feature-row { padding-left: 20px; padding-right: 20px; }
-      .hero { grid-template-columns: 1fr; }
-      .illustration { min-height: 340px; }
-      .feature-row { grid-template-columns: 1fr; }
+    @media (max-width: 900px) {
+      nav, .page-top, .features { padding-left: 24px; padding-right: 24px; }
+      .stamp-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 700px) {
+      .page-top {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding-bottom: 32px;
+      }
+      .illus-frame { min-height: 320px; }
+      /* Safe zone stays strict on mobile */
+      .env-overlay { top: 13%; left: 11%; right: 11%; bottom: 13%; }
+    }
+
+    @media (max-width: 520px) {
+      nav { padding: 16px 20px; }
+      .page-top, .features { padding-left: 16px; padding-right: 16px; }
+      .stamp-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -361,150 +449,169 @@
     <div class="logo-mark">♪</div>
     SongNotes
   </a>
-  <a class="nav-cta" href="#">
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v8M3.5 6l3.5 3.5L10.5 6M1.5 11.5h11" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    Download
-  </a>
+  <a class="nav-cta" href="#">↓ Download</a>
 </nav>
 
-<!-- HERO -->
-<div class="hero">
+<!--
+  PAGE TOP
+  Left:  envelope.jpg fills the column.
+         A single transparent overlay sits on the paper area of the image.
+         No card, no background, no border — text printed on the existing letter.
+  Right: hero.jpg in a rounded frame with a note UI overlay.
+-->
+<section class="page-top">
 
-  <!-- ENVELOPE -->
-  <div class="envelope">
-    <div class="env-flap">
-      <!-- SVG fold: lines always go from corners to exact center-bottom -->
-      <svg preserveAspectRatio="none" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-        <polygon points="0,0 100,0 50,100" fill="rgba(255,255,255,0.13)"/>
-        <line x1="0" y1="0" x2="50" y2="100" stroke="rgba(58,36,24,0.18)" stroke-width="0.6"/>
-        <line x1="100" y1="0" x2="50" y2="100" stroke="rgba(58,36,24,0.18)" stroke-width="0.6"/>
-      </svg>
-    </div>
-    <div class="letter">
-      <!-- Postmark stamp -->
-      <div class="postmark">
-        <span>SongNotes</span>
-        <div class="pm-waves"><i></i><i></i><i></i></div>
-        <span>2025</span>
+  <!-- LEFT: envelope image + single transparent text overlay -->
+  <div class="env-col">
+    <div class="env-wrap">
+
+      <img
+        class="env-img"
+        src="envelope.jpg"
+        alt="Open envelope with handwritten letter"
+      />
+
+      <!--
+        Single absolutely-positioned overlay.
+        transparent background · no border · no shadow.
+        top/left/right are % of the image — scale with it.
+        Adjust these values to align with the paper area in your image.
+      -->
+      <div class="env-overlay">
+
+        <!-- Top row: label left · stamp right -->
+        <div class="env-top-row">
+          <span class="letter-label">✧ a love letter, embedded in a song</span>
+          <div class="letter-stamp" aria-hidden="true">
+            <span class="stamp-name">SongNotes</span>
+            <span class="stamp-year">2025</span>
+          </div>
+        </div>
+
+        <h1 class="letter-h1">
+          Leave a note<br>
+          <em>inside the music.</em>
+        </h1>
+
+        <p class="letter-p">
+          Attach a private message to any Spotify song — at a specific second,
+          or the very first note. Share a song-letter with one quiet link.
+          No account needed.
+        </p>
+
+        <a class="btn-primary" href="#">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <path d="M7 1v8M3.5 6l3.5 3.5L10.5 6M1.5 11.5h11"
+              stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Download for Chrome
+        </a>
+
       </div>
-
-      <!-- Tag pill -->
-      <div class="letter-tag">✧ a love letter, embedded in a song</div>
-
-      <!-- Headline -->
-      <h1 class="letter-h1">
-        Leave a note
-        <em>inside the music.</em>
-      </h1>
-
-      <!-- Body -->
-      <p class="letter-p">
-        Attach a private message to any Spotify song — at a specific second,
-        or the very first note. Share a song-letter with one quiet link.
-      </p>
-
-      <!-- CTA -->
-      <a class="btn-dl" href="#">
-        <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 1.5v8M3.5 7l4 4 4-4M1.5 12.5h12" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Download for Chrome
-      </a>
     </div>
   </div>
 
-  <!-- ILLUSTRATION -->
-  <div class="illustration">
-    <img src="hero.jpg" alt="Vinyl record with handwritten letter and flowers, warm illustrated scene" />
-    <div class="note-overlay">
-      <div class="n-meta">A NOTE · 1:24</div>
-      <div class="n-body">this part — every time I hear it,<br>I think of that night in october.</div>
-      <div class="n-sig">— a note from you</div>
+  <!-- RIGHT: illustration in rounded frame -->
+  <div class="illus-col">
+    <div class="illus-frame">
+      <img
+        src="hero.jpg"
+        alt="Illustrated scene — vinyl record, handwritten letter, and flowers on a warm desk"
+      />
+      <div class="note-overlay" aria-label="Example note">
+        <div class="note-meta">A NOTE · 1:24</div>
+        <div class="note-body">
+          this part — every time I hear it,<br>
+          I think of that night in october.
+        </div>
+        <div class="note-sig">— a note from you</div>
+      </div>
     </div>
   </div>
 
-</div>
+</section>
 
-<!-- FEATURE CARDS -->
-<div class="feature-row">
-
-  <!-- Blue: A note in music -->
-  <div class="stamp stamp-blue">
-    <span class="feat-icon">
-      <svg width="22" height="18" viewBox="0 0 22 18" fill="none"><rect x="1" y="1" width="20" height="16" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M1 4l10 7 10-7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-    </span>
-    <div class="feat-title">A note in music</div>
-    <p class="feat-body">Pin a private message to any track. Arrives exactly when you choose.</p>
-    <!-- Floral: daisy -->
-    <svg class="floral" viewBox="0 0 96 96" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M48 96 L48 58"/>
-      <path d="M48 78 C36 70 30 58 35 50"/>
-      <path d="M48 70 C62 64 66 52 60 45"/>
-      <ellipse cx="48" cy="35" rx="5" ry="13" transform="rotate(0 48 48)"/>
-      <ellipse cx="48" cy="35" rx="5" ry="13" transform="rotate(45 48 48)"/>
-      <ellipse cx="48" cy="35" rx="5" ry="13" transform="rotate(90 48 48)"/>
-      <ellipse cx="48" cy="35" rx="5" ry="13" transform="rotate(135 48 48)"/>
-      <ellipse cx="48" cy="35" rx="5" ry="13" transform="rotate(180 48 48)"/>
-      <ellipse cx="48" cy="35" rx="5" ry="13" transform="rotate(225 48 48)"/>
-      <ellipse cx="48" cy="35" rx="5" ry="13" transform="rotate(270 48 48)"/>
-      <ellipse cx="48" cy="35" rx="5" ry="13" transform="rotate(315 48 48)"/>
-      <circle cx="48" cy="48" r="8"/>
-    </svg>
+<!-- FEATURES -->
+<section class="features">
+  <div class="features-header">
+    <div class="features-eyebrow">How it works</div>
+    <h2 class="features-title">Three stamps. One song-letter.</h2>
   </div>
 
-  <!-- Cream: At the right moment -->
-  <div class="stamp">
-    <span class="feat-icon">
-      <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="9.5" stroke="currentColor" stroke-width="1.6"/><path d="M11 6v5.5l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </span>
-    <div class="feat-title">At the right moment</div>
-    <p class="feat-body">The note fades in at the second you chose. The chorus, the drop, the silence before.</p>
-    <!-- Floral: lily -->
-    <svg class="floral" viewBox="0 0 96 110" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M48 110 C47 92 49 78 48 62"/>
-      <path d="M48 88 C36 80 28 66 34 57"/>
-      <path d="M48 76 C62 70 68 57 62 50"/>
-      <path d="M48 62 C42 50 34 36 38 24 C40 14 50 18 48 32 C47 44 48 56 48 62"/>
-      <path d="M48 62 C36 54 22 48 22 34 C22 20 34 22 40 34 C44 44 47 56 48 62"/>
-      <path d="M48 62 C60 54 74 48 74 34 C74 20 62 22 56 34 C52 44 49 56 48 62"/>
-      <path d="M48 62 C54 50 62 36 58 24 C56 14 46 18 48 32 C49 44 48 56 48 62"/>
-      <line x1="48" y1="48" x2="43" y2="30"/><circle cx="43" cy="29" r="1.5" fill="currentColor" stroke="none"/>
-      <line x1="48" y1="48" x2="53" y2="30"/><circle cx="53" cy="29" r="1.5" fill="currentColor" stroke="none"/>
-      <line x1="48" y1="48" x2="48" y2="27"/><circle cx="48" cy="26" r="1.5" fill="currentColor" stroke="none"/>
-    </svg>
-  </div>
+  <div class="stamp-grid">
 
-  <!-- Olive: Send to someone -->
-  <div class="stamp stamp-olive">
-    <span class="feat-icon">
-      <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M10 4H4a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M14 2h6v6M20 2l-9 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </span>
-    <div class="feat-title">Send to someone</div>
-    <p class="feat-body">Group notes across multiple songs and share them with one quiet link.</p>
-    <!-- Floral: lily variant -->
-    <svg class="floral" viewBox="0 0 96 110" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M48 110 C47 92 49 78 48 62"/>
-      <path d="M48 84 C60 76 66 62 60 54"/>
-      <path d="M48 74 C34 68 28 54 34 46"/>
-      <path d="M48 62 C52 48 62 32 56 20 C52 10 42 14 44 28 C46 42 48 56 48 62"/>
-      <path d="M48 62 C38 52 24 44 26 30 C28 16 40 20 44 34 C46 44 47 56 48 62"/>
-      <path d="M48 62 C58 52 72 44 70 30 C68 16 56 20 52 34 C50 44 49 56 48 62"/>
-      <path d="M48 62 C44 48 34 32 40 20 C44 10 54 14 52 28 C50 42 48 56 48 62"/>
-      <line x1="48" y1="46" x2="42" y2="28"/><circle cx="42" cy="27" r="1.5" fill="currentColor" stroke="none"/>
-      <line x1="48" y1="46" x2="54" y2="28"/><circle cx="54" cy="27" r="1.5" fill="currentColor" stroke="none"/>
-      <line x1="48" y1="46" x2="48" y2="25"/><circle cx="48" cy="24" r="1.5" fill="currentColor" stroke="none"/>
-      <!-- small bud -->
-      <path d="M34 42 C30 36 32 27 35 29 C38 31 36 40 34 42"/>
-      <path d="M62 38 C66 32 64 23 61 25 C58 27 60 36 62 38"/>
-    </svg>
-  </div>
+    <div class="stamp-card blue">
+      <div class="stamp-inner">
+        <div class="stamp-visual">
+          <img src="stamp-blue.jpg" alt="A note in music" />
+          <span class="stamp-series">SongNotes · 01</span>
+        </div>
+        <div class="stamp-content">
+          <div class="stamp-icon" aria-hidden="true">
+            <svg width="15" height="13" viewBox="0 0 15 13" fill="none">
+              <rect x="1" y="1" width="13" height="11" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M1 3.5l6.5 4.5L14 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="stamp-title">A note in music</div>
+          <p class="stamp-desc">Pin a private message to any track. It arrives exactly when you choose — the chorus, the drop, the silence before.</p>
+          <div class="stamp-denom">SongNotes · ♪ 01</div>
+        </div>
+      </div>
+    </div>
 
-</div>
+    <div class="stamp-card">
+      <div class="stamp-inner">
+        <div class="stamp-visual">
+          <img src="stamp-cream.jpg" alt="At the right moment" />
+          <span class="stamp-series">SongNotes · 02</span>
+        </div>
+        <div class="stamp-content">
+          <div class="stamp-icon" aria-hidden="true">
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+              <circle cx="7.5" cy="7.5" r="6" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M7.5 4v4l2.5 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="stamp-title">At the right moment</div>
+          <p class="stamp-desc">The note fades in at the second you chose — a timestamp sewn into the song, visible only to the listener.</p>
+          <div class="stamp-denom">SongNotes · ♪ 02</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stamp-card olive">
+      <div class="stamp-inner">
+        <div class="stamp-visual">
+          <img src="stamp-olive.jpg" alt="Send to someone" />
+          <span class="stamp-series">SongNotes · 03</span>
+        </div>
+        <div class="stamp-content">
+          <div class="stamp-icon" aria-hidden="true">
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+              <path d="M6.5 2.5H2.5A1.5 1.5 0 001 4v8.5A1.5 1.5 0 002.5 14h8.5A1.5 1.5 0 0012.5 12.5V8.5"
+                stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M9.5 1H14v4.5M14 1l-6.5 6.5"
+                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="stamp-title">Send to someone</div>
+          <p class="stamp-desc">Group notes across songs and share them with one quiet link. No account, no login — just music and meaning.</p>
+          <div class="stamp-denom">SongNotes · ♪ 03</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
 
 <!-- FOOTER -->
 <footer>SongNotes &nbsp;·&nbsp; Works on Spotify Web Player &nbsp;·&nbsp; No account required</footer>
 
-<!-- Paper grain overlay — gives the vintage/analog texture -->
-<svg id="grain" xmlns="http://www.w3.org/2000/svg"
-  style="position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:9999;mix-blend-mode:multiply;opacity:0.072">
+<!-- Grain overlay -->
+<svg xmlns="http://www.w3.org/2000/svg"
+  style="position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:9999;mix-blend-mode:multiply;opacity:0.065"
+  aria-hidden="true">
   <filter id="gf">
     <feTurbulence type="fractalNoise" baseFrequency="0.72" numOctaves="4" stitchTiles="stitch"/>
     <feColorMatrix type="saturate" values="0"/>
