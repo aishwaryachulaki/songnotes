@@ -1,6 +1,6 @@
 window.SN_CONFIG = {
-  SUPABASE_URL: "https://earyrktanwypmffzxedd.supabase.co",
-  SUPABASE_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVhcnlya3Rhbnd5cG1mZnp4ZWRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MDA5OTEsImV4cCI6MjA5MTk3Njk5MX0.QjUyEDkvSJh7olYe2Aij-s9j4d7ch8Fvyn2UPtTLnrg",
+  SUPABASE_URL: "https://kkasgbkgwjxiutdalbbm.supabase.co",
+  SUPABASE_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtrYXNnYmtnd2p4aXV0ZGFsYmJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyNjU3OTQsImV4cCI6MjA5Mjg0MTc5NH0.z1JLMTzz3X_swbWHdt2z4UDKyUwjEfNYys5kdDMq3R4",
 
   // URL where share.html is hosted (no trailing slash).
   // During local testing use the empty string — share links won't open a page
