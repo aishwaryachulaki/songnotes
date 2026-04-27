@@ -168,13 +168,13 @@
       opacity: 0.75;
     }
 
-    /* ── Import into extension ── */
+    /* ── Import into extension (installed) ── */
     .import-area {
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 10px;
-      padding: 4px 0;
+      min-height: 52px; /* prevents layout jump during detection */
     }
     .btn-import {
       background: var(--tangerine);
@@ -197,8 +197,52 @@
       text-align: center;
       line-height: 1.6;
       opacity: 0.75;
+      margin: 0;
     }
-    .import-note strong { color: var(--ink); opacity: 1; }
+
+    /* ── Install nudge (not installed) ── */
+    .install-nudge {
+      background: var(--cream);
+      border-radius: 14px;
+      padding: 20px 22px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      text-align: center;
+      width: 100%;
+    }
+    .install-nudge-eyebrow {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.13em;
+      color: var(--ink-mid);
+      font-weight: 700;
+      opacity: 0.65;
+    }
+    .install-nudge-body {
+      font-size: 13px;
+      color: var(--ink);
+      line-height: 1.55;
+      max-width: 340px;
+    }
+    .btn-install {
+      display: inline-block;
+      background: var(--tangerine);
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      padding: 13px 26px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.04em;
+      text-decoration: none;
+      box-shadow: 0 5px 18px rgba(240,140,33,0.28);
+      transition: opacity 0.15s, transform 0.12s;
+      margin-top: 2px;
+    }
+    .btn-install:hover { opacity: 0.9; transform: translateY(-1px); }
 
     /* ── States ── */
     .state {
@@ -234,6 +278,8 @@
   // ── Config (keep in sync with config.js) ──────────────────
   const SUPABASE_URL = "https://earyrktanwypmffzxedd.supabase.co";
   const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVhcnlya3Rhbnd5cG1mZnp4ZWRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MDA5OTEsImV4cCI6MjA5MTk3Njk5MX0.QjUyEDkvSJh7olYe2Aij-s9j4d7ch8Fvyn2UPtTLnrg";
+  // ── Chrome Web Store link — update this one line when published ──
+  const EXTENSION_CWS_URL = null; // e.g. "https://chromewebstore.google.com/detail/songnotes/EXTENSION_ID"
 
   // ── Helpers ───────────────────────────────────────────────
   function getShareId() {
@@ -352,43 +398,82 @@
       `;
     }
 
-    // Import into extension
-    html += `
-      <div class="import-area">
-        <button class="btn-import" id="importBtn">♫ Import into SongNotes</button>
-        <div class="import-note" id="importNote">
-          Notes will pop up as you listen.<br/>
-          <strong>Requires the SongNotes Chrome extension.</strong>
-        </div>
-      </div>
-    `;
+    // Import section — filled in after extension detection below
+    html += `<div id="importArea" class="import-area"></div>`;
 
     page.innerHTML = html;
 
-    // Set the payload for share-bridge.js (if extension is installed)
+    // Set payload so share-bridge.js can pick it up when it loads
     window.__SN_PAYLOAD = { share_id: shareId, share: meta || {}, notes };
-    window.dispatchEvent(new CustomEvent("songnotes:import", { detail: window.__SN_PAYLOAD }));
 
-    // Manual import button
+    // ── Extension detection ───────────────────────────────────
+    // share-bridge.js sets data-songnotes-installed and fires "songnotes:ready"
+    // at document_idle. We give it up to 1 s to appear; if it doesn't, the
+    // extension isn't installed.
+    let detected = false;
+
+    function onExtensionReady() {
+      if (detected) return;
+      detected = true;
+      renderImportInstalled(shareId, meta, notes);
+      // Bridge may have already picked up __SN_PAYLOAD; fire once more to be safe
+      window.dispatchEvent(new CustomEvent("songnotes:import", { detail: window.__SN_PAYLOAD }));
+    }
+
+    function onDetectionTimeout() {
+      if (detected) return;
+      detected = true;
+      renderImportNotInstalled();
+    }
+
+    window.addEventListener("songnotes:ready", onExtensionReady, { once: true });
+    // Fallback: check the attribute directly (bridge may have already run)
+    if (document.documentElement.getAttribute("data-songnotes-installed") === "1") {
+      onExtensionReady();
+    } else {
+      setTimeout(onDetectionTimeout, 1000);
+    }
+  }
+
+  // ── Import UI: extension installed ───────────────────────
+  function renderImportInstalled(shareId, meta, notes) {
+    const area = document.getElementById("importArea");
+    if (!area) return;
+    area.innerHTML = `
+      <button class="btn-import" id="importBtn">♫ Import into SongNotes</button>
+      <p class="import-note">Notes will pop up as you listen in Spotify.</p>
+    `;
     document.getElementById("importBtn").addEventListener("click", () => {
       window.__SN_PAYLOAD = { share_id: shareId, share: meta || {}, notes };
       window.dispatchEvent(new CustomEvent("songnotes:import", { detail: window.__SN_PAYLOAD }));
-
       window.addEventListener("songnotes:imported", () => {
         const btn = document.getElementById("importBtn");
-        const note = document.getElementById("importNote");
+        const note = area.querySelector(".import-note");
         if (btn) btn.disabled = true;
-        if (note) note.innerHTML = `<span style="color:var(--tangerine)">✓ Imported! Open Spotify and hit play.</span>`;
+        if (note) note.innerHTML = `<span style="color:var(--tangerine);font-weight:600">✓ Imported! Open Spotify and hit play.</span>`;
       }, { once: true });
-
-      setTimeout(() => {
-        const btn = document.getElementById("importBtn");
-        if (btn && !btn.disabled) {
-          document.getElementById("importNote").innerHTML =
-            `SongNotes extension not detected. <strong>Install it, then paste this link in the Import field.</strong>`;
-        }
-      }, 2000);
     });
+  }
+
+  // ── Import UI: extension not installed ───────────────────
+  function renderImportNotInstalled() {
+    const area = document.getElementById("importArea");
+    if (!area) return;
+    const cwsHref = EXTENSION_CWS_URL || "#";
+    const isPublished = !!EXTENSION_CWS_URL;
+    area.innerHTML = `
+      <div class="install-nudge">
+        <div class="install-nudge-eyebrow">Want to hear it their way?</div>
+        <div class="install-nudge-body">
+          SongNotes pops up their notes as you listen — right on the Spotify page.
+        </div>
+        <a class="btn-install" href="${cwsHref}" target="_blank" rel="noopener"
+          ${!isPublished ? 'aria-disabled="true" style="opacity:0.5;cursor:default;pointer-events:none"' : ""}>
+          Add SongNotes to Chrome — it's free
+        </a>
+        ${!isPublished ? `<p class="import-note" style="color:var(--blush);opacity:1">Not yet published — coming soon.</p>` : ""}
+      </div>
+    `;
   }
 
   // ── Main ──────────────────────────────────────────────────
