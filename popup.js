@@ -30,6 +30,11 @@ function formatTs(sec) {
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 }
+// Returns only structurally valid notes — guards share/import paths.
+function sanitizeNotes(notes) {
+  return (notes || []).filter((n) => n && n.id && n.note && n.track_id);
+}
+
 function parsePlaylistId(input) {
   if (!input) return null;
   const s = String(input).trim();
@@ -69,6 +74,7 @@ function ensureActive(store, sender) {
       playlist_id: null,
       playlist_url: null,
       sender_name: sender || "someone",
+      recipient_name: null,
       notes: [],
       imported: false,
       created_at: Date.now(),
@@ -148,6 +154,23 @@ async function pushNote(share, note) {
     return res.ok;
   } catch { return false; }
 }
+async function deleteNoteRemote(id) {
+  // Works for imported notes (id === Supabase row id).
+  // For locally-created notes the id won't match any row — silently no-ops.
+  try {
+    await fetch(
+      `${SUPABASE_URL}/rest/v1/annotations?id=eq.${encodeURIComponent(id)}`,
+      {
+        method: "DELETE",
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: `Bearer ${SUPABASE_KEY}`,
+        },
+      }
+    );
+  } catch {}
+}
+
 async function fetchShareNotes(id) {
   const url = `${SUPABASE_URL}/rest/v1/annotations?share_id=eq.${encodeURIComponent(id)}&select=*`;
   const res = await fetch(url, { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } });
@@ -169,9 +192,10 @@ function shareUrl(id) {
 
 // ---------- rendering ----------
 function setMode(mode) {
-  // Only "editing" and "inactive" modes exist now.
+  // Banner has been removed from the DOM; this is a no-op kept for call-site compatibility.
   const m = mode === "inactive" ? "inactive" : "editing";
   const banner = $("modeBanner");
+  if (!banner) return;
   banner.classList.remove("mode-editing", "mode-preview", "mode-inactive");
   banner.classList.add(`mode-${m}`);
   const labels = {
@@ -201,11 +225,19 @@ async function renderNotes() {
   });
   list.querySelectorAll(".del").forEach((b) =>
     b.addEventListener("click", async (e) => {
-      const id = e.currentTarget.dataset.id;
-      activeShare.notes = activeShare.notes.filter((n) => n.id !== id);
+      const deletedId = e.currentTarget.dataset.id;
       const { store } = await loadStore();
-      store.shares[activeShare.id] = activeShare;
+      // Remove this note from EVERY share so no archived copy keeps it alive.
+      for (const shareId in store.shares) {
+        store.shares[shareId].notes = store.shares[shareId].notes.filter(
+          (n) => n.id !== deletedId
+        );
+      }
       await saveStore(store);
+      // Keep the module-level reference consistent with the saved store.
+      activeShare.notes = store.shares[activeShare.id]?.notes ?? [];
+      // Best-effort remote delete (works when id is a Supabase row id).
+      deleteNoteRemote(deletedId);
       renderNotes();
       renderSummary();
       notifyContentRefresh();
@@ -226,25 +258,39 @@ function renderSummary() {
     const tag = t === "playlist" ? " · playlist" : t === "multi" ? " · across multiple songs" : "";
     el.textContent = `${noteCount} note${noteCount === 1 ? "" : "s"} across ${songCount} song${songCount === 1 ? "" : "s"}${tag}`;
   }
+
 }
 
 async function renderPrevious() {
   const { store } = await loadStore();
   const list = $("previousList");
-  const prev = (store.previous || []).filter((id) => store.shares[id]);
+  const prev = (store.previous || [])
+    .filter((id) => store.shares[id])
+    .slice(0, 3);
   if (!prev.length) { list.innerHTML = ""; return; }
   list.innerHTML = '<div class="prev-header">Previous experiences</div>';
   prev.forEach((id) => {
     const s = store.shares[id];
     const noteCount = s.notes.length;
     const songCount = new Set(s.notes.map((n) => n.track_id)).size;
-    const fromLabel = s.imported ? `from ${s.sender_name || "someone"}` : "your share";
+    const title = s.recipient_name
+      ? `Notes for ${s.recipient_name}`
+      : "Notes (unknown recipient)";
+    // Short date, e.g. "Apr 27"
+    const dateStr = s.created_at
+      ? new Date(s.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+      : null;
+    const sub = [
+      `${noteCount} note${noteCount === 1 ? "" : "s"}`,
+      `${songCount} song${songCount === 1 ? "" : "s"}`,
+      dateStr,
+    ].filter(Boolean).join(" · ");
     const row = document.createElement("div");
     row.className = "prev-item";
     row.innerHTML = `
       <div class="prev-meta">
-        <div class="prev-title">${escapeHtml(fromLabel)}</div>
-        <div class="prev-sub">${noteCount} note${noteCount === 1 ? "" : "s"} · ${songCount} song${songCount === 1 ? "" : "s"}</div>
+        <div class="prev-title">${escapeHtml(title)}</div>
+        <div class="prev-sub">${escapeHtml(sub)}</div>
       </div>
       <button class="btn prev-activate" data-id="${id}">Reactivate</button>
     `;
@@ -255,6 +301,13 @@ async function renderPrevious() {
       await activateShare(e.currentTarget.dataset.id);
     }),
   );
+
+  if ((store.previous || []).filter((id) => store.shares[id]).length > 3) {
+    const more = document.createElement("div");
+    more.className = "prev-more";
+    more.textContent = "View more on your account →";
+    list.appendChild(more);
+  }
 }
 
 function showComposer(show) {
@@ -278,6 +331,7 @@ async function activateShare(id) {
   store.active = id;
   await saveStore(store);
   activeShare = store.shares[id];
+  $("recipientName").value = activeShare.recipient_name || "";
   setMode(activeShare.mode || "editing");
   renderNotes();
   renderSummary();
@@ -306,6 +360,7 @@ async function init() {
   }
 
   $("playlistUrl").value = activeShare.playlist_url || "";
+  $("recipientName").value = activeShare.recipient_name || "";
   setMode(activeShare.mode || "editing");
   showComposer(!!senderName);
   renderNotes();
@@ -332,15 +387,26 @@ $("changeName").addEventListener("click", (e) => {
   $("senderName").value = senderName;
   showComposer(false);
 });
+$("recipientName").addEventListener("input", async () => {
+  if (!activeShare) return;
+  activeShare.recipient_name = $("recipientName").value.trim() || null;
+  const { store } = await loadStore();
+  store.shares[activeShare.id] = activeShare;
+  await saveStore(store);
+});
+
 $("useCurrent").addEventListener("click", async () => {
   const state = await fetchTrack();
   if (state && state.position != null) $("ts").value = formatTs(Math.floor(state.position));
 });
 
 $("save").addEventListener("click", async () => {
+  const btn = $("save");
+  if (btn.disabled) return;
+  btn.disabled = true;
   const text = $("note").value.trim();
-  if (!text) return ($("status").textContent = "Note can't be empty.");
-  if (!currentTrack) return ($("status").textContent = "No song detected.");
+  if (!text) { btn.disabled = false; return ($("status").textContent = "Note can't be empty."); }
+  if (!currentTrack) { btn.disabled = false; return ($("status").textContent = "No song detected."); }
   const ts = parseTimestamp($("ts").value);
   const note = {
     id: uuid(),
@@ -362,6 +428,7 @@ $("save").addEventListener("click", async () => {
   setMode("editing");
 
   const ok = await pushNote(activeShare, note);
+  btn.disabled = false;
   $("note").value = "";
   $("ts").value = "";
   $("status").textContent = ok ? "Saved & shared ✓" : "Saved locally ✓";
@@ -383,8 +450,12 @@ $("playlistUrl").addEventListener("change", async () => {
 });
 
 $("copyShare").addEventListener("click", async () => {
+  const shareBtn = $("copyShare");
+  if (shareBtn.disabled) return;
+  shareBtn.disabled = true;
   if (!activeShare.notes.length) {
     $("shareInfo").textContent = "Write at least one note before sending.";
+    shareBtn.disabled = false;
     return;
   }
   // STRICT: multi-song shares REQUIRE a playlist URL.
@@ -393,6 +464,7 @@ $("copyShare").addEventListener("click", async () => {
   const playlistId = parsePlaylistId($("playlistUrl").value);
   if (isMulti && !playlistId) {
     $("shareInfo").textContent = "Add a playlist link to share notes across multiple songs";
+    shareBtn.disabled = false;
     return;
   }
   // Sync playlist fields from input one more time
@@ -400,13 +472,38 @@ $("copyShare").addEventListener("click", async () => {
   activeShare.playlist_url = v || null;
   activeShare.playlist_id = parsePlaylistId(v);
   activeShare.type = deriveType(activeShare);
+  // Drop malformed notes, then deduplicate by content signature.
+  activeShare.notes = sanitizeNotes(activeShare.notes);
+  const seen = new Set();
+  activeShare.notes = activeShare.notes.filter((n) => {
+    const key = `${n.track_id}|${n.timestamp ?? ""}|${n.note}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+
+  // Always mint a fresh share ID on every send.
+  // This sidesteps Supabase RLS blocking DELETEs — old rows are simply
+  // orphaned (unreachable), and the new link is a clean slate.
+  const { store } = await loadStore();
+  const oldId = activeShare.id;
+  const newId = shortId();
+
+  // Migrate local share object to new ID.
+  activeShare.id = newId;
+  activeShare.mode = "inactive";
+  delete store.shares[oldId];
+  store.shares[newId] = activeShare;
+  store.active = newId;
+
+  // Push fresh rows under the new ID.
+  for (const note of activeShare.notes) {
+    await pushNote(activeShare, note);
+  }
   await pushShareMeta(activeShare);
 
-  // Auto-flip to inactive after sharing.
-  activeShare.mode = "inactive";
-  const { store } = await loadStore();
-  store.shares[activeShare.id] = activeShare;
   await saveStore(store);
+  shareBtn.disabled = false;
   setMode("inactive");
   notifyContentRefresh();
 
@@ -429,6 +526,7 @@ $("resetShare").addEventListener("click", async () => {
   await saveStore(store);
   $("shareInfo").textContent = "";
   $("playlistUrl").value = "";
+  $("recipientName").value = "";
   setMode("editing");
   renderNotes();
   renderSummary();
@@ -477,7 +575,7 @@ $("importBtn").addEventListener("click", async () => {
     sender_name: meta?.sender_name || remote[0]?.sender_name || "someone",
     imported: true,
     created_at: Date.now(),
-    notes: remote.map((r) => ({
+    notes: sanitizeNotes(remote.map((r) => ({
       id: r.id,
       track_id: r.track_id,
       track_title: r.track_title,
@@ -486,7 +584,7 @@ $("importBtn").addEventListener("click", async () => {
       timestamp: r.timestamp,
       sender_name: r.sender_name,
       created_at: new Date(r.created_at).getTime(),
-    })),
+    }))),
   };
   store.shares[v] = newShare;
   store.active = v;
