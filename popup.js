@@ -543,11 +543,10 @@ $("save").addEventListener("click", async () => {
   await saveStore(store);
   setMode("editing");
 
-  const ok = await pushNote(activeShare, note);
   btn.disabled = false;
   $("note").value = "";
   $("ts").value = "";
-  $("status").textContent = ok ? "Saved & shared ✓" : "Saved locally ✓";
+  $("status").textContent = "Saved ✓";
   setTimeout(() => ($("status").textContent = ""), 2000);
   renderNotes();
   renderSummary();
