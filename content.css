@@ -1,14 +1,14 @@
-/* ── SongNotes Toast — Stationery Edition ── */
+/* ── SongNotes Toast ── */
 
 .songnotes-overlay {
   position: fixed;
-  top: 36px;
+  top: 24px;
   right: 24px;
   z-index: 2147483647;
   opacity: 0;
-  transform: translateY(-14px);
-  transition: opacity 420ms cubic-bezier(0.34, 1.56, 0.64, 1),
-              transform 420ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform: translateY(-12px);
+  transition: opacity 400ms cubic-bezier(0.34, 1.56, 0.64, 1),
+              transform 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
   pointer-events: none;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
 }
@@ -16,109 +16,86 @@
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
-  /* drop-shadow respects clip-path shape, giving shadow matching the torn edge */
-  filter: drop-shadow(0 16px 48px rgba(100, 55, 35, 0.22))
-          drop-shadow(0 4px 10px rgba(100, 55, 35, 0.10));
+  /* drop-shadow follows the PNG alpha channel — torn edge included */
+  filter: drop-shadow(0 16px 40px rgba(100, 55, 35, 0.28))
+          drop-shadow(0 4px 10px rgba(100, 55, 35, 0.12));
 }
 .songnotes-overlay.pinned.visible {
-  filter: drop-shadow(0 20px 60px rgba(100, 55, 35, 0.30))
-          drop-shadow(0 5px 14px rgba(100, 55, 35, 0.15));
+  filter: drop-shadow(0 20px 56px rgba(100, 55, 35, 0.35))
+          drop-shadow(0 5px 14px rgba(100, 55, 35, 0.16));
 }
 
-/* ── Paper card ── */
+/* ── Card — image is the entire visual ── */
 .songnotes-card {
   position: relative;
+  /* background-image set in JS via chrome.runtime.getURL */
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-color: transparent;
 
-  /* Warm dusty-rose paper base + subtle SVG noise grain */
-  background-color: #F2C4B5;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.065'/%3E%3C/svg%3E");
-  background-size: 200px 200px;
+  /* Dimensions locked to floater.png aspect ratio (1867 × 842) */
+  width: 460px;
+  height: 208px;
 
-  border-radius: 18px 18px 0 0;
-  padding: 26px 20px 46px 24px;
-  color: #3d2618;
-  width: 420px;
-  min-width: 300px;
+  /* Left text area clears the floral on the right (~56% from left) */
+  padding: 22px 206px 44px 26px;
+
   cursor: pointer;
-
-  /* Torn bottom edge — polygon zigzags from ~80% height down */
-  clip-path: polygon(
-    0% 0%, 100% 0%, 100% 80%,
-    98% 85%, 96% 79%, 93% 84%, 91% 78%, 88% 83%, 85% 77%,
-    83% 82%, 80% 76%, 78% 81%, 75% 75%, 72% 80%, 70% 74%,
-    67% 79%, 64% 73%, 62% 78%, 59% 72%, 57% 77%, 54% 71%,
-    51% 76%, 49% 70%, 46% 75%, 44% 69%, 41% 74%, 38% 68%,
-    36% 73%, 33% 67%, 31% 72%, 28% 66%, 25% 71%, 23% 65%,
-    20% 70%, 17% 64%, 15% 69%, 12% 63%, 10% 68%, 7% 73%,
-    5% 67%, 2% 72%, 0% 67%
-  );
-}
-
-/* ── Wrap — positions pin above the card without clipping ── */
-.songnotes-wrap {
-  position: relative;
-  padding-top: 14px; /* space for the pin to float above the card top */
-}
-
-/* ── Brass brad pin — sibling of card, not inside it ── */
-.songnotes-pin {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 36% 34%, #F4E282, #CFA040 52%, #936218 100%);
-  box-shadow:
-    0 3px 9px rgba(75, 42, 8, 0.52),
-    inset 0 1px 4px rgba(255, 248, 180, 0.75),
-    inset 0 -1px 3px rgba(75, 42, 8, 0.35);
-  z-index: 10;
-}
-
-/* ── Card body — padded right to leave room for floral ── */
-.songnotes-body {
-  position: relative;
-  z-index: 2;
-  padding-right: 138px;
+  border-radius: 0;
+  box-shadow: none;
+  border: none;
 }
 
 /* ── Sender label ── */
 .songnotes-label {
   font-size: 12px;
-  color: rgba(80, 45, 28, 0.60);
+  color: rgba(80, 45, 28, 0.62);
   letter-spacing: 0.02em;
-  margin-bottom: 13px;
+  margin-bottom: 10px;
   font-weight: 400;
   line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* ── Note text (serif) ── */
-/* Playfair Display injected at runtime; Georgia is the graceful fallback */
+/* ── Note text — font-size set dynamically in JS by length ── */
 .songnotes-text {
-  font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
-  font-weight: 700;
-  font-size: 30px;
   line-height: 1.22;
   color: #2c180d;
-  white-space: pre-wrap;
   word-break: break-word;
-  max-height: 5.5em;
   overflow: hidden;
+}
+.songnotes-text.sn-large {
+  font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  font-weight: 700;
+  font-size: 28px;
+  line-height: 1.2;
+}
+.songnotes-text.sn-medium {
+  font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 1.25;
+}
+.songnotes-text.sn-small {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 13.5px;
+  line-height: 1.45;
 }
 
 /* ── Close button ── */
 .songnotes-close {
   position: absolute;
   top: 10px;
-  right: 12px;
-  width: 28px;
-  height: 28px;
+  right: 10px;
+  width: 26px;
+  height: 26px;
   border: none;
   background: transparent;
   color: rgba(80, 45, 28, 0.38);
-  font-size: 19px;
+  font-size: 18px;
   line-height: 1;
   cursor: pointer;
   border-radius: 50%;
@@ -132,22 +109,4 @@
 .songnotes-close:hover {
   background: rgba(120, 60, 40, 0.10);
   color: #3d2618;
-}
-
-/* ── Floral lily illustration ── */
-.songnotes-floral {
-  position: absolute;
-  right: -8px;
-  bottom: 12px;
-  width: 158px;
-  height: 158px;
-  opacity: 0.50;
-  pointer-events: none;
-  z-index: 3;
-  overflow: visible;
-}
-.songnotes-floral svg {
-  width: 100%;
-  height: 100%;
-  overflow: visible;
 }

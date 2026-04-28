@@ -14,6 +14,12 @@
     "default_title": "SongNotes"
   },
   "icons": { "48": "icon.png", "128": "icon.png" },
+  "web_accessible_resources": [
+    {
+      "resources": ["floater.png"],
+      "matches": ["https://open.spotify.com/*"]
+    }
+  ],
   "content_scripts": [
     {
       "matches": ["https://open.spotify.com/*"],
