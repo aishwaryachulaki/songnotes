@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Montserrat:wght@500;600;700&display=swap" />
     <link rel="stylesheet" href="popup.css" />
   </head>
   <body>
@@ -17,12 +17,14 @@
 
       <!-- Auth bar — shown when signed in -->
       <div id="authBar" class="auth-bar hidden">
-        <span id="authEmail" class="auth-email"></span>
-        <div class="auth-right">
-          <span id="creditsBadge" class="credits-badge"></span>
-          <a id="accountLink" href="#" class="auth-link">Account</a>
-          <a id="signOutLink" href="#" class="auth-link">Sign out</a>
+        <div class="auth-top">
+          <span id="authEmail" class="auth-email"></span>
+          <div class="auth-links">
+            <a id="accountLink" href="#" class="auth-link">Account</a>
+            <a id="signOutLink" href="#" class="auth-link">Sign out</a>
+          </div>
         </div>
+        <span id="creditsBadge" class="credits-badge"></span>
       </div>
 
       <!-- Now Playing -->
@@ -60,8 +62,10 @@
         </div>
         <input id="recipientName" class="underline-input" type="text"
                placeholder="Recipient name" autocomplete="off" />
-        <textarea id="note" class="ruled-textarea"
-                  placeholder="Write a note for this song…" rows="4"></textarea>
+        <div class="note-area">
+          <textarea id="note" class="ruled-textarea"
+                    placeholder="Write a note for this song…" rows="5" maxlength="260"></textarea>
+        </div>
         <div class="timestamp-row">
           <div class="ts-wrap">
             <svg class="ts-icon" width="13" height="13" viewBox="0 0 24 24" fill="none"
@@ -74,10 +78,9 @@
           <button id="useCurrent" class="now-btn">Now</button>
         </div>
         <div class="save-row">
-          <button id="save" class="save-btn">🖇 Save note</button>
+          <button id="save" class="save-btn">Save note</button>
           <span id="status" class="status"></span>
         </div>
-        <div class="composer-floral" aria-hidden="true"></div>
       </div>
 
       <!-- Notes section -->
@@ -93,7 +96,7 @@
           <span class="playlist-icon">🖇</span>
           <input id="playlistUrl" class="playlist-input" type="text" placeholder="Add playlist link" />
         </div>
-        <button id="copyShare" class="share-btn">✉ Send all notes</button>
+        <button id="copyShare" class="share-btn">Send all notes</button>
         <div id="shareInfo" class="share-info"></div>
         <button id="resetShare" class="new-share-btn">New share</button>
       </div>

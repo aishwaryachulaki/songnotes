@@ -3,6 +3,8 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+button, .btn { font-family: 'Montserrat', sans-serif; }
+
 :root {
   --blush:     #E36888;
   --tangerine: #F08C21;
@@ -40,23 +42,31 @@ body {
 /* ── Auth bar ── */
 .auth-bar {
   display: flex;
+  flex-direction: column;
+  padding: 2px 2px 6px;
+  gap: 6px;
+}
+.auth-top {
+  display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 2px 2px 6px;
   gap: 8px;
 }
 .auth-email {
   font-size: 10px; color: var(--ink-mid);
-  min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-.auth-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.auth-links { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .credits-badge {
+  display: block;
+  text-align: center;
   font-size: 10px; font-weight: 600;
   border: 1.5px solid var(--blush);
   color: var(--blush);
   border-radius: 20px;
-  padding: 6px 32px;
+  padding: 6px 0;
   white-space: nowrap;
+  width: 100%;
 }
 .credits-badge.empty { border-color: var(--ink-lt); color: var(--ink-lt); }
 .auth-link { font-size: 10px; color: var(--ink-mid); text-decoration: none; cursor: pointer; }
@@ -103,9 +113,6 @@ body {
 /* ── Composer card (shared base for name-block + composer) ── */
 .composer-card {
   background: var(--cream);
-  background-image: url('composer-bg.png'); /* user-provided texture */
-  background-size: cover;
-  background-position: center;
   border-radius: 14px;
   padding: 14px 16px;
   display: flex;
@@ -126,7 +133,7 @@ body {
   letter-spacing: 0.12em; text-transform: uppercase;
   color: var(--ink-mid); line-height: 1.4;
 }
-.composer-header strong { color: var(--ink); font-weight: 800; }
+.composer-header strong { color: var(--blush); font-weight: 700; text-transform: none; }
 .composer-header a {
   color: var(--tangerine); text-decoration: none; font-weight: 600;
 }
@@ -144,6 +151,7 @@ body {
 .underline-input::placeholder { color: var(--ink-lt); }
 
 /* Ruled paper textarea */
+.note-area { position: relative; }
 .ruled-textarea {
   width: 100%; background: transparent;
   background-image: repeating-linear-gradient(
@@ -153,8 +161,9 @@ body {
   border: none; border-radius: 0; padding: 2px 0 0;
   font: inherit; font-size: 13px;
   line-height: 24px; color: var(--ink);
-  resize: vertical; outline: none;
-  min-height: 96px; /* 4 lines */
+  resize: none; outline: none;
+  height: 120px; /* 5 lines, fixed */
+  overflow-y: auto;
 }
 .ruled-textarea::placeholder { color: var(--ink-lt); }
 
@@ -193,16 +202,6 @@ body {
 .save-btn:disabled { opacity: 0.5; cursor: default; }
 .status { font-size: 11px; color: var(--ink-mid); }
 
-/* Floral corner illustration */
-.composer-floral {
-  position: absolute; bottom: 0; right: 0;
-  width: 90px; height: 80px;
-  background-image: url('composer-floral.png');
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: bottom right;
-  pointer-events: none;
-}
 
 /* ── Section header (shared by Notes + Previous) ── */
 .section-header {
@@ -309,15 +308,15 @@ body {
   border-radius: 11px; padding: 8px 10px;
 }
 .prev-thumb {
-  width: 38px; height: 38px; border-radius: 7px;
-  object-fit: cover; flex-shrink: 0;
-  background: rgba(58,36,24,0.05);
+  width: 54px; height: 54px; border-radius: 0;
+  object-fit: contain; flex-shrink: 0;
+  background: transparent;
 }
 .prev-meta { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
 .prev-title { font-size: 12px; font-weight: 700; color: var(--ink); }
 .prev-sub { font-size: 10px; color: var(--ink-mid); }
 .prev-activate {
-  font-size: 10px; padding: 4px 10px; border-radius: 20px;
+  font-size: 10px; padding: 4px 10px; border-radius: 6px;
   color: var(--blush); border: 1.5px solid var(--blush);
   background: transparent; cursor: pointer; font: inherit;
   font-weight: 600; white-space: nowrap; flex-shrink: 0;

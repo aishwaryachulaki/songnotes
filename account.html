@@ -4,137 +4,195 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>SongNotes — My Account</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,500&family=Montserrat:wght@500;600;700&display=swap" />
   <style>
     :root {
-      --butter:    #F2D88F;
       --blush:     #E36888;
       --tangerine: #F08C21;
-      --sea:       #6698CC;
       --cream:     #FFFBF4;
+      --bg:        #F5EFE4;
       --ink:       #3a2418;
       --ink-mid:   #8a5a48;
       --ink-lt:    #c4977a;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      background: var(--butter);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      background: var(--bg);
+      font-family: 'Lora', Georgia, serif;
       min-height: 100vh;
       color: var(--ink);
       padding: 32px 16px 64px;
     }
-    .page { max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+    .page { max-width: 640px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
 
     /* ── Nav ── */
-    .nav {
-      display: flex; align-items: center; justify-content: space-between;
+    .nav { display: flex; align-items: center; justify-content: space-between; }
+    .nav-logo { display: flex; align-items: center; gap: 10px; }
+    .nav-logo-icon {
+      width: 36px; height: 36px; background: var(--blush);
+      border-radius: 50%; display: flex; align-items: center;
+      justify-content: center; font-size: 16px;
     }
-    .nav-logo { font-size: 13px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--tangerine); }
+    .nav-logo-text { font-size: 18px; font-weight: 700; color: var(--ink); }
     .nav-right { display: flex; align-items: center; gap: 12px; }
-    .nav-email { font-size: 11px; color: var(--ink-mid); }
+    .nav-email { font-size: 12px; color: var(--ink-mid); }
     .btn-signout {
-      font-size: 11px; padding: 5px 10px; border-radius: 6px;
-      background: rgba(58,36,24,0.08); border: 1px solid rgba(58,36,24,0.14);
-      color: var(--ink-mid); cursor: pointer; font: inherit; font-size: 11px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px; font-weight: 600;
+      padding: 6px 16px; border-radius: 20px;
+      background: transparent; border: 1.5px solid var(--blush);
+      color: var(--blush); cursor: pointer;
+      transition: background 0.15s, color 0.15s;
     }
-    .btn-signout:hover { background: rgba(58,36,24,0.14); color: var(--ink); }
+    .btn-signout:hover { background: var(--blush); color: #fff; }
 
-    /* ── Cards ── */
-    .card {
+    /* ── Hero credits card ── */
+    .hero-card {
       background: var(--cream);
-      border-radius: 14px;
-      padding: 20px 22px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
+      border-radius: 18px; padding: 28px 32px;
+      position: relative; overflow: hidden; min-height: 170px;
     }
-    .card-blush { background: var(--blush); color: #fff; }
-
-    .eyebrow {
-      font-size: 9px; text-transform: uppercase; letter-spacing: 0.13em;
-      font-weight: 700; opacity: 0.6;
+    .hero-content { max-width: 55%; position: relative; z-index: 1; }
+    .hero-eyebrow {
+      font-size: 9px; font-weight: 700; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--blush); margin-bottom: 14px;
     }
-    .card-blush .eyebrow { color: rgba(255,251,244,0.7); opacity: 1; }
-
-    /* ── Credits display ── */
-    .credits-row { display: flex; align-items: baseline; gap: 10px; }
-    .credits-num { font-size: 48px; font-weight: 900; color: #fff; line-height: 1; }
-    .credits-label { font-size: 14px; color: rgba(255,251,244,0.75); }
-    .credits-sub { font-size: 12px; color: rgba(255,251,244,0.6); line-height: 1.5; }
-    .lifetime-badge {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: rgba(255,251,244,0.2); border-radius: 20px;
-      padding: 4px 12px; font-size: 12px; font-weight: 700; color: #fff;
+    .hero-number {
+      font-size: 72px; font-weight: 700; color: var(--ink);
+      line-height: 1; margin-bottom: 12px;
+    }
+    .hero-status { font-size: 13px; color: var(--ink-mid); line-height: 1.5; margin-bottom: 8px; }
+    .hero-cta {
+      font-size: 13px; color: var(--blush); font-style: italic;
+      text-decoration: none; cursor: pointer;
+      background: none; border: none; padding: 0; font: inherit;
+    }
+    .hero-cta:hover { text-decoration: underline; }
+    .hero-flower {
+      position: absolute; right: 0; top: 0;
+      height: 100%; width: 45%;
+      background: url('credits-flower.png') right center / contain no-repeat;
+      pointer-events: none;
+    }
+    .sparkle {
+      position: absolute; color: var(--blush); opacity: 0.45;
+      pointer-events: none; user-select: none; font-style: normal;
     }
 
-    /* ── Section divider ── */
-    .section-label {
-      font-size: 9px; text-transform: uppercase; letter-spacing: 0.13em;
-      color: var(--ink-mid); font-weight: 700; opacity: 0.6;
-      display: flex; align-items: center; gap: 8px;
-    }
-    .section-label::after { content: ''; flex: 1; height: 1px; background: rgba(58,36,24,0.14); }
+    /* ── Tagline ── */
+    .tagline { text-align: center; padding: 4px 0; }
+    .tagline-main { font-size: 15px; color: var(--ink); line-height: 1.6; }
+    .tagline-sub { font-size: 14px; color: var(--blush); font-style: italic; margin-top: 4px; }
 
-    /* ── Bundle grid ── */
-    .bundle-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    /* ── Section header ── */
+    .section-header { display: flex; align-items: center; gap: 8px; }
+    .section-header span {
+      font-size: 8px; font-weight: 700; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--blush); white-space: nowrap;
+    }
+    .section-header::after {
+      content: ''; flex: 1; height: 1px; background: rgba(227,104,136,0.28);
+    }
+
+    /* ── Pricing grid ── */
+    .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
     .bundle {
-      background: var(--cream); border: 1.5px solid rgba(58,36,24,0.1);
-      border-radius: 12px; padding: 14px 14px 12px;
-      display: flex; flex-direction: column; gap: 6px; cursor: pointer;
+      background: var(--cream);
+      border: 1.5px solid rgba(58,36,24,0.08);
+      border-radius: 14px; padding: 20px 18px 18px;
+      display: flex; flex-direction: column; gap: 8px;
+      cursor: pointer; position: relative; overflow: hidden;
       transition: border-color 0.15s, box-shadow 0.15s;
     }
-    .bundle:hover { border-color: var(--tangerine); box-shadow: 0 0 0 3px rgba(240,140,33,0.12); }
-    .bundle-letters { font-size: 22px; font-weight: 900; color: var(--ink); line-height: 1; }
-    .bundle-letters span { font-size: 13px; font-weight: 500; color: var(--ink-mid); }
-    .bundle-price { font-size: 17px; font-weight: 800; color: var(--tangerine); }
-    .bundle-per { font-size: 10px; color: var(--ink-lt); }
+    .bundle:hover {
+      border-color: var(--blush);
+      box-shadow: 0 0 0 3px rgba(227,104,136,0.1);
+    }
+    .bundle-sparkles {
+      position: absolute; top: 10px; right: 10px;
+      width: 38px; height: 38px;
+      background: url('credits-sparkles.png') center / contain no-repeat;
+      pointer-events: none;
+    }
+    .bundle-name {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px; font-weight: 600; color: var(--blush);
+    }
+    .bundle-count {
+      font-size: 26px; font-weight: 700; color: var(--ink); line-height: 1.1;
+    }
+    .bundle-rule { border: none; border-top: 1px solid rgba(227,104,136,0.2); }
+    .bundle-price { font-size: 22px; font-weight: 700; color: var(--blush); }
+    .bundle-desc { font-size: 11px; color: var(--ink-mid); line-height: 1.4; }
 
     /* ── Lifetime card ── */
     .lifetime-card {
-      border: 2px solid var(--tangerine);
-      background: rgba(240,140,33,0.05);
-      border-radius: 12px; padding: 16px 18px;
-      display: flex; align-items: center; justify-content: space-between;
-      cursor: pointer; transition: background 0.15s;
+      background: #F9DDE5;
+      border-radius: 14px; padding: 28px 32px;
+      position: relative; overflow: hidden;
+      cursor: pointer; transition: filter 0.15s;
     }
-    .lifetime-card:hover { background: rgba(240,140,33,0.1); }
-    .lifetime-card-left { display: flex; flex-direction: column; gap: 3px; }
-    .lifetime-title { font-size: 15px; font-weight: 800; color: var(--ink); }
-    .lifetime-sub { font-size: 12px; color: var(--ink-mid); }
-    .lifetime-price { font-size: 22px; font-weight: 900; color: var(--tangerine); }
-
-    /* ── Purchase button ── */
-    .btn-buy {
-      background: var(--tangerine); color: #fff; border: none; border-radius: 9px;
-      padding: 12px; font: inherit; font-size: 14px; font-weight: 700;
-      cursor: pointer; width: 100%; transition: opacity 0.15s;
+    .lifetime-card:hover { filter: brightness(0.97); }
+    .lifetime-content { max-width: 58%; position: relative; z-index: 1; }
+    .lifetime-title {
+      font-size: 26px; font-weight: 700; color: var(--ink); line-height: 1.2; margin-bottom: 4px;
     }
-    .btn-buy:hover { opacity: 0.88; }
-    .btn-buy:disabled { opacity: 0.5; cursor: default; }
+    .lifetime-sub {
+      font-size: 16px; color: var(--blush); font-style: italic; margin-bottom: 16px;
+    }
+    .lifetime-rule {
+      border: none; border-top: 1px solid rgba(227,104,136,0.3);
+      margin-bottom: 16px; max-width: 80%;
+    }
+    .lifetime-price-row { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+    .lifetime-price { font-size: 36px; font-weight: 700; color: var(--ink); line-height: 1; }
+    .lifetime-desc { font-size: 12px; color: var(--ink-mid); line-height: 1.6; }
+    .lifetime-flower {
+      position: absolute; right: 0; top: 0;
+      height: 100%; width: 44%;
+      background: url('lifetime-flower.png') right center / contain no-repeat;
+      pointer-events: none;
+    }
 
-    /* ── Purchase history ── */
+    /* ── Trust line ── */
+    .trust-line {
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      font-size: 12px; color: var(--ink-mid);
+    }
+
+    /* ── Purchase history card ── */
+    .history-card {
+      background: var(--cream);
+      border-radius: 14px; padding: 20px 22px;
+    }
     .purchase-row {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 10px 0; border-bottom: 1px solid rgba(58,36,24,0.08);
-      font-size: 13px;
+      padding: 12px 0; border-bottom: 1px solid rgba(58,36,24,0.07); font-size: 13px;
     }
     .purchase-row:last-child { border-bottom: none; }
-    .purchase-desc { color: var(--ink); }
+    .purchase-desc { color: var(--ink); font-weight: 600; }
     .purchase-date { font-size: 11px; color: var(--ink-lt); margin-top: 2px; }
-    .purchase-amount { font-weight: 700; color: var(--tangerine); }
+    .purchase-amount { font-weight: 700; color: var(--blush); }
+    .empty-history { display: flex; align-items: center; gap: 16px; padding: 8px 0; }
+    .empty-history-img {
+      width: 48px; height: 48px; flex-shrink: 0;
+      background: url('prev-thumb.png') center / contain no-repeat; opacity: 0.7;
+    }
+    .empty-history-title { font-size: 14px; font-weight: 600; color: var(--ink); }
+    .empty-history-sub { font-size: 12px; color: var(--ink-mid); margin-top: 2px; }
 
-    .empty-state { font-size: 12px; color: var(--ink-lt); text-align: center; padding: 12px 0; font-style: italic; }
+    /* ── Messages ── */
+    .msg { font-size: 12px; padding: 10px 14px; border-radius: 8px; text-align: center; }
+    .msg.error { background: rgba(227,104,136,0.12); color: var(--blush); }
+    .msg.success {
+      background: rgba(227,104,136,0.1); color: var(--blush);
+      font-weight: 600; font-family: 'Montserrat', sans-serif;
+    }
 
-    /* ── Loading / redirect states ── */
+    /* ── Loading state ── */
     .state { text-align: center; padding: 60px 20px; color: var(--ink-mid); font-size: 14px; line-height: 1.6; }
     .state strong { display: block; font-size: 20px; color: var(--ink); margin-bottom: 8px; }
-
-    .msg { font-size: 12px; padding: 10px 12px; border-radius: 8px; text-align: center; }
-    .msg.error { background: rgba(227,104,136,0.12); color: var(--blush); }
-    .msg.success { background: rgba(240,140,33,0.1); color: var(--tangerine); font-weight: 600; }
-
-    /* ── Razorpay note ── */
-    .payment-note { font-size: 10px; color: var(--ink-lt); text-align: center; line-height: 1.5; }
   </style>
 </head>
 <body>
@@ -147,39 +205,33 @@
 <script>
   const SUPABASE_URL = "https://kkasgbkgwjxiutdalbbm.supabase.co";
   const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtrYXNnYmtnd2p4aXV0ZGFsYmJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyNjU3OTQsImV4cCI6MjA5Mjg0MTc5NH0.z1JLMTzz3X_swbWHdt2z4UDKyUwjEfNYys5kdDMq3R4";
-  // ── Razorpay key — swap for live key when going live ──
   const RAZORPAY_KEY = "rzp_test_SiSA0de5zVIh2x";
 
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   const BUNDLES = [
-    { letters: 1,   price_paise: 4900,  label: "₹49",  per: "₹49 per letter" },
-    { letters: 3,   price_paise: 12900, label: "₹129", per: "₹43 per letter" },
-    { letters: 5,   price_paise: 19900, label: "₹199", per: "₹39.80 per letter" },
-    { letters: 10,  price_paise: 34900, label: "₹349", per: "₹34.90 per letter" },
+    { letters: 5,  price_paise: 15000, label: "₹150", name: "Small moments",       desc: "For quick thoughts you don't want to lose." },
+    { letters: 12, price_paise: 29900, label: "₹299", name: "A little collection",  desc: "For when songs start meaning more." },
+    { letters: 25, price_paise: 54900, label: "₹549", name: "Memory stack",         desc: "For the ones you'll come back to." },
   ];
 
   let currentUser = null;
-  let credits = null;
+  let creditsData = null;
 
-  // ── Init ──
   (async () => {
     const { data: { session } } = await sb.auth.getSession();
-    if (!session) {
-      window.location.href = "auth.html";
-      return;
-    }
+    if (!session) { window.location.href = "auth.html"; return; }
     currentUser = session.user;
     await loadAndRender();
   })();
 
   async function loadAndRender() {
-    const [creditsData, purchasesData] = await Promise.all([
+    const [cRes, pRes] = await Promise.all([
       sb.from("user_credits").select("*").eq("user_id", currentUser.id).single(),
       sb.from("purchases").select("*").eq("user_id", currentUser.id).order("created_at", { ascending: false }).limit(20),
     ]);
-    credits = creditsData.data || { paid_credits: 0, lifetime: false, monthly_free_used_at: null };
-    render(credits, purchasesData.data || []);
+    creditsData = cRes.data || { paid_credits: 0, lifetime: false, monthly_free_used_at: null };
+    render(creditsData, pRes.data || []);
   }
 
   function freeAvailable(c) {
@@ -191,32 +243,30 @@
   }
 
   function render(c, purchases) {
-    const name = currentUser.user_metadata?.full_name || currentUser.email;
     const free = freeAvailable(c);
+    const total = c.lifetime ? null : c.paid_credits + (free ? 1 : 0);
 
-    let creditsBlock;
+    let heroNumber, heroStatus, heroCta;
     if (c.lifetime) {
-      creditsBlock = `
-        <div class="lifetime-badge">∞ Lifetime — unlimited letters</div>
-      `;
+      heroNumber = "∞";
+      heroStatus = "Unlimited notes, forever.";
+      heroCta = "";
     } else {
-      const total = c.paid_credits + (free ? 1 : 0);
-      creditsBlock = `
-        <div class="credits-row">
-          <div class="credits-num">${total}</div>
-          <div class="credits-label">letter${total !== 1 ? "s" : ""} remaining</div>
-        </div>
-        <div class="credits-sub">
-          ${c.paid_credits} purchased · ${free ? "1 free this month" : "free letter used this month"}
-        </div>
-      `;
+      heroNumber = total;
+      heroStatus = free
+        ? `${c.paid_credits} purchased · 1 free available this month`
+        : "You've used your free note this month.";
+      heroCta = `<button class="hero-cta" onclick="document.querySelector('.pricing-grid').scrollIntoView({behavior:'smooth'})">Write something again?</button>`;
     }
 
     const bundleCards = BUNDLES.map((b, i) => `
       <div class="bundle" data-bundle="${i}">
-        <div class="bundle-letters">${b.letters} <span>letter${b.letters > 1 ? "s" : ""}</span></div>
+        <div class="bundle-sparkles"></div>
+        <div class="bundle-name">${b.name}</div>
+        <div class="bundle-count">${b.letters} notes</div>
+        <hr class="bundle-rule" />
         <div class="bundle-price">${b.label}</div>
-        <div class="bundle-per">${b.per}</div>
+        <div class="bundle-desc">${b.desc}</div>
       </div>
     `).join("");
 
@@ -230,41 +280,66 @@
             <div class="purchase-amount">₹${Math.round(p.amount_paise / 100)}</div>
           </div>
         `).join("")
-      : `<div class="empty-state">No purchases yet</div>`;
+      : `<div class="empty-history">
+           <div class="empty-history-img"></div>
+           <div>
+             <div class="empty-history-title">No notes collected yet</div>
+             <div class="empty-history-sub">Your past purchases will appear here.</div>
+           </div>
+         </div>`;
 
     document.getElementById("page").innerHTML = `
       <div class="nav">
-        <div class="nav-logo">♪ SongNotes</div>
+        <div class="nav-logo">
+          <div class="nav-logo-icon">🎵</div>
+          <span class="nav-logo-text">SongNotes</span>
+        </div>
         <div class="nav-right">
           <span class="nav-email">${currentUser.email}</span>
           <button class="btn-signout" id="signoutBtn">Sign out</button>
         </div>
       </div>
 
-      <div class="card card-blush">
-        <div class="eyebrow">Your credits</div>
-        ${creditsBlock}
-      </div>
-
-      <div class="section-label">Buy more letters</div>
-
-      <div class="card">
-        <div class="bundle-grid" id="bundleGrid">${bundleCards}</div>
-
-        <div class="lifetime-card" id="lifetimeCard">
-          <div class="lifetime-card-left">
-            <div class="lifetime-title">Lifetime</div>
-            <div class="lifetime-sub">Unlimited letters, forever</div>
-          </div>
-          <div class="lifetime-price">₹999</div>
+      <div class="hero-card">
+        <div class="hero-content">
+          <div class="hero-eyebrow">Your notes left</div>
+          <div class="hero-number">${heroNumber}</div>
+          <div class="hero-status">${heroStatus}</div>
+          ${heroCta}
         </div>
-
-        <div id="paymentMsg"></div>
-        <div class="payment-note">Payments are processed securely by Razorpay · UPI, cards & netbanking accepted</div>
+        <div class="hero-flower"></div>
+        <i class="sparkle" style="top:20px;left:53%;font-size:15px">✦</i>
+        <i class="sparkle" style="bottom:24px;left:50%;font-size:9px">✦</i>
       </div>
 
-      <div class="section-label">Purchase history</div>
-      <div class="card">${purchaseRows}</div>
+      <div class="tagline">
+        <div class="tagline-main">Every note lives inside a moment in a song.</div>
+        <div class="tagline-sub">Don't run out mid-memory.</div>
+      </div>
+
+      <div class="pricing-grid" id="bundleGrid">${bundleCards}</div>
+
+      <div class="lifetime-card" id="lifetimeCard">
+        <div class="lifetime-content">
+          <div class="lifetime-title">Keep every note</div>
+          <div class="lifetime-sub">Unlimited, forever</div>
+          <hr class="lifetime-rule" />
+          <div class="lifetime-price-row">
+            <div class="lifetime-price">₹999</div>
+            <div class="lifetime-desc">Write as much as you want.<br>No limits.</div>
+          </div>
+        </div>
+        <div class="lifetime-flower"></div>
+        <i class="sparkle" style="top:18px;left:55%;font-size:13px">✦</i>
+        <i class="sparkle" style="top:32px;left:62%;font-size:8px">✦</i>
+      </div>
+
+      <div class="trust-line">🔒 Secure payments · UPI, cards, netbanking</div>
+
+      <div id="paymentMsg"></div>
+
+      <div class="section-header"><span>Purchase history</span></div>
+      <div class="history-card">${purchaseRows}</div>
     `;
 
     document.getElementById("signoutBtn").addEventListener("click", async () => {
@@ -285,10 +360,9 @@
     });
   }
 
-  // ── Razorpay checkout ──
   // TODO (production): create order_id server-side via Supabase Edge Function
   // and verify razorpay_signature before calling add_credits.
-  function openRazorpay(amountPaise, credits, isLifetime, description) {
+  function openRazorpay(amountPaise, numCredits, isLifetime, description) {
     const options = {
       key: RAZORPAY_KEY,
       amount: amountPaise,
@@ -296,13 +370,13 @@
       name: "SongNotes",
       description,
       prefill: { email: currentUser.email },
-      theme: { color: "#F08C21" },
+      theme: { color: "#E36888" },
       handler: async function (response) {
         const msg = document.getElementById("paymentMsg");
         msg.innerHTML = `<div class="msg">Processing…</div>`;
         const { error } = await sb.rpc("add_credits", {
           p_user_id: currentUser.id,
-          p_credits: credits,
+          p_credits: numCredits,
           p_lifetime: isLifetime,
           p_razorpay_id: response.razorpay_payment_id,
           p_amount_paise: amountPaise,
@@ -310,8 +384,8 @@
         if (error) {
           msg.innerHTML = `<div class="msg error">Payment recorded but credit update failed — contact support with payment ID: ${response.razorpay_payment_id}</div>`;
         } else {
-          msg.innerHTML = `<div class="msg success">✓ ${isLifetime ? "Lifetime plan activated!" : `${credits} letter${credits > 1 ? "s" : ""} added!`}</div>`;
-          await loadAndRender(); // refresh credits display
+          msg.innerHTML = `<div class="msg success">✓ ${isLifetime ? "Lifetime plan activated!" : `${numCredits} letter${numCredits > 1 ? "s" : ""} added!`}</div>`;
+          await loadAndRender();
         }
       },
       modal: { ondismiss: () => {} }
