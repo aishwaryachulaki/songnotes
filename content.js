@@ -145,14 +145,16 @@
     const wrap = document.createElement("div");
     wrap.className = "songnotes-overlay";
     wrap.innerHTML = `
-      <div class="songnotes-card">
+      <div class="songnotes-wrap">
         <div class="songnotes-pin"></div>
-        <button class="songnotes-close" aria-label="Dismiss">&#x00D7;</button>
-        <div class="songnotes-body">
-          <div class="songnotes-label"></div>
-          <div class="songnotes-text"></div>
+        <div class="songnotes-card">
+          <button class="songnotes-close" aria-label="Dismiss">&#x00D7;</button>
+          <div class="songnotes-body">
+            <div class="songnotes-label"></div>
+            <div class="songnotes-text"></div>
+          </div>
+          <div class="songnotes-floral">${FLORAL_SVG}</div>
         </div>
-        <div class="songnotes-floral">${FLORAL_SVG}</div>
       </div>
     `;
     wrap.querySelector(".songnotes-label").textContent = `✦  ${sender.toLowerCase()} sent you a note`;

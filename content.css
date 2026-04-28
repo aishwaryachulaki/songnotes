@@ -40,7 +40,6 @@
   width: 420px;
   min-width: 300px;
   cursor: pointer;
-  overflow: hidden;
 
   /* Torn bottom edge — polygon zigzags from ~80% height down */
   clip-path: polygon(
@@ -55,10 +54,16 @@
   );
 }
 
-/* ── Brass brad pin ── */
+/* ── Wrap — positions pin above the card without clipping ── */
+.songnotes-wrap {
+  position: relative;
+  padding-top: 14px; /* space for the pin to float above the card top */
+}
+
+/* ── Brass brad pin — sibling of card, not inside it ── */
 .songnotes-pin {
   position: absolute;
-  top: -13px;
+  top: 0;
   left: 50%;
   transform: translateX(-50%);
   width: 26px;
