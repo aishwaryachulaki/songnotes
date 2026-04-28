@@ -75,7 +75,7 @@
       const link = document.createElement("link");
       link.id   = "sn-playfair";
       link.rel  = "stylesheet";
-      link.href = "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap";
+      link.href = "https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400&display=swap";
       document.head.appendChild(link);
     }
 

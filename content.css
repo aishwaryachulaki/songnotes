@@ -37,8 +37,8 @@
   width: 460px;
   height: 208px;
 
-  /* Left text area clears the floral on the right (~56% from left) */
-  padding: 22px 206px 44px 26px;
+  /* Left text area clears the floral on the right (~50% from left) */
+  padding: 30px 210px 48px 30px;
 
   cursor: pointer;
   border-radius: 0;
@@ -48,10 +48,10 @@
 
 /* ── Sender label ── */
 .songnotes-label {
-  font-size: 12px;
-  color: rgba(80, 45, 28, 0.62);
-  letter-spacing: 0.02em;
-  margin-bottom: 10px;
+  font-size: 11px;
+  color: rgba(80, 45, 28, 0.52);
+  letter-spacing: 0.03em;
+  margin-bottom: 8px;
   font-weight: 400;
   line-height: 1.4;
   white-space: nowrap;
@@ -61,28 +61,29 @@
 
 /* ── Note text — font-size set dynamically in JS by length ── */
 .songnotes-text {
-  line-height: 1.22;
-  color: #2c180d;
+  color: #3a1f10;
   word-break: break-word;
   overflow: hidden;
 }
 .songnotes-text.sn-large {
   font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
-  font-weight: 700;
-  font-size: 28px;
-  line-height: 1.2;
+  font-weight: 400;
+  font-style: italic;
+  font-size: 26px;
+  line-height: 1.25;
 }
 .songnotes-text.sn-medium {
   font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
-  font-weight: 700;
-  font-size: 20px;
-  line-height: 1.25;
+  font-weight: 400;
+  font-style: italic;
+  font-size: 18px;
+  line-height: 1.35;
 }
 .songnotes-text.sn-small {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-  font-weight: 500;
-  font-size: 13.5px;
-  line-height: 1.45;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 /* ── Close button ── */
