@@ -64,7 +64,7 @@ body {
 
 /* ── Now Playing card ── */
 .stamp-track {
-  background: var(--blush);
+  background: var(--blush) url('now-playing-bg.png') center / cover no-repeat;
   border-radius: 14px;
   padding: 14px 16px 16px;
   position: relative;
