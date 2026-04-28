@@ -130,13 +130,21 @@
       color: var(--tangerine);
       text-transform: uppercase;
       letter-spacing: 0.06em;
-      margin-bottom: 5px;
+      margin-bottom: 8px;
     }
-    .note-text {
-      font-size: 13px;
-      line-height: 1.55;
-      color: var(--ink);
-      white-space: pre-wrap;
+    .note-redacted {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .note-redacted span {
+      display: block;
+      height: 8px;
+      background: rgba(58,36,24,0.1);
+      border-radius: 4px;
+    }
+    .note-redacted span:last-child {
+      width: 60%;
     }
 
     /* ── Spotify button ── */
@@ -384,7 +392,11 @@
         html += `
           <div class="note-card">
             <div class="note-ts">${escHtml(formatTs(n.timestamp))}</div>
-            <div class="note-text">${escHtml(n.note)}</div>
+            <div class="note-redacted">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
           </div>
         `;
       });
