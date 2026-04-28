@@ -8,8 +8,8 @@
     <div class="wrap">
 
       <!-- Auth gate — shown when not signed in -->
-      <div id="authGate" class="stamp stamp-compose hidden">
-        <div class="hello">Sign in to send letters and manage credits.</div>
+      <div id="authGate" class="auth-gate hidden">
+        <div class="auth-gate-text">Sign in to send letters and manage credits.</div>
         <button id="signInBtn" class="btn primary">Sign in / Create account</button>
       </div>
 
@@ -23,65 +23,95 @@
         </div>
       </div>
 
-      <!-- Featured track stamp -->
-      <div class="stamp stamp-track track">
-        <div class="stamp-eyebrow">♪ now playing</div>
-        <div id="trackTitle" class="title">Loading…</div>
-        <div id="trackArtist" class="artist"></div>
+      <!-- Now Playing -->
+      <div class="stamp-track">
+        <div class="stamp-eyebrow">♪ NOW PLAYING</div>
+        <div id="trackTitle" class="track-title">Loading…</div>
+        <div id="trackArtist" class="track-artist"></div>
+        <div class="postmark" aria-hidden="true">
+          <div class="postmark-inner">
+            <div class="postmark-top">SONGNOTES</div>
+            <svg class="postmark-wave" viewBox="0 0 44 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0 5 C3.5 1 7 9 11 5 C15 1 18.5 9 22 5 C25.5 1 29 9 33 5 C37 1 40.5 9 44 5"
+                    stroke="rgba(255,251,244,0.55)" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+              <path d="M0 8 C3.5 4 7 12 11 8 C15 4 18.5 12 22 8 C25.5 4 29 12 33 8 C37 4 40.5 12 44 8"
+                    stroke="rgba(255,251,244,0.35)" stroke-width="0.9" stroke-linecap="round" fill="none"/>
+            </svg>
+            <div class="postmark-year">2025</div>
+          </div>
+        </div>
       </div>
 
-      <!-- Name setup stamp -->
-      <div id="nameBlock" class="stamp stamp-compose name-block hidden">
-        <label>Your name (shown to friends)</label>
+      <!-- Name setup -->
+      <div id="nameBlock" class="composer-card name-block hidden">
+        <label class="field-label">Your name (shown to friends)</label>
         <div class="row">
-          <input id="senderName" type="text" placeholder="e.g. Sam" />
+          <input id="senderName" type="text" class="underline-input" placeholder="e.g. Sam" />
           <button id="saveName" class="btn primary">Save</button>
         </div>
       </div>
 
-      <!-- Note composer stamp -->
-      <div id="composer" class="stamp stamp-compose composer hidden">
-        <div class="hello">writing as <strong id="whoami">—</strong> · <a href="#" id="changeName">change</a></div>
-        <input id="recipientName" class="receiver-input" type="text" placeholder="Recipient name" />
-        <textarea id="note" placeholder="Write a note for this song…" rows="3"></textarea>
-        <div class="timestamp-row">
-          <input id="ts" class="timestamp-input" type="text" placeholder="Timestamp (e.g. 1:24) — optional" />
-          <button id="useCurrent" class="btn now-btn">Now</button>
+      <!-- Composer -->
+      <div id="composer" class="composer-card composer hidden">
+        <div class="composer-header">
+          WRITING AS <strong id="whoami">—</strong> · <a href="#" id="changeName">change</a>
         </div>
-        <div class="row">
-          <button id="save" class="btn primary">Save note</button>
+        <input id="recipientName" class="underline-input" type="text"
+               placeholder="Recipient name" autocomplete="off" />
+        <textarea id="note" class="ruled-textarea"
+                  placeholder="Write a note for this song…" rows="4"></textarea>
+        <div class="timestamp-row">
+          <div class="ts-wrap">
+            <svg class="ts-icon" width="13" height="13" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+            <input id="ts" class="timestamp-input" type="text"
+                   placeholder="Timestamp (e.g. 1:24) — optional" />
+          </div>
+          <button id="useCurrent" class="now-btn">Now</button>
+        </div>
+        <div class="save-row">
+          <button id="save" class="save-btn">🖇 Save note</button>
           <span id="status" class="status"></span>
         </div>
+        <div class="composer-floral" aria-hidden="true"></div>
       </div>
 
-      <!-- Notes bento grid -->
-      <div class="notes-section-header">
-        <span>Notes for this song</span>
+      <!-- Notes section -->
+      <div class="section-header">
+        <span>NOTES FOR THIS SONG</span>
       </div>
       <div id="notes" class="notes"></div>
 
       <!-- Share stamp -->
-      <div class="stamp stamp-share share">
-        <div id="shareSummary" class="share-summary">No notes yet — write one above to start a shared experience.</div>
-        <input id="playlistUrl" class="playlist-input" type="text" placeholder="Add playlist link" />
-        <button id="copyShare" class="btn share-btn">✉ Send all notes</button>
-        <div id="shareInfo" class="share-info"></div>
-        <div class="row" style="gap:6px">
-          <button id="resetShare" class="btn ghost" style="flex:1">New share</button>
+      <div class="share-card">
+        <div id="shareSummary" class="share-summary"></div>
+        <div class="playlist-wrap">
+          <span class="playlist-icon">🖇</span>
+          <input id="playlistUrl" class="playlist-input" type="text" placeholder="Add playlist link" />
         </div>
+        <button id="copyShare" class="share-btn">✉ Send all notes</button>
+        <div id="shareInfo" class="share-info"></div>
+        <button id="resetShare" class="new-share-btn">New share</button>
       </div>
+
+      <!-- Previous Experiences -->
+      <div class="section-header" id="prevHeader" style="display:none">
+        <span>PREVIOUS EXPERIENCES</span>
+      </div>
+      <div id="previousList" class="previous-list"></div>
 
       <!-- Import block -->
       <div class="import-block">
         <details>
-          <summary>Import a shared letter</summary>
+          <summary>▸ Import a shared letter</summary>
           <div class="row" style="margin-top:8px">
             <input id="importId" type="text" placeholder="Paste share link" />
             <button id="importBtn" class="btn">Import</button>
           </div>
           <div id="importStatus" class="status"></div>
         </details>
-        <div id="previousList" class="previous-list"></div>
       </div>
 
     </div>

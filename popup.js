@@ -198,13 +198,14 @@ async function notifyContentRefresh() {
 }
 
 // ---------- backend ----------
-async function pushShareMeta(share) {
+async function pushShareMeta(share, accessToken) {
+  const token = accessToken || SUPABASE_KEY;
   try {
     await fetch(`${SUPABASE_URL}/rest/v1/shares`, {
       method: "POST",
       headers: {
         apikey: SUPABASE_KEY,
-        Authorization: `Bearer ${SUPABASE_KEY}`,
+        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
         Prefer: "resolution=merge-duplicates,return=minimal",
       },
@@ -219,13 +220,14 @@ async function pushShareMeta(share) {
     });
   } catch {}
 }
-async function pushNote(share, note) {
+async function pushNote(share, note, accessToken) {
+  const token = accessToken || SUPABASE_KEY;
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/annotations`, {
       method: "POST",
       headers: {
         apikey: SUPABASE_KEY,
-        Authorization: `Bearer ${SUPABASE_KEY}`,
+        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
         Prefer: "return=minimal",
       },
@@ -353,11 +355,19 @@ function renderSummary() {
 async function renderPrevious() {
   const { store } = await loadStore();
   const list = $("previousList");
-  const prev = (store.previous || [])
-    .filter((id) => store.shares[id])
-    .slice(0, 3);
-  if (!prev.length) { list.innerHTML = ""; return; }
-  list.innerHTML = '<div class="prev-header">Previous experiences</div>';
+  const header = $("prevHeader");
+  const allPrev = (store.previous || []).filter((id) => store.shares[id]);
+  const prev = allPrev.slice(0, 3);
+
+  if (!prev.length) {
+    list.innerHTML = "";
+    if (header) header.style.display = "none";
+    return;
+  }
+
+  if (header) header.style.display = "";
+  list.innerHTML = "";
+
   prev.forEach((id) => {
     const s = store.shares[id];
     const noteCount = s.notes.length;
@@ -365,7 +375,6 @@ async function renderPrevious() {
     const title = s.recipient_name
       ? `Notes for ${s.recipient_name}`
       : "Notes (unknown recipient)";
-    // Short date, e.g. "Apr 27"
     const dateStr = s.created_at
       ? new Date(s.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })
       : null;
@@ -374,27 +383,31 @@ async function renderPrevious() {
       `${songCount} song${songCount === 1 ? "" : "s"}`,
       dateStr,
     ].filter(Boolean).join(" · ");
+
     const row = document.createElement("div");
     row.className = "prev-item";
     row.innerHTML = `
+      <img class="prev-thumb" src="prev-thumb.png" alt="" />
       <div class="prev-meta">
         <div class="prev-title">${escapeHtml(title)}</div>
         <div class="prev-sub">${escapeHtml(sub)}</div>
       </div>
-      <button class="btn prev-activate" data-id="${id}">Reactivate</button>
+      <button class="prev-activate" data-id="${id}">Reactivate</button>
     `;
     list.appendChild(row);
   });
+
   list.querySelectorAll(".prev-activate").forEach((b) =>
     b.addEventListener("click", async (e) => {
       await activateShare(e.currentTarget.dataset.id);
     }),
   );
 
-  if ((store.previous || []).filter((id) => store.shares[id]).length > 3) {
+  if (allPrev.length > 3) {
     const more = document.createElement("div");
     more.className = "prev-more";
     more.textContent = "View more on your account →";
+    more.addEventListener("click", openAccountPage);
     list.appendChild(more);
   }
 }
