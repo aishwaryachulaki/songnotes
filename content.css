@@ -37,15 +37,8 @@
   width: 460px;
   height: 208px;
 
-  /* Flex column so content is vertically centred for short notes,
-     naturally fills for long ones */
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-
-  /* Top/bottom padding reserves space for rounded corners & torn edge;
-     left/right padding keeps text clear of the floral illustration */
-  padding: 18px 210px 50px 30px;
+  /* Left text area clears the floral on the right (~50% from left) */
+  padding: 30px 210px 48px 30px;
 
   cursor: pointer;
   border-radius: 0;
@@ -58,7 +51,7 @@
   font-size: 11px;
   color: rgba(80, 45, 28, 0.52);
   letter-spacing: 0.03em;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
   font-weight: 400;
   line-height: 1.4;
   white-space: nowrap;
