@@ -55,7 +55,7 @@ body {
   border: 1.5px solid var(--blush);
   color: var(--blush);
   border-radius: 20px;
-  padding: 5px 20px;
+  padding: 6px 32px;
   white-space: nowrap;
 }
 .credits-badge.empty { border-color: var(--ink-lt); color: var(--ink-lt); }
