@@ -179,44 +179,8 @@
       white-space: nowrap;
     }
 
-    /* Circular stamp seal */
-    .letter-stamp {
-      position: relative;
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      border: 1.5px solid rgba(58,46,42,0.2);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 2px;
-      flex-shrink: 0;
-    }
-    .letter-stamp::before {
-      content: '';
-      position: absolute;
-      inset: 3px;
-      border-radius: 50%;
-      border: 1px dashed rgba(58,46,42,0.15);
-    }
-    .letter-stamp .stamp-name {
-      font-size: 4.5px;
-      font-weight: 800;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--ink-mid);
-      opacity: 0.65;
-      position: relative;
-    }
-    .letter-stamp .stamp-year {
-      font-size: 7px;
-      font-weight: 600;
-      color: var(--ink-mid);
-      opacity: 0.5;
-      letter-spacing: 0.04em;
-      position: relative;
-    }
+    /* Postmark stamp SVG */
+    .letter-stamp { flex-shrink: 0; opacity: 0.55; }
 
     /* Heading — serif, sized to fit the letter area */
     .letter-h1 {
@@ -482,10 +446,32 @@
       <!-- Block 1: pill label + stamp -->
       <div class="env-label-row">
         <span class="letter-label">✧ a love letter, embedded in a song</span>
-        <div class="letter-stamp" aria-hidden="true">
-          <span class="stamp-name">SongNotes</span>
-          <span class="stamp-year">2025</span>
-        </div>
+          <!-- Postmark stamp -->
+          <svg class="letter-stamp" aria-hidden="true"
+               width="62" height="62" viewBox="0 0 62 62"
+               fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- outer circle -->
+            <circle cx="31" cy="31" r="29.5" stroke="rgba(58,46,42,0.55)" stroke-width="1.4"/>
+            <!-- inner dashed circle -->
+            <circle cx="31" cy="31" r="23" stroke="rgba(58,46,42,0.35)" stroke-width="1" stroke-dasharray="2.5 2.5"/>
+            <!-- curved "SONGNOTES" text along top arc -->
+            <path id="topArc" d="M 5,31 A 26,26 0 0,1 57,31"/>
+            <text font-size="7.5" font-weight="700" letter-spacing="2.2"
+                  fill="rgba(58,46,42,0.7)" font-family="Montserrat, sans-serif">
+              <textPath href="#topArc" startOffset="50%" text-anchor="middle">SONGNOTES</textPath>
+            </text>
+            <!-- wavy cancellation lines -->
+            <path d="M14 33 Q18 30 22 33 Q26 36 30 33 Q34 30 38 33 Q42 36 46 33"
+                  stroke="rgba(58,46,42,0.35)" stroke-width="1.2" stroke-linecap="round"/>
+            <path d="M14 37 Q18 34 22 37 Q26 40 30 37 Q34 34 38 37 Q42 40 46 37"
+                  stroke="rgba(58,46,42,0.25)" stroke-width="1.2" stroke-linecap="round"/>
+            <!-- year along bottom arc -->
+            <path id="botArc" d="M 8,31 A 23,23 0 0,0 54,31"/>
+            <text font-size="7" font-weight="600" letter-spacing="1.5"
+                  fill="rgba(58,46,42,0.55)" font-family="Montserrat, sans-serif">
+              <textPath href="#botArc" startOffset="50%" text-anchor="middle">2025</textPath>
+            </text>
+          </svg>
       </div>
 
       <!-- Block 2: heading -->
