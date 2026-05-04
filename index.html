@@ -95,7 +95,7 @@
       padding: 0 32px 52px;
       max-width: 1440px;
       margin: 0 auto;
-      align-items: start;
+      align-items: stretch;
     }
 
     /* ─────────────────────────────────────────────────────────
@@ -244,9 +244,7 @@
       overflow: hidden;
       width: 100%;
       flex: 1;
-      /* Match the envelope's rendered height (~568px at desktop).
-         At narrower viewports the envelope shrinks and this scales too. */
-      min-height: 568px;
+      height: 100%;
       box-shadow: 0 8px 40px rgba(58,36,24,0.14);
     }
     .illus-frame > img {
