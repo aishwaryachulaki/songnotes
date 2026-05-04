@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SongNotes — Leave a note inside the music</title>
+  <title>SongNotes — Leave a note, inside the music</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
   <style>
@@ -128,18 +128,13 @@
       NO background. NO border. NO shadow. NO card styling.
     */
     .env-overlay {
-  position: absolute;
-
-  top: 20%;
-  left: 22%;
-  width: 52%;
-
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-
-  /* allow natural height */
-}
+      position: absolute;
+      top: 20%;
+      left: 22%;
+      width: 52%;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
     }
     .env-overlay > * { max-width: 100%; }
 
@@ -209,28 +204,26 @@
     /* Heading — serif, sized to fit the letter area */
     .letter-h1 {
       font-family: 'Lora', Georgia, serif;
-      font-size: 2rem;
+      font-size: 2.6rem;
       font-weight: 700;
-      line-height: 1.2;
+      line-height: 1.18;
       color: var(--ink);
       word-break: break-word;
-      max-width: 90%;
       margin: 0;
     }
     .letter-h1 em {
       font-style: italic;
       color: var(--rose);
-      /* Option 2: inline — reads as one sentence */
-      display: inline;
+      display: block;
     }
 
     /* Body paragraph */
     .letter-p {
-      font-size: 0.95rem;
-      line-height: 1.5;
+      font-size: 0.85rem;
+      line-height: 1.6;
       color: var(--ink-mid);
-      max-width: 85%;
-      margin-top: 8px;
+      max-width: 90%;
+      margin-top: 0;
     }
 
     /* CTA button */
@@ -489,7 +482,7 @@
         </div>
 
         <h1 class="letter-h1">
-          Leave a note <em>inside the music.</em>
+          Leave a note,<em>inside the music.</em>
         </h1>
 
         <p class="letter-p">
