@@ -341,75 +341,60 @@
       color: var(--ink);
     }
 
-    /* ── Stamp bento grid ── */
+    /* ── Stamp grid ── */
     .stamp-grid {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
-      gap: 24px;
+      gap: 28px;
       align-items: start;
     }
 
+    /* No card container — stamp image IS the card */
     .stamp-card {
-      background: var(--cream);
-      border-radius: 16px;
-      padding: 14px;
-      box-shadow: 0 4px 20px rgba(58,36,24,0.11);
+      position: relative;
     }
-    .stamp-card.blue  { background: var(--blue);  }
-    .stamp-card.olive { background: var(--olive); }
-
-    .stamp-inner {
-      border: 1px solid rgba(255,255,255,0.28);
-      border-radius: 2px;
-      overflow: hidden;
+    .stamp-card img {
+      width: 100%;
+      height: auto;
+      display: block;
     }
-    .stamp-card:not(.blue):not(.olive) .stamp-inner { border-color: rgba(58,46,42,0.14); }
 
-    .stamp-visual { position: relative; overflow: hidden; }
-    .stamp-visual img { width: 100%; height: 160px; object-fit: cover; display: block; }
-
-    .stamp-series {
+    /* Text sits over the left ~55% of the stamp (florals live bottom-right) */
+    .stamp-overlay {
       position: absolute;
-      top: 8px; left: 8px;
-      font-size: 7.5px; font-weight: 700;
-      letter-spacing: 0.16em; text-transform: uppercase;
-      color: rgba(255,255,255,0.9);
-      background: rgba(0,0,0,0.28);
-      padding: 2px 6px; border-radius: 3px;
-      backdrop-filter: blur(3px);
-    }
-    .stamp-card:not(.blue):not(.olive) .stamp-series {
-      color: rgba(58,46,42,0.75);
-      background: rgba(255,255,255,0.55);
+      top: 0; left: 0; right: 42%; bottom: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 16px 12px 16px 20px;
+      gap: 5px;
     }
 
-    .stamp-content { padding: 14px 15px 15px; }
-
-    .stamp-icon {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 30px; height: 30px; border-radius: 50%; margin-bottom: 10px;
+    .stamp-num {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 7.5px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      opacity: 0.45;
     }
-    .stamp-card.blue  .stamp-icon,
-    .stamp-card.olive .stamp-icon { background: rgba(255,255,255,0.2); color: #fff; }
-    .stamp-card:not(.blue):not(.olive) .stamp-icon { background: rgba(58,46,42,0.08); color: var(--ink-mid); }
-
-    .stamp-title { font-size: 15.5px; font-weight: 700; line-height: 1.25; margin-bottom: 7px; }
-    .stamp-card.blue  .stamp-title,
-    .stamp-card.olive .stamp-title { color: #fff; }
-    .stamp-card:not(.blue):not(.olive) .stamp-title { color: var(--ink); }
-
-    .stamp-desc { font-size: 12.5px; line-height: 1.65; }
-    .stamp-card.blue  .stamp-desc,
-    .stamp-card.olive .stamp-desc { color: rgba(255,255,255,0.84); }
-    .stamp-card:not(.blue):not(.olive) .stamp-desc { color: var(--ink-mid); }
-
-    .stamp-denom {
-      font-size: 7.5px; font-weight: 700;
-      letter-spacing: 0.13em; text-transform: uppercase;
-      text-align: right; margin-top: 14px; opacity: 0.38;
+    .stamp-title {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.2;
     }
-    .stamp-card.blue  .stamp-denom,
-    .stamp-card.olive .stamp-denom { color: #fff; }
+    .stamp-desc {
+      font-size: 11px;
+      line-height: 1.55;
+      opacity: 0.72;
+      margin-top: 2px;
+    }
+
+    /* Per-stamp text colours to match each background */
+    .stamp-card.blue  .stamp-overlay { color: #1e3d6b; }
+    .stamp-card.cream .stamp-overlay { color: #3a2418; }
+    .stamp-card.olive .stamp-overlay { color: #2e2800; }
 
     /* ── Footer ── */
     footer {
@@ -539,64 +524,29 @@
   <div class="stamp-grid">
 
     <div class="stamp-card blue">
-      <div class="stamp-inner">
-        <div class="stamp-visual">
-          <img src="stamp-blue.jpg" alt="A note in music" />
-          <span class="stamp-series">SongNotes · 01</span>
-        </div>
-        <div class="stamp-content">
-          <div class="stamp-icon" aria-hidden="true">
-            <svg width="15" height="13" viewBox="0 0 15 13" fill="none">
-              <rect x="1" y="1" width="13" height="11" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
-              <path d="M1 3.5l6.5 4.5L14 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <div class="stamp-title">A note in music</div>
-          <p class="stamp-desc">Pin a private message to any track. It arrives exactly when you choose — the chorus, the drop, the silence before.</p>
-          <div class="stamp-denom">SongNotes · ♪ 01</div>
-        </div>
+      <img src="stamp-blue.jpg" alt="A note in music" />
+      <div class="stamp-overlay">
+        <div class="stamp-num">01</div>
+        <div class="stamp-title">A note in music</div>
+        <p class="stamp-desc">Pin a message to any track — at the chorus, the drop, the silence before.</p>
       </div>
     </div>
 
-    <div class="stamp-card">
-      <div class="stamp-inner">
-        <div class="stamp-visual">
-          <img src="stamp-cream.jpg" alt="At the right moment" />
-          <span class="stamp-series">SongNotes · 02</span>
-        </div>
-        <div class="stamp-content">
-          <div class="stamp-icon" aria-hidden="true">
-            <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
-              <circle cx="7.5" cy="7.5" r="6" stroke="currentColor" stroke-width="1.5"/>
-              <path d="M7.5 4v4l2.5 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-          <div class="stamp-title">At the right moment</div>
-          <p class="stamp-desc">The note fades in at the second you chose — a timestamp sewn into the song, visible only to the listener.</p>
-          <div class="stamp-denom">SongNotes · ♪ 02</div>
-        </div>
+    <div class="stamp-card cream">
+      <img src="stamp-cream.jpg" alt="At the right moment" />
+      <div class="stamp-overlay">
+        <div class="stamp-num">02</div>
+        <div class="stamp-title">At the right moment</div>
+        <p class="stamp-desc">The note appears at the exact second you chose — sewn into the song.</p>
       </div>
     </div>
 
     <div class="stamp-card olive">
-      <div class="stamp-inner">
-        <div class="stamp-visual">
-          <img src="stamp-olive.jpg" alt="Send to someone" />
-          <span class="stamp-series">SongNotes · 03</span>
-        </div>
-        <div class="stamp-content">
-          <div class="stamp-icon" aria-hidden="true">
-            <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
-              <path d="M6.5 2.5H2.5A1.5 1.5 0 001 4v8.5A1.5 1.5 0 002.5 14h8.5A1.5 1.5 0 0012.5 12.5V8.5"
-                stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-              <path d="M9.5 1H14v4.5M14 1l-6.5 6.5"
-                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-          <div class="stamp-title">Send to someone</div>
-          <p class="stamp-desc">Group notes across songs and share them with one quiet link. No account, no login — just music and meaning.</p>
-          <div class="stamp-denom">SongNotes · ♪ 03</div>
-        </div>
+      <img src="stamp-olive.jpg" alt="Send to someone" />
+      <div class="stamp-overlay">
+        <div class="stamp-num">03</div>
+        <div class="stamp-title">Send to someone</div>
+        <p class="stamp-desc">Share across songs with one quiet link. No account needed.</p>
       </div>
     </div>
 
