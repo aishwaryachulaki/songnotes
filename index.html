@@ -346,16 +346,18 @@
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
       gap: 28px;
-      align-items: start;
+      align-items: stretch;
     }
 
     /* No card container — stamp image IS the card */
     .stamp-card {
       position: relative;
+      aspect-ratio: 3 / 2;
     }
     .stamp-card img {
       width: 100%;
-      height: auto;
+      height: 100%;
+      object-fit: cover;
       display: block;
     }
 
