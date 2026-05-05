@@ -286,6 +286,38 @@
       font-style: italic;
     }
 
+    /* ── Scroll cue ── */
+    .scroll-cue {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 0 52px;
+    }
+    .scroll-cue-text {
+      font-family: 'Spectral', Georgia, serif;
+      font-style: italic;
+      font-size: 1rem;
+      color: var(--rose);
+      opacity: 0.75;
+    }
+    .scroll-arrow {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(217,107,124,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--rose);
+      font-size: 15px;
+      animation: cue-bounce 2.2s ease-in-out infinite;
+    }
+    @keyframes cue-bounce {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(7px); }
+    }
+
     /* ── Features section ── */
     .features {
       max-width: 1200px;
@@ -492,6 +524,12 @@
   </div>
 
 </section>
+
+<!-- SCROLL CUE -->
+<div class="scroll-cue">
+  <p class="scroll-cue-text">It unfolds below.</p>
+  <div class="scroll-arrow" aria-hidden="true">↓</div>
+</div>
 
 <!-- FEATURES -->
 <section class="features">
