@@ -127,21 +127,21 @@
     }
 
     const wrap = document.createElement("div");
-    wrap.className = "songnotes-overlay";
+    wrap.className = "ks-overlay";
     wrap.innerHTML = `
-      <div class="songnotes-card">
-        <button class="songnotes-close" aria-label="Dismiss">&#x00D7;</button>
-        <div class="songnotes-label"></div>
-        <div class="songnotes-text ${textSizeClass(text.length)}"></div>
+      <div class="ks-card">
+        <button class="ks-close" aria-label="Dismiss">&#x00D7;</button>
+        <div class="ks-label"></div>
+        <div class="ks-text ${textSizeClass(text.length)}"></div>
       </div>
     `;
 
     // Set background image via extension URL (required for content scripts in MV3)
-    wrap.querySelector(".songnotes-card").style.backgroundImage =
+    wrap.querySelector(".ks-card").style.backgroundImage =
       `url('${chrome.runtime.getURL("floater.png")}')`;
 
-    wrap.querySelector(".songnotes-label").textContent = `✦  ${sender.toLowerCase()} sent you a note`;
-    wrap.querySelector(".songnotes-text").textContent  = text;
+    wrap.querySelector(".ks-label").textContent = `✦  ${sender.toLowerCase()} sent you a note`;
+    wrap.querySelector(".ks-text").textContent  = text;
     document.body.appendChild(wrap);
     requestAnimationFrame(() => wrap.classList.add("visible"));
 
@@ -158,11 +158,11 @@
       if (timer) clearTimeout(timer);
       timer = setTimeout(close, ms);
     };
-    wrap.querySelector(".songnotes-close").addEventListener("click", close);
+    wrap.querySelector(".ks-close").addEventListener("click", close);
     wrap.addEventListener("mouseenter", () => { if (timer) clearTimeout(timer); });
     wrap.addEventListener("mouseleave", () => startTimer(2000));
-    wrap.querySelector(".songnotes-card").addEventListener("click", (e) => {
-      if (e.target.classList.contains("songnotes-close")) return;
+    wrap.querySelector(".ks-card").addEventListener("click", (e) => {
+      if (e.target.classList.contains("ks-close")) return;
       pinned = !pinned;
       wrap.classList.toggle("pinned", pinned);
       if (pinned && timer) clearTimeout(timer);

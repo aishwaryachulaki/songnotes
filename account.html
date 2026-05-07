@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SongNotes — My Account</title>
+  <title>Keepsake — My Account</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,500&family=Montserrat:wght@500;600;700&display=swap" />
   <style>
@@ -305,7 +305,7 @@
       <div class="nav">
         <div class="nav-logo">
           <div class="nav-logo-icon">🎵</div>
-          <span class="nav-logo-text">SongNotes</span>
+          <span class="nav-logo-text">Keepsake</span>
         </div>
         <div class="nav-right">
           <span class="nav-email">${currentUser.email}</span>
@@ -358,7 +358,7 @@
 
     document.getElementById("signoutBtn").addEventListener("click", async () => {
       await sb.auth.signOut();
-      window.dispatchEvent(new CustomEvent("songnotes:signout"));
+      window.dispatchEvent(new CustomEvent("keepsake:signout"));
       window.location.href = "auth.html";
     });
 
@@ -381,7 +381,7 @@
       key: RAZORPAY_KEY,
       amount: amountPaise,
       currency: "INR",
-      name: "SongNotes",
+      name: "Keepsake",
       description,
       prefill: { email: currentUser.email },
       theme: { color: "#E36888" },

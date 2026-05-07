@@ -1,5 +1,5 @@
 // Bridges share pages → extension storage using the share-scoped storage model.
-// The share page sets window.__SN_PAYLOAD = { share_id, share, notes: [...] } and dispatches "songnotes:import".
+// The share page sets window.__SN_PAYLOAD = { share_id, share, notes: [...] } and dispatches "keepsake:import".
 (function () {
   function inject(payload) {
     if (!payload || !payload.share_id) return;
@@ -12,7 +12,7 @@
 
       // Same id as active → no-op (do not duplicate or replace)
       if (store.active === incomingId) {
-        window.dispatchEvent(new CustomEvent("songnotes:imported", { detail: { added: 0, alreadyActive: true } }));
+        window.dispatchEvent(new CustomEvent("keepsake:imported", { detail: { added: 0, alreadyActive: true } }));
         return;
       }
 
@@ -51,16 +51,16 @@
       store.active = incomingId;
 
       chrome.storage.local.set({ sn_shares: store }, () => {
-        window.dispatchEvent(new CustomEvent("songnotes:imported", { detail: { added: remoteNotes.length } }));
+        window.dispatchEvent(new CustomEvent("keepsake:imported", { detail: { added: remoteNotes.length } }));
       });
     });
   }
 
-  document.documentElement.setAttribute("data-songnotes-installed", "1");
-  window.dispatchEvent(new CustomEvent("songnotes:ready"));
+  document.documentElement.setAttribute("data-keepsake-installed", "1");
+  window.dispatchEvent(new CustomEvent("keepsake:ready"));
   try { chrome.storage.local.set({ sn_share_origin: window.location.origin }); } catch (e) {}
 
-  window.addEventListener("songnotes:import", (e) => {
+  window.addEventListener("keepsake:import", (e) => {
     inject(e.detail || window.__SN_PAYLOAD);
   });
   if (window.__SN_PAYLOAD) inject(window.__SN_PAYLOAD);

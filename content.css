@@ -1,6 +1,6 @@
-/* ── SongNotes Toast ── */
+/* ── Keepsake Toast ── */
 
-.songnotes-overlay {
+.ks-overlay {
   position: fixed;
   top: 24px;
   right: 24px;
@@ -12,7 +12,7 @@
   pointer-events: none;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
 }
-.songnotes-overlay.visible {
+.ks-overlay.visible {
   opacity: 1;
   transform: translateY(0) scale(1);
   pointer-events: auto;
@@ -20,13 +20,13 @@
   filter: drop-shadow(0 16px 40px rgba(100, 55, 35, 0.28))
           drop-shadow(0 4px 10px rgba(100, 55, 35, 0.12));
 }
-.songnotes-overlay.pinned.visible {
+.ks-overlay.pinned.visible {
   filter: drop-shadow(0 20px 56px rgba(100, 55, 35, 0.35))
           drop-shadow(0 5px 14px rgba(100, 55, 35, 0.16));
 }
 
 /* ── Card — image is the entire visual ── */
-.songnotes-card {
+.ks-card {
   position: relative;
   /* background-image set in JS via chrome.runtime.getURL */
   background-size: 100% 100%;
@@ -47,7 +47,7 @@
 }
 
 /* ── Sender label ── */
-.songnotes-label {
+.ks-label {
   font-size: 11px;
   color: rgba(80, 45, 28, 0.52);
   letter-spacing: 0.03em;
@@ -60,27 +60,27 @@
 }
 
 /* ── Note text — font-size set dynamically in JS by length ── */
-.songnotes-text {
+.ks-text {
   color: #3a1f10;
   word-break: break-word;
   overflow: hidden;
   margin-left: 10px;
 }
-.songnotes-text.sn-large {
+.ks-text.sn-large {
   font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
   font-weight: 400;
   font-style: italic;
   font-size: 26px;
   line-height: 1.25;
 }
-.songnotes-text.sn-medium {
+.ks-text.sn-medium {
   font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
   font-weight: 400;
   font-style: italic;
   font-size: 18px;
   line-height: 1.35;
 }
-.songnotes-text.sn-small {
+.ks-text.sn-small {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   font-weight: 400;
   font-size: 13px;
@@ -88,7 +88,7 @@
 }
 
 /* ── Close button ── */
-.songnotes-close {
+.ks-close {
   position: absolute;
   top: 10px;
   right: 10px;
@@ -108,7 +108,7 @@
   transition: background 150ms ease, color 150ms ease;
   z-index: 10;
 }
-.songnotes-close:hover {
+.ks-close:hover {
   background: rgba(120, 60, 40, 0.10);
   color: #3d2618;
 }

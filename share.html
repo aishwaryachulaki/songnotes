@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SongNotes — A letter for you</title>
+  <title>Keepsake — A letter for you</title>
   <style>
     /* ── Palette (matches extension) ── */
     :root {
@@ -293,7 +293,7 @@
   const SUPABASE_URL = "https://kkasgbkgwjxiutdalbbm.supabase.co";
   const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtrYXNnYmtnd2p4aXV0ZGFsYmJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyNjU3OTQsImV4cCI6MjA5Mjg0MTc5NH0.z1JLMTzz3X_swbWHdt2z4UDKyUwjEfNYys5kdDMq3R4";
   // ── Chrome Web Store link — update this one line when published ──
-  const EXTENSION_CWS_URL = null; // e.g. "https://chromewebstore.google.com/detail/songnotes/EXTENSION_ID"
+  const EXTENSION_CWS_URL = null; // e.g. "https://chromewebstore.google.com/detail/keepsake/EXTENSION_ID"
 
   // ── Helpers ───────────────────────────────────────────────
   function getShareId() {
@@ -376,7 +376,7 @@
         <div class="sender-name">${escHtml(sender)}</div>
         ${recipient ? `<div class="recipient-line">for <strong>${escHtml(recipient)}</strong></div>` : ""}
         <div class="sender-sub">chose ${notes.length} moment${notes.length === 1 ? "" : "s"} across ${trackCount} song${trackCount === 1 ? "" : "s"} just for you</div>
-        <div class="denomination">SongNotes</div>
+        <div class="denomination">Keepsake</div>
       </div>
     `;
 
@@ -427,7 +427,7 @@
     window.__SN_PAYLOAD = { share_id: shareId, share: meta || {}, notes };
 
     // ── Extension detection ───────────────────────────────────
-    // share-bridge.js sets data-songnotes-installed and fires "songnotes:ready"
+    // share-bridge.js sets data-keepsake-installed and fires "keepsake:ready"
     // at document_idle. We give it up to 1 s to appear; if it doesn't, the
     // extension isn't installed.
     let detected = false;
@@ -437,7 +437,7 @@
       detected = true;
       renderImportInstalled(shareId, meta, notes);
       // Bridge may have already picked up __SN_PAYLOAD; fire once more to be safe
-      window.dispatchEvent(new CustomEvent("songnotes:import", { detail: window.__SN_PAYLOAD }));
+      window.dispatchEvent(new CustomEvent("keepsake:import", { detail: window.__SN_PAYLOAD }));
     }
 
     function onDetectionTimeout() {
@@ -446,9 +446,9 @@
       renderImportNotInstalled();
     }
 
-    window.addEventListener("songnotes:ready", onExtensionReady, { once: true });
+    window.addEventListener("keepsake:ready", onExtensionReady, { once: true });
     // Fallback: check the attribute directly (bridge may have already run)
-    if (document.documentElement.getAttribute("data-songnotes-installed") === "1") {
+    if (document.documentElement.getAttribute("data-keepsake-installed") === "1") {
       onExtensionReady();
     } else {
       setTimeout(onDetectionTimeout, 1000);
@@ -460,13 +460,13 @@
     const area = document.getElementById("importArea");
     if (!area) return;
     area.innerHTML = `
-      <button class="btn-import" id="importBtn">♫ Import into SongNotes</button>
+      <button class="btn-import" id="importBtn">♫ Import into Keepsake</button>
       <p class="import-note">Notes will pop up as you listen in Spotify.</p>
     `;
     document.getElementById("importBtn").addEventListener("click", () => {
       window.__SN_PAYLOAD = { share_id: shareId, share: meta || {}, notes };
-      window.dispatchEvent(new CustomEvent("songnotes:import", { detail: window.__SN_PAYLOAD }));
-      window.addEventListener("songnotes:imported", () => {
+      window.dispatchEvent(new CustomEvent("keepsake:import", { detail: window.__SN_PAYLOAD }));
+      window.addEventListener("keepsake:imported", () => {
         const btn = document.getElementById("importBtn");
         const note = area.querySelector(".import-note");
         if (btn) btn.disabled = true;
@@ -485,11 +485,11 @@
       <div class="install-nudge">
         <div class="install-nudge-eyebrow">Want to hear it their way?</div>
         <div class="install-nudge-body">
-          SongNotes pops up their notes as you listen — right on the Spotify page.
+          Keepsake pops up their notes as you listen — right on the Spotify page.
         </div>
         <a class="btn-install" href="${cwsHref}" target="_blank" rel="noopener"
           ${!isPublished ? 'aria-disabled="true" style="opacity:0.5;cursor:default;pointer-events:none"' : ""}>
-          Add SongNotes to Chrome — it's free
+          Add Keepsake to Chrome — it's free
         </a>
         ${!isPublished ? `<p class="import-note" style="color:var(--blush);opacity:1">Not yet published — coming soon.</p>` : ""}
       </div>
@@ -518,7 +518,7 @@
       return;
     }
 
-    document.title = `SongNotes — a letter from ${meta?.sender_name || "someone"}`;
+    document.title = `Keepsake — a letter from ${meta?.sender_name || "someone"}`;
     render(shareId, meta, notes);
   })();
 </script>

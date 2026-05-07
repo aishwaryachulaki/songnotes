@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SongNotes — Sign in</title>
+  <title>Keepsake — Sign in</title>
   <style>
     :root {
       --butter:    #F2D88F;
@@ -103,7 +103,7 @@
 </head>
 <body>
 <div class="card" id="card">
-  <div class="logo">♪ SongNotes</div>
+  <div class="logo">♪ Keepsake</div>
   <div>
     <h1>Sign in</h1>
     <p class="sub" style="margin-top:6px">to send letters and manage your credits</p>
@@ -173,7 +173,7 @@
     if (session && (event === "SIGNED_IN" || event === "TOKEN_REFRESHED" || event === "INITIAL_SESSION")) {
       redirecting = true;
       // Broadcast to auth-bridge.js content script so extension picks up the session
-      window.dispatchEvent(new CustomEvent("songnotes:auth", {
+      window.dispatchEvent(new CustomEvent("keepsake:auth", {
         detail: {
           access_token: session.access_token,
           refresh_token: session.refresh_token,

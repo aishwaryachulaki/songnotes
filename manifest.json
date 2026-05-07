@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "SongNotes",
+  "name": "Keepsake",
   "version": "1.3.0",
-  "description": "Attach personal notes to Spotify songs and share them as a link.",
+  "description": "Attach personal notes to moments in Spotify songs and share them as a link.",
   "permissions": ["storage", "activeTab", "tabs"],
   "host_permissions": [
     "https://open.spotify.com/*",
@@ -11,7 +11,7 @@
   "action": {
     "default_popup": "popup.html",
     "default_icon": "icon.png",
-    "default_title": "SongNotes"
+    "default_title": "Keepsake"
   },
   "icons": { "48": "icon.png", "128": "icon.png" },
   "web_accessible_resources": [
