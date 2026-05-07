@@ -209,7 +209,7 @@ async function notifyContentRefresh() {
 async function pushShareMeta(share, accessToken) {
   const token = accessToken || SUPABASE_KEY;
   try {
-    await fetch(`${SUPABASE_URL}/rest/v1/shares`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/shares`, {
       method: "POST",
       headers: {
         apikey: SUPABASE_KEY,
@@ -226,7 +226,8 @@ async function pushShareMeta(share, accessToken) {
         recipient_name: share.recipient_name || null,
       }),
     });
-  } catch {}
+    return res.ok;
+  } catch { return false; }
 }
 async function pushNote(share, note, accessToken) {
   const token = accessToken || SUPABASE_KEY;
@@ -599,7 +600,7 @@ $("copyShare").addEventListener("click", async () => {
   if (shareBtn.disabled) return;
   shareBtn.disabled = true;
 
-  // ── Auth + credit check ──
+  // ── Step 1: Auth check ──
   const session = await getSession();
   if (!session) {
     $("shareInfo").innerHTML = `Sign in to send letters. <a href="#" id="signInLink" style="color:var(--tangerine);font-weight:600">Sign in</a>`;
@@ -607,20 +608,13 @@ $("copyShare").addEventListener("click", async () => {
     shareBtn.disabled = false;
     return;
   }
-  const { data: creditResult, error: creditErr } = await supabaseRpc("use_credit", { p_user_id: session.user.id }, session.access_token);
-  if (creditErr || !creditResult?.ok) {
-    $("shareInfo").innerHTML = `No letters left. <a href="#" id="buyLink" style="color:var(--tangerine);font-weight:600">Buy more →</a>`;
-    document.getElementById("buyLink")?.addEventListener("click", (e) => { e.preventDefault(); openAccountPage(); });
-    shareBtn.disabled = false;
-    return;
-  }
 
+  // ── Step 2: Validate before touching credits ──
   if (!activeShare.notes.length) {
     $("shareInfo").textContent = "Write at least one note before sending.";
     shareBtn.disabled = false;
     return;
   }
-  // STRICT: multi-song shares REQUIRE a playlist URL.
   const trackIds = new Set(activeShare.notes.map((n) => n.track_id));
   const isMulti = trackIds.size > 1;
   const playlistId = parsePlaylistId($("playlistUrl").value);
@@ -629,12 +623,26 @@ $("copyShare").addEventListener("click", async () => {
     shareBtn.disabled = false;
     return;
   }
-  // Sync playlist fields from input one more time
+
+  // ── Step 3: Check credits are available (read-only — not consumed yet) ──
+  const credits = await fetchCredits(session.access_token, session.user.id);
+  const hasCredit = credits && (
+    credits.lifetime ||
+    credits.paid_credits > 0 ||
+    creditsFreeAvailable(credits)
+  );
+  if (!hasCredit) {
+    $("shareInfo").innerHTML = `No letters left. <a href="#" id="buyLink" style="color:var(--tangerine);font-weight:600">Buy more →</a>`;
+    document.getElementById("buyLink")?.addEventListener("click", (e) => { e.preventDefault(); openAccountPage(); });
+    shareBtn.disabled = false;
+    return;
+  }
+
+  // ── Step 4: Prepare share (sanitize, dedup, mint new ID) ──
   const v = $("playlistUrl").value.trim();
   activeShare.playlist_url = v || null;
   activeShare.playlist_id = parsePlaylistId(v);
   activeShare.type = deriveType(activeShare);
-  // Drop malformed notes, then deduplicate by content signature.
   activeShare.notes = sanitizeNotes(activeShare.notes);
   const seen = new Set();
   activeShare.notes = activeShare.notes.filter((n) => {
@@ -644,26 +652,51 @@ $("copyShare").addEventListener("click", async () => {
     return true;
   });
 
-  // Always mint a fresh share ID on every send.
-  // This sidesteps Supabase RLS blocking DELETEs — old rows are simply
-  // orphaned (unreachable), and the new link is a clean slate.
+  // Always mint a fresh share ID on every send so orphaned rows are unreachable.
   const { store } = await loadStore();
   const oldId = activeShare.id;
   const newId = shortId();
-
-  // Migrate local share object to new ID.
   activeShare.id = newId;
   activeShare.mode = "inactive";
   delete store.shares[oldId];
   store.shares[newId] = activeShare;
   store.active = newId;
 
-  // Push share meta FIRST (annotations has a FK → shares.id).
-  await pushShareMeta(activeShare);
-  for (const note of activeShare.notes) {
-    await pushNote(activeShare, note);
+  // ── Step 5: Push notes to Supabase BEFORE consuming credit ──
+  $("shareInfo").textContent = "Sending…";
+  const metaOk = await pushShareMeta(activeShare, session.access_token);
+  if (!metaOk) {
+    // Restore old ID so the user's local state is unchanged and they can retry.
+    activeShare.id = oldId;
+    delete store.shares[newId];
+    store.shares[oldId] = activeShare;
+    store.active = oldId;
+    await saveStore(store);
+    $("shareInfo").textContent = "Couldn't reach the server. Check your connection and try again.";
+    shareBtn.disabled = false;
+    return;
   }
 
+  const noteResults = await Promise.all(
+    activeShare.notes.map((note) => pushNote(activeShare, note, session.access_token))
+  );
+  const failedCount = noteResults.filter((ok) => !ok).length;
+  if (failedCount > 0) {
+    // Some notes failed — abort. Credit not touched, user can retry.
+    $("shareInfo").textContent = `${failedCount} note${failedCount > 1 ? "s" : ""} failed to send. Check your connection and try again.`;
+    shareBtn.disabled = false;
+    return;
+  }
+
+  // ── Step 6: Notes confirmed in Supabase — now consume the credit ──
+  const { data: creditResult, error: creditErr } = await supabaseRpc("use_credit", { p_user_id: session.user.id }, session.access_token);
+  if (creditErr || !creditResult?.ok) {
+    // Extremely unlikely (we already checked availability), but handle gracefully.
+    // Notes are already pushed and the link works — don't block the user.
+    console.warn("Credit deduction failed after successful push:", creditErr);
+  }
+
+  // ── Step 7: Finalise local state and show the link ──
   await saveStore(store);
   shareBtn.disabled = false;
   setMode("inactive");
