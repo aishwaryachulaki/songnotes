@@ -1,5 +1,5 @@
 // Bridges share pages → extension storage using the share-scoped storage model.
-// The share page sets window.__SN_PAYLOAD = { share_id, share, notes: [...] } and dispatches "keepsake:import".
+// The share page sets window.__KS_PAYLOAD = { share_id, share, notes: [...] } and dispatches "keepsake:import".
 (function () {
   function inject(payload) {
     if (!payload || !payload.share_id) return;
@@ -7,8 +7,8 @@
     const remoteNotes = Array.isArray(payload.notes) ? payload.notes : [];
     const meta = payload.share || {};
 
-    chrome.storage.local.get(["sn_shares"], (data) => {
-      const store = data.sn_shares || { active: null, shares: {}, previous: [] };
+    chrome.storage.local.get(["ks_shares"], (data) => {
+      const store = data.ks_shares || { active: null, shares: {}, previous: [] };
 
       // Same id as active → no-op (do not duplicate or replace)
       if (store.active === incomingId) {
@@ -50,7 +50,7 @@
       };
       store.active = incomingId;
 
-      chrome.storage.local.set({ sn_shares: store }, () => {
+      chrome.storage.local.set({ ks_shares: store }, () => {
         window.dispatchEvent(new CustomEvent("keepsake:imported", { detail: { added: remoteNotes.length } }));
       });
     });
@@ -58,10 +58,10 @@
 
   document.documentElement.setAttribute("data-keepsake-installed", "1");
   window.dispatchEvent(new CustomEvent("keepsake:ready"));
-  try { chrome.storage.local.set({ sn_share_origin: window.location.origin }); } catch (e) {}
+  try { chrome.storage.local.set({ ks_share_origin: window.location.origin }); } catch (e) {}
 
   window.addEventListener("keepsake:import", (e) => {
-    inject(e.detail || window.__SN_PAYLOAD);
+    inject(e.detail || window.__KS_PAYLOAD);
   });
-  if (window.__SN_PAYLOAD) inject(window.__SN_PAYLOAD);
+  if (window.__KS_PAYLOAD) inject(window.__KS_PAYLOAD);
 })();

@@ -1,14 +1,14 @@
 const $ = (id) => document.getElementById(id);
-const { SUPABASE_URL, SUPABASE_KEY, SHARE_ORIGIN: CONFIGURED_ORIGIN } = window.SN_CONFIG;
+const { SUPABASE_URL, SUPABASE_KEY, SHARE_ORIGIN: CONFIGURED_ORIGIN } = window.KS_CONFIG;
 
 // ---------- auth ----------
 let _session = null; // cached session from chrome.storage
 
 async function getSession() {
   if (_session && _session.expires_at > Date.now() / 1000 + 30) return _session;
-  const data = await chrome.storage.local.get("sn_session");
-  if (!data.sn_session) return null;
-  const s = data.sn_session;
+  const data = await chrome.storage.local.get("ks_session");
+  if (!data.ks_session) return null;
+  const s = data.ks_session;
   // If expired, attempt silent refresh via Supabase token endpoint
   if (s.expires_at && s.expires_at < Date.now() / 1000 + 30) {
     try {
@@ -25,13 +25,13 @@ async function getSession() {
           expires_at: Math.floor(Date.now() / 1000) + fresh.expires_in,
           user: s.user,
         };
-        await chrome.storage.local.set({ sn_session: updated });
+        await chrome.storage.local.set({ ks_session: updated });
         _session = updated;
         return updated;
       }
     } catch {}
     // Refresh failed — session is dead
-    await chrome.storage.local.remove("sn_session");
+    await chrome.storage.local.remove("ks_session");
     return null;
   }
   _session = s;
@@ -133,7 +133,7 @@ function parsePlaylistId(input) {
 }
 
 // ---------- share-scoped storage model ----------
-// sn_shares = {
+// ks_shares = {
 //   active: "<id>",
 //   shares: {
 //     [id]: { id, mode: "editing"|"preview"|"inactive",
@@ -145,12 +145,12 @@ function parsePlaylistId(input) {
 //   previous: ["<id>", ...]   // archived (most recent first)
 // }
 async function loadStore() {
-  const data = await chrome.storage.local.get(["sn_shares", "sn_sender"]);
-  const store = data.sn_shares || { active: null, shares: {}, previous: [] };
-  return { store, sender: data.sn_sender || "" };
+  const data = await chrome.storage.local.get(["ks_shares", "ks_sender"]);
+  const store = data.ks_shares || { active: null, shares: {}, previous: [] };
+  return { store, sender: data.ks_sender || "" };
 }
 async function saveStore(store) {
-  await chrome.storage.local.set({ sn_shares: store });
+  await chrome.storage.local.set({ ks_shares: store });
 }
 function ensureActive(store, sender) {
   if (!store.active || !store.shares[store.active]) {
@@ -194,7 +194,7 @@ async function fetchTrack() {
     return { trackId: null, playerVisible: false, notOnSpotify: true };
   }
   try {
-    return await chrome.tabs.sendMessage(tab.id, { type: "SN_GET_STATE" });
+    return await chrome.tabs.sendMessage(tab.id, { type: "KS_GET_STATE" });
   } catch {
     // Content script not injected yet (page still loading) — treat as undetectable
     return { trackId: null, playerVisible: false, notOnSpotify: false };
@@ -202,7 +202,7 @@ async function fetchTrack() {
 }
 async function notifyContentRefresh() {
   const tab = await getActiveTab();
-  if (tab) chrome.tabs.sendMessage(tab.id, { type: "SN_REFRESH" }).catch(() => {});
+  if (tab) chrome.tabs.sendMessage(tab.id, { type: "KS_REFRESH" }).catch(() => {});
 }
 
 // ---------- backend ----------
@@ -453,7 +453,7 @@ async function activateShare(id) {
 async function init() {
   const { store, sender } = await loadStore();
   senderName = sender;
-  chrome.storage.local.remove("sn_share_origin");
+  chrome.storage.local.remove("ks_share_origin");
   shareOrigin = CONFIGURED_ORIGIN || "";
 
   activeShare = ensureActive(store, senderName);
@@ -510,7 +510,7 @@ $("signInBtn").addEventListener("click", openAuthPage);
 $("accountLink").addEventListener("click", (e) => { e.preventDefault(); openAccountPage(); });
 $("signOutLink").addEventListener("click", async (e) => {
   e.preventDefault();
-  await chrome.storage.local.remove("sn_session");
+  await chrome.storage.local.remove("ks_session");
   _session = null;
   $("authGate").classList.remove("hidden");
   $("authBar").classList.add("hidden");
@@ -520,7 +520,7 @@ $("saveName").addEventListener("click", async () => {
   const v = $("senderName").value.trim();
   if (!v) return;
   senderName = v;
-  await chrome.storage.local.set({ sn_sender: v });
+  await chrome.storage.local.set({ ks_sender: v });
   if (activeShare) {
     activeShare.sender_name = v;
     const { store } = await loadStore();

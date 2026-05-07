@@ -91,8 +91,8 @@
 
   async function loadActiveShare() {
     return new Promise((resolve) => {
-      chrome.storage.local.get(["sn_shares"], (data) => {
-        const store = data.sn_shares || {};
+      chrome.storage.local.get(["ks_shares"], (data) => {
+        const store = data.ks_shares || {};
         const active = store.active && store.shares ? store.shares[store.active] : null;
         resolve(active || null);
       });
@@ -227,13 +227,13 @@
   setInterval(tick, 800);
 
   chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
-    if (msg && msg.type === "SN_GET_STATE") {
+    if (msg && msg.type === "KS_GET_STATE") {
       const info = getTrackInfo();
       const pos = getPosition();
       sendResponse({ ...info, position: pos });
       return true;
     }
-    if (msg && msg.type === "SN_REFRESH") {
+    if (msg && msg.type === "KS_REFRESH") {
       // Force re-evaluation on next tick by clearing the per-track cache
       lastTrackId = null;
       firedNotes = new Set();

@@ -424,7 +424,7 @@
     page.innerHTML = html;
 
     // Set payload so share-bridge.js can pick it up when it loads
-    window.__SN_PAYLOAD = { share_id: shareId, share: meta || {}, notes };
+    window.__KS_PAYLOAD = { share_id: shareId, share: meta || {}, notes };
 
     // ── Extension detection ───────────────────────────────────
     // share-bridge.js sets data-keepsake-installed and fires "keepsake:ready"
@@ -436,8 +436,8 @@
       if (detected) return;
       detected = true;
       renderImportInstalled(shareId, meta, notes);
-      // Bridge may have already picked up __SN_PAYLOAD; fire once more to be safe
-      window.dispatchEvent(new CustomEvent("keepsake:import", { detail: window.__SN_PAYLOAD }));
+      // Bridge may have already picked up __KS_PAYLOAD; fire once more to be safe
+      window.dispatchEvent(new CustomEvent("keepsake:import", { detail: window.__KS_PAYLOAD }));
     }
 
     function onDetectionTimeout() {
@@ -464,8 +464,8 @@
       <p class="import-note">Notes will pop up as you listen in Spotify.</p>
     `;
     document.getElementById("importBtn").addEventListener("click", () => {
-      window.__SN_PAYLOAD = { share_id: shareId, share: meta || {}, notes };
-      window.dispatchEvent(new CustomEvent("keepsake:import", { detail: window.__SN_PAYLOAD }));
+      window.__KS_PAYLOAD = { share_id: shareId, share: meta || {}, notes };
+      window.dispatchEvent(new CustomEvent("keepsake:import", { detail: window.__KS_PAYLOAD }));
       window.addEventListener("keepsake:imported", () => {
         const btn = document.getElementById("importBtn");
         const note = area.querySelector(".import-note");

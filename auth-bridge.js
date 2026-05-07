@@ -3,13 +3,13 @@
 (function () {
   window.addEventListener("keepsake:auth", (e) => {
     if (!e.detail?.access_token) return;
-    chrome.storage.local.set({ sn_session: e.detail }, () => {
+    chrome.storage.local.set({ ks_session: e.detail }, () => {
       // Signal the page so it can show a "connected" state if needed
       window.dispatchEvent(new CustomEvent("keepsake:auth_saved"));
     });
   });
 
   window.addEventListener("keepsake:signout", () => {
-    chrome.storage.local.remove("sn_session");
+    chrome.storage.local.remove("ks_session");
   });
 })();
