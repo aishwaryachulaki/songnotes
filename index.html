@@ -428,6 +428,115 @@
       .page-top, .features { padding-left: 16px; padding-right: 16px; }
       .stamp-grid { grid-template-columns: 1fr; }
     }
+
+    /* ── FAQ section ── */
+    .faq-wrap {
+      position: relative;
+      overflow: hidden;
+      padding: 80px 32px 96px;
+    }
+    .faq-section {
+      max-width: 700px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+    .faq-eyebrow {
+      text-align: center;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--rose);
+      margin-bottom: 12px;
+    }
+    .faq-heading {
+      font-family: 'Lora', Georgia, serif;
+      font-size: clamp(24px, 3vw, 36px);
+      font-weight: 700;
+      color: var(--ink);
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .faq-sub {
+      text-align: center;
+      font-size: 0.88rem;
+      color: var(--ink-mid);
+      line-height: 1.7;
+      margin-bottom: 40px;
+    }
+    .faq-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .faq-item {
+      background: var(--cream);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .faq-q {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 17px 22px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-align: left;
+      font-family: 'Lora', Georgia, serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+    .faq-toggle {
+      font-size: 22px;
+      font-weight: 300;
+      color: var(--rose);
+      flex-shrink: 0;
+      line-height: 1;
+      transition: transform 0.25s ease;
+      font-family: sans-serif;
+    }
+    .faq-item.open .faq-toggle { transform: rotate(45deg); }
+    .faq-a {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, padding 0.3s ease;
+      padding: 0 22px;
+      font-size: 13.5px;
+      color: var(--ink-mid);
+      line-height: 1.7;
+    }
+    .faq-item.open .faq-a {
+      max-height: 300px;
+      padding: 0 22px 20px;
+    }
+    .faq-contact {
+      text-align: center;
+      margin-top: 48px;
+      font-size: 13px;
+      color: var(--ink-mid);
+      line-height: 1.8;
+      font-style: italic;
+    }
+    .faq-contact a {
+      color: var(--rose);
+      font-weight: 600;
+      font-style: normal;
+      text-decoration: none;
+    }
+    .faq-contact a:hover { text-decoration: underline; }
+    .faq-floral {
+      position: absolute;
+      bottom: 40px;
+      right: 40px;
+      width: 200px;
+      opacity: 0.55;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
@@ -553,6 +662,57 @@
   </div>
 </section>
 
+<!-- FAQ -->
+<div class="faq-wrap">
+  <img class="faq-floral" src="lifetime-flower.png" alt="" aria-hidden="true" />
+  <div class="faq-section">
+
+    <div class="faq-eyebrow">FAQ</div>
+    <h2 class="faq-heading">Questions? We've got you.</h2>
+    <p class="faq-sub">Here are some common things people ask.<br>If you need anything else, feel free to reach out.</p>
+
+    <div class="faq-list">
+
+      <div class="faq-item">
+        <button class="faq-q">Do I need a Spotify account to use Keepsake?<span class="faq-toggle">+</span></button>
+        <div class="faq-a">Keepsake works on the Spotify web player in Chrome. You'll need an active Spotify account — free or premium. No account is needed to visit a share page, but the recipient needs the extension installed to receive notes while listening.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">Does the recipient need Keepsake installed?<span class="faq-toggle">+</span></button>
+        <div class="faq-a">Yes — they'll need the Chrome extension to receive notes while listening. If they don't have it, the share page will prompt them to install it. It only takes a moment.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">Are my notes private?<span class="faq-toggle">+</span></button>
+        <div class="faq-a">Yes. Note content is intentionally hidden on the share page — the recipient sees which songs to listen to, but your actual words only appear at the right moment while the song plays. No one else can read them.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">Is Keepsake free to use?<span class="faq-toggle">+</span></button>
+        <div class="faq-a">You get 3 free letters when you sign up. After that, you can buy credit packs starting at ₹150, or go lifetime for unlimited notes with a one-time purchase.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">Does this work on mobile?<span class="faq-toggle">+</span></button>
+        <div class="faq-a">Not yet — Keepsake is a Chrome extension and works on desktop browsers only. Mobile support is something we're actively exploring.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">Can I edit or delete a note after I've sent it?<span class="faq-toggle">+</span></button>
+        <div class="faq-a">You can delete notes from the extension before sharing. Once a share link has been sent and imported by the recipient, the notes are locked — so take your time before you share.</div>
+      </div>
+
+    </div>
+
+    <div class="faq-contact">
+      <p>if you need something else, we're just a message away.</p>
+      <a href="mailto:hello@keepsake.app">hello@keepsake.app</a>
+    </div>
+
+  </div>
+</div>
+
 <!-- FOOTER -->
 <footer>Keepsake &nbsp;·&nbsp; Works on Spotify Web Player &nbsp;·&nbsp; No account required</footer>
 
@@ -566,6 +726,16 @@
   </filter>
   <rect width="100%" height="100%" filter="url(#gf)"/>
 </svg>
+
+<script>
+  document.querySelectorAll('.faq-item').forEach(item => {
+    item.querySelector('.faq-q').addEventListener('click', () => {
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    });
+  });
+</script>
 
 </body>
 </html>
