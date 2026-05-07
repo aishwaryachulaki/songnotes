@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FAQ — Keepsake</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@1,400&family=Lora:ital,wght@0,600;0,700;1,500;1,600&family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --butter:    #F4D9A6;
+      --cream:     #F7E9D3;
+      --blush:     #E48A8A;
+      --rose:      #D96B7C;
+      --tangerine: #F08C21;
+      --ink:       #3A2E2A;
+      --ink-mid:   #6B5A52;
+      --ink-lt:    #A08878;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--butter);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      color: var(--ink);
+      min-height: 100vh;
+    }
+
+    /* Grain overlay */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.04;
+      background-image: url('cardboard-texture.jpg');
+      background-size: 300px;
+    }
+
+    /* ── Nav ── */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 32px;
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+    .nav-logo {
+      font-family: 'Spectral', Georgia, serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: 26px;
+      color: var(--rose);
+      text-decoration: none;
+      letter-spacing: -0.01em;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .nav-logo .logo-spark {
+      font-style: normal;
+      font-family: sans-serif;
+      font-size: 14px;
+      color: var(--tangerine);
+      font-weight: 400;
+      margin-bottom: 6px;
+    }
+    .nav-back {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-mid);
+      text-decoration: none;
+      opacity: 0.7;
+      transition: opacity 0.15s;
+    }
+    .nav-back:hover { opacity: 1; }
+
+    /* ── Page ── */
+    .page {
+      position: relative;
+      max-width: 740px;
+      margin: 0 auto;
+      padding: 60px 32px 120px;
+    }
+
+    .faq-eyebrow {
+      text-align: center;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--rose);
+      margin-bottom: 12px;
+    }
+    .faq-heading {
+      font-family: 'Lora', Georgia, serif;
+      font-size: clamp(26px, 3.5vw, 40px);
+      font-weight: 700;
+      color: var(--ink);
+      text-align: center;
+      margin-bottom: 12px;
+    }
+    .faq-sub {
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--ink-mid);
+      line-height: 1.7;
+      margin-bottom: 52px;
+    }
+
+    /* ── Accordion ── */
+    .faq-group { margin-bottom: 40px; }
+    .faq-group-label {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--rose);
+      opacity: 0.6;
+      margin-bottom: 10px;
+      padding-left: 4px;
+    }
+    .faq-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .faq-item {
+      background: var(--cream);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .faq-q {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 22px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-align: left;
+      font-family: 'Lora', Georgia, serif;
+      font-size: 14.5px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+    .faq-toggle {
+      font-size: 22px;
+      font-weight: 300;
+      color: var(--rose);
+      flex-shrink: 0;
+      line-height: 1;
+      font-family: sans-serif;
+      transition: transform 0.25s ease;
+    }
+    .faq-item.open .faq-toggle { transform: rotate(45deg); }
+    .faq-a {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, padding 0.3s ease;
+      padding: 0 22px;
+      font-size: 13.5px;
+      color: var(--ink-mid);
+      line-height: 1.75;
+    }
+    .faq-item.open .faq-a {
+      max-height: 400px;
+      padding: 0 22px 22px;
+    }
+
+    /* ── Contact ── */
+    .faq-contact {
+      text-align: center;
+      margin-top: 56px;
+      font-size: 13.5px;
+      color: var(--ink-mid);
+      line-height: 1.9;
+      font-style: italic;
+    }
+    .faq-contact a {
+      color: var(--rose);
+      font-weight: 600;
+      font-style: normal;
+      text-decoration: none;
+    }
+    .faq-contact a:hover { text-decoration: underline; }
+
+    /* ── Floral ── */
+    .faq-floral {
+      position: fixed;
+      bottom: 40px;
+      right: 40px;
+      width: 220px;
+      opacity: 0.45;
+      pointer-events: none;
+    }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 8px 24px 36px;
+      font-size: 11px;
+      color: var(--ink-mid);
+      opacity: 0.5;
+      letter-spacing: 0.03em;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">keepsake.<span class="logo-spark">✦</span></a>
+  <a class="nav-back" href="index.html">← Back to home</a>
+</nav>
+
+<div class="page">
+
+  <div class="faq-eyebrow">FAQ</div>
+  <h1 class="faq-heading">Questions? We've got you.</h1>
+  <p class="faq-sub">Here are some common things people ask.<br>If you need anything else, feel free to reach out.</p>
+
+  <!-- Group 1: Getting started -->
+  <div class="faq-group">
+    <div class="faq-group-label">Getting started</div>
+    <div class="faq-list">
+
+      <div class="faq-item">
+        <button class="faq-q">What is Keepsake?<span class="faq-toggle">+</span></button>
+        <div class="faq-a">Keepsake is a Chrome extension that lets you attach personal notes to specific moments in a song. When your recipient listens to that track, your note appears on their screen at the exact second you chose — like a handwritten letter tucked inside the music.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">Do I need a Spotify account to use Keepsake?<span class="faq-toggle">+</span></button>
+        <div class="faq-a">Keepsake works on the Spotify web player in Chrome. You'll need an active Spotify account — free or premium — to listen and write notes. The recipient also needs a Spotify account to receive them while listening.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">Does the recipient need Keepsake installed?<span class="faq-toggle">+</span></button>
+        <div class="faq-a">Yes — they'll need the Chrome extension to receive notes while listening. If they don't have it installed, the share page will prompt them. It only takes a moment to set up.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Group 2: How it works -->
+  <div class="faq-group">
+    <div class="faq-group-label">How it works</div>
+    <div class="faq-list">
+
+      <div class="faq-item">
+        <button class="faq-q">What is a timestamp?<span class="faq-toggle">+</span></button>
+        <div class="faq-a">A timestamp is the exact moment in a song where your note appears. You can type one manually (e.g. 1:24) or hit the "Now" button while the song is playing to capture the current position.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">Can I attach notes to multiple songs?<span class="faq-toggle">+</span></button>
+        <div class="faq-a">Yes. You can write notes across several songs and bundle them into one share link — the recipient gets all of them delivered across their listening session.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">Will the note re-appear if they replay the song?<span class="faq-toggle">+</span></button>
+        <div class="faq-a">Yes. If the listener rewinds past a timestamp, the note fires again. The experience is designed to feel like rediscovering something each time.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">Can I edit or delete a note after I've sent it?<span class="faq-toggle">+</span></button>
+        <div class="faq-a">You can delete notes from the extension before sharing. Once a share link has been sent and imported by the recipient, the notes are locked — so take your time before you share.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Group 3: Privacy -->
+  <div class="faq-group">
+    <div class="faq-group-label">Privacy</div>
+    <div class="faq-list">
+
+      <div class="faq-item">
+        <button class="faq-q">Are my notes private?<span class="faq-toggle">+</span></button>
+        <div class="faq-a">Yes. Note content is intentionally hidden on the share page — the recipient sees which songs to listen to, but your actual words only appear at the right moment while the song plays. No one else can read them.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">Do you store my notes?<span class="faq-toggle">+</span></button>
+        <div class="faq-a">Notes are stored securely and only used to deliver them to your recipient. We don't read, sell, or share your note content with anyone.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Group 4: Pricing -->
+  <div class="faq-group">
+    <div class="faq-group-label">Pricing</div>
+    <div class="faq-list">
+
+      <div class="faq-item">
+        <button class="faq-q">Is Keepsake free to use?<span class="faq-toggle">+</span></button>
+        <div class="faq-a">You get 3 free letters when you sign up. After that, you can buy credit packs starting at ₹150, or go lifetime for unlimited notes with a one-time purchase. Credits never expire.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">What happens when I run out of credits?<span class="faq-toggle">+</span></button>
+        <div class="faq-a">You won't be able to send new letters until you top up. Your existing sent notes remain active — your recipients can still receive them.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">What is the Lifetime plan?<span class="faq-toggle">+</span></button>
+        <div class="faq-a">A one-time purchase that gives you unlimited letters forever — no packs, no counting credits, no recurring charges.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Group 5: Compatibility -->
+  <div class="faq-group">
+    <div class="faq-group-label">Compatibility</div>
+    <div class="faq-list">
+
+      <div class="faq-item">
+        <button class="faq-q">Does this work on mobile?<span class="faq-toggle">+</span></button>
+        <div class="faq-a">Not yet — Keepsake is a Chrome extension and works on desktop browsers only. Mobile support is something we're actively exploring.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">Which music platforms does Keepsake support?<span class="faq-toggle">+</span></button>
+        <div class="faq-a">Currently Keepsake works on the Spotify web player. Support for other platforms is planned — stay tuned.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Group 6: Troubleshooting -->
+  <div class="faq-group">
+    <div class="faq-group-label">Troubleshooting</div>
+    <div class="faq-list">
+
+      <div class="faq-item">
+        <button class="faq-q">My note isn't appearing when the song plays.<span class="faq-toggle">+</span></button>
+        <div class="faq-a">Make sure the extension is active and you're on the Spotify web player in Chrome. Check that the share was imported correctly — you can do this from the extension popup. If it still doesn't work, try refreshing the Spotify tab.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">I found a bug / something isn't working.<span class="faq-toggle">+</span></button>
+        <div class="faq-a">We're sorry about that! Drop us a message at hello@keepsake.app and we'll look into it right away. The more detail you can share about what happened, the faster we can fix it.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="faq-contact">
+    <p>if you need something else, we're just a message away.</p>
+    <a href="mailto:hello@keepsake.app">hello@keepsake.app</a>
+  </div>
+
+</div>
+
+<img class="faq-floral" src="lifetime-flower.png" alt="" aria-hidden="true" />
+
+<footer>Keepsake &nbsp;·&nbsp; Works on Spotify Web Player &nbsp;·&nbsp; No account required</footer>
+
+<script>
+  document.querySelectorAll('.faq-item').forEach(item => {
+    item.querySelector('.faq-q').addEventListener('click', () => {
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    });
+  });
+</script>
+
+</body>
+</html>
