@@ -267,6 +267,15 @@
       line-height: 1.6;
     }
     .state strong { color: var(--ink); display: block; font-size: 20px; margin-bottom: 8px; }
+    .state.loading { color: var(--rose); font-family: 'Lora', Georgia, serif; font-style: italic; font-size: 16px; }
+    .loading-dot {
+      display: inline-block;
+      animation: ks-pulse 1.6s ease-in-out infinite;
+    }
+    @keyframes ks-pulse {
+      0%, 100% { opacity: 1;   transform: scale(1); }
+      50%       { opacity: 0.3; transform: scale(0.85); }
+    }
 
     .imported-banner {
       background: rgba(240,140,33,0.12);
@@ -315,12 +324,24 @@
       ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   }
 
-  async function fetchJson(url) {
-    const res = await fetch(url, {
-      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }
-    });
-    if (!res.ok) return null;
-    return res.json();
+  // Fetches JSON with a hard timeout. Throws on network failure or timeout
+  // so callers can show a proper error instead of hanging forever.
+  async function fetchJson(url, timeoutMs = 9000) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const res = await fetch(url, {
+        headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` },
+        signal: controller.signal,
+      });
+      clearTimeout(timer);
+      if (!res.ok) return null;
+      return res.json();
+    } catch (err) {
+      clearTimeout(timer);
+      if (err.name === "AbortError") throw new Error("timeout");
+      throw err; // re-throw network errors so the outer catch can handle them
+    }
   }
 
   // ── Spotify link logic ─────────────────────────────────────
@@ -506,20 +527,37 @@
       return;
     }
 
-    const [meta, notes] = await Promise.all([
-      fetchJson(`${SUPABASE_URL}/rest/v1/shares?id=eq.${encodeURIComponent(shareId)}&select=*`)
-        .then(r => (Array.isArray(r) ? r[0] : null)),
-      fetchJson(`${SUPABASE_URL}/rest/v1/annotations?share_id=eq.${encodeURIComponent(shareId)}&select=*`)
-        .then(r => Array.isArray(r) ? r : []),
-    ]);
+    // Show immediately — recipient sees something the moment the page loads,
+    // not a blank screen while waiting for Supabase.
+    page.innerHTML = `<div class="state loading"><span class="loading-dot">✦</span> opening your letter…</div>`;
 
-    if (!notes.length && !meta) {
-      page.innerHTML = `<div class="state"><strong>Letter not found</strong>This link may be invalid or the notes were removed.</div>`;
-      return;
+    try {
+      const [meta, notes] = await Promise.all([
+        fetchJson(`${SUPABASE_URL}/rest/v1/shares?id=eq.${encodeURIComponent(shareId)}&select=*`)
+          .then(r => (Array.isArray(r) ? r[0] : null)),
+        fetchJson(`${SUPABASE_URL}/rest/v1/annotations?share_id=eq.${encodeURIComponent(shareId)}&select=*`)
+          .then(r => Array.isArray(r) ? r : []),
+      ]);
+
+      if (!notes.length && !meta) {
+        page.innerHTML = `<div class="state"><strong>Letter not found</strong>This link may be invalid or the notes were removed.</div>`;
+        return;
+      }
+
+      document.title = `Keepsake — a letter from ${meta?.sender_name || "someone"}`;
+      render(shareId, meta, notes);
+
+    } catch (err) {
+      const isTimeout = err.message === "timeout";
+      page.innerHTML = `
+        <div class="state">
+          <strong>${isTimeout ? "Still loading…" : "Couldn't load your letter"}</strong>
+          ${isTimeout
+            ? "This is taking longer than usual. Check your connection and try again."
+            : "Something went wrong. Check your connection and try again."}
+          <a href="" style="display:block;margin-top:14px;color:var(--rose);font-weight:600;font-size:13px;">Try again</a>
+        </div>`;
     }
-
-    document.title = `Keepsake — a letter from ${meta?.sender_name || "someone"}`;
-    render(shareId, meta, notes);
   })();
 </script>
 </body>
