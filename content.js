@@ -1,10 +1,47 @@
 (() => {
   // ---- Track detection ----
+  // Multiple selector fallbacks per element — if Spotify renames a testid,
+  // the next candidate in the list takes over. Add new candidates at the end.
+  const NOW_PLAYING_SELECTORS = [
+    '[data-testid="now-playing-widget"]',
+    '[data-testid="player-bar"]',
+    '[data-testid="now-playing-bar"]',
+    '.now-playing-bar',
+    '[aria-label*="Now playing"]',
+  ];
+  const TITLE_SELECTORS = [
+    '[data-testid="context-item-link"]',
+    'a[data-testid="context-item-link"]',
+    '[data-testid="track-info-name"] a',
+    '[data-testid="track-title"] a',
+    '.track-info__name a',
+  ];
+  const POSITION_SELECTORS = [
+    '[data-testid="playback-position"]',
+    '[data-testid="playback-progressbar-elapsed-time"]',
+    '[data-testid="player-position"]',
+    '.playback-bar__progress-time:first-child',
+  ];
+
+  function queryFirst(selectors, root) {
+    const ctx = root || document;
+    for (const sel of selectors) {
+      try {
+        const el = ctx.querySelector(sel);
+        if (el) return el;
+      } catch { /* invalid selector in future — skip */ }
+    }
+    return null;
+  }
+
   function getTrackInfo() {
-    const nowPlaying = document.querySelector('[data-testid="now-playing-widget"]');
+    const nowPlaying = queryFirst(NOW_PLAYING_SELECTORS);
     let title = "", artist = "", trackId = "";
+    // detected = true means we found the player container, even if track parse fails
+    const detected = !!nowPlaying;
+
     if (nowPlaying) {
-      const titleEl = nowPlaying.querySelector('[data-testid="context-item-link"], a[data-testid="context-item-link"]');
+      const titleEl = queryFirst(TITLE_SELECTORS, nowPlaying);
       if (titleEl) {
         title = titleEl.textContent.trim();
         const href = titleEl.getAttribute("href") || "";
@@ -14,13 +51,25 @@
       const artistEls = nowPlaying.querySelectorAll('a[href^="/artist/"]');
       artist = Array.from(artistEls).map((a) => a.textContent.trim()).join(", ");
     }
+
+    // Fallback 1: document.title ("Spotify – Song · Artist")
     if (!title) {
       const t = document.title || "";
-      const m = t.match(/^Spotify\s*[–-]\s*(.+?)\s*·\s*(.+)$/);
+      const m = t.match(/^Spotify\s*[–-]\s*(.+?)\s*[·•]\s*(.+)$/);
       if (m) { title = m[1].trim(); artist = m[2].trim(); }
     }
+
+    // Fallback 2: og:title meta tag (some Spotify pages set this)
+    if (!title) {
+      const og = document.querySelector('meta[property="og:title"]');
+      if (og) title = og.getAttribute("content")?.trim() || "";
+    }
+
     if (!trackId && title) trackId = `local:${title}::${artist}`;
-    return { title, artist, trackId };
+
+    // playerVisible tells the popup whether we can see the Spotify player at all,
+    // so it can show a helpful message if selectors broke vs. Spotify just not open
+    return { title, artist, trackId, playerVisible: detected };
   }
   function parseTime(str) {
     if (!str) return null;
@@ -29,9 +78,7 @@
     return parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
   }
   function getPosition() {
-    const el =
-      document.querySelector('[data-testid="playback-position"]') ||
-      document.querySelector('[data-testid="playback-progressbar-elapsed-time"]');
+    const el = queryFirst(POSITION_SELECTORS);
     if (el) return parseTime(el.textContent);
     return null;
   }

@@ -189,8 +189,16 @@ async function getActiveTab() {
 }
 async function fetchTrack() {
   const tab = await getActiveTab();
-  if (!tab || !tab.url || !tab.url.includes("open.spotify.com")) return null;
-  try { return await chrome.tabs.sendMessage(tab.id, { type: "SN_GET_STATE" }); } catch { return null; }
+  // Not on Spotify at all — signal clearly so the popup can say the right thing
+  if (!tab || !tab.url || !tab.url.includes("open.spotify.com")) {
+    return { trackId: null, playerVisible: false, notOnSpotify: true };
+  }
+  try {
+    return await chrome.tabs.sendMessage(tab.id, { type: "SN_GET_STATE" });
+  } catch {
+    // Content script not injected yet (page still loading) — treat as undetectable
+    return { trackId: null, playerVisible: false, notOnSpotify: false };
+  }
 }
 async function notifyContentRefresh() {
   const tab = await getActiveTab();
@@ -455,9 +463,18 @@ async function init() {
     currentTrack = state;
     $("trackTitle").textContent = state.title || "Unknown track";
     $("trackArtist").textContent = state.artist || "";
-  } else {
-    $("trackTitle").textContent = "No song detected";
+  } else if (state && state.notOnSpotify) {
+    // User hasn't opened Spotify yet — expected state
+    $("trackTitle").textContent = "No song playing";
     $("trackArtist").textContent = "Open Spotify Web Player to start";
+  } else if (state && !state.notOnSpotify && !state.playerVisible) {
+    // On Spotify, but the player widget couldn't be found — likely a Spotify update
+    $("trackTitle").textContent = "Player not detected";
+    $("trackArtist").textContent = "Spotify may have updated — check for a Keepsake update";
+  } else {
+    // On Spotify, player found, but no track loaded yet (paused on home screen etc.)
+    $("trackTitle").textContent = "Nothing playing";
+    $("trackArtist").textContent = "Play a song to get started";
   }
 
   $("playlistUrl").value = activeShare.playlist_url || "";
@@ -535,7 +552,7 @@ $("save").addEventListener("click", async () => {
   btn.disabled = true;
   const text = $("note").value.trim();
   if (!text) { btn.disabled = false; return ($("status").textContent = "Note can't be empty."); }
-  if (!currentTrack) { btn.disabled = false; return ($("status").textContent = "No song detected."); }
+  if (!currentTrack) { btn.disabled = false; return ($("status").textContent = "Play a song on Spotify first."); }
   const ts = parseTimestamp($("ts").value);
   const note = {
     id: uuid(),
