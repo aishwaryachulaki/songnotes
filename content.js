@@ -1,4 +1,11 @@
 (() => {
+  // Guard against double-injection — Spotify's SPA navigation can cause Chrome
+  // to re-inject content scripts without unloading the previous instance.
+  // Without this, two setInterval loops run simultaneously and every note
+  // fires twice on the same play-through.
+  if (window.__ks_loaded) return;
+  window.__ks_loaded = true;
+
   // ---- Track detection ----
   // Multiple selector fallbacks per element — if Spotify renames a testid,
   // the next candidate in the list takes over. Add new candidates at the end.
