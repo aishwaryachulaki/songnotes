@@ -344,6 +344,39 @@
     }
   }
 
+  // ── End-to-end decryption ────────────────────────────────────
+  // The encryption key lives only in the URL fragment (#k=...).
+  // Fragments are never sent to any server — only the browser and
+  // JavaScript running locally can read them.
+
+  async function importEncKey(b64) {
+    const raw = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+    return crypto.subtle.importKey("raw", raw, { name: "AES-GCM" }, false, ["decrypt"]);
+  }
+  async function decryptField(b64, key) {
+    if (b64 == null) return null;
+    try {
+      const buf = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+      const dec = await crypto.subtle.decrypt(
+        { name: "AES-GCM", iv: buf.slice(0, 12) },
+        key,
+        buf.slice(12)
+      );
+      return new TextDecoder().decode(dec);
+    } catch {
+      return b64; // old plaintext share — return value as-is
+    }
+  }
+  async function decryptNoteFields(note, key) {
+    return {
+      ...note,
+      note:         await decryptField(note.note, key),
+      track_title:  await decryptField(note.track_title, key),
+      track_artist: await decryptField(note.track_artist, key),
+      sender_name:  await decryptField(note.sender_name, key),
+    };
+  }
+
   // ── Spotify link logic ─────────────────────────────────────
   function isLocalTrack(trackId) {
     // Local files have IDs like "local:Coffee::BTS" — no real Spotify URL exists
@@ -531,18 +564,43 @@
     // not a blank screen while waiting for Supabase.
     page.innerHTML = `<div class="state loading"><span class="loading-dot">✦</span> opening your letter…</div>`;
 
+    // Extract encryption key from URL fragment — never sent to any server.
+    const fragment = new URLSearchParams(window.location.hash.slice(1));
+    const keyB64 = fragment.get("k");
+    let encKey = null;
+    if (keyB64) {
+      try {
+        encKey = await importEncKey(keyB64);
+      } catch {
+        page.innerHTML = `<div class="state"><strong>Invalid link</strong>This share link appears to be corrupted or incomplete.</div>`;
+        return;
+      }
+    }
+
     try {
-      const [meta, notes] = await Promise.all([
+      const [rawMeta, rawNotes] = await Promise.all([
         fetchJson(`${SUPABASE_URL}/rest/v1/shares?id=eq.${encodeURIComponent(shareId)}&select=*`)
           .then(r => (Array.isArray(r) ? r[0] : null)),
         fetchJson(`${SUPABASE_URL}/rest/v1/annotations?share_id=eq.${encodeURIComponent(shareId)}&select=*`)
           .then(r => Array.isArray(r) ? r : []),
       ]);
 
-      if (!notes.length && !meta) {
+      if (!rawNotes.length && !rawMeta) {
         page.innerHTML = `<div class="state"><strong>Letter not found</strong>This link may be invalid or the notes were removed.</div>`;
         return;
       }
+
+      // Decrypt locally — ciphertext never leaves this device in plaintext form
+      const notes = encKey
+        ? await Promise.all(rawNotes.map(n => decryptNoteFields(n, encKey)))
+        : rawNotes;
+      const meta = (encKey && rawMeta) ? {
+        ...rawMeta,
+        sender_name:    await decryptField(rawMeta.sender_name, encKey),
+        recipient_name: rawMeta.recipient_name
+          ? await decryptField(rawMeta.recipient_name, encKey)
+          : null,
+      } : rawMeta;
 
       document.title = `Keepsake — a letter from ${meta?.sender_name || "someone"}`;
       render(shareId, meta, notes);

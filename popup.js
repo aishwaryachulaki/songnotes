@@ -123,6 +123,68 @@ function sanitizeNotes(notes) {
   return (notes || []).filter((n) => n && n.id && n.note && n.track_id);
 }
 
+// ---------- end-to-end encryption ----------
+// AES-256-GCM via Web Crypto. The key never leaves the client —
+// it lives only in the share link URL fragment (#k=...) which
+// browsers never send to any server.
+
+async function generateEncKey() {
+  return crypto.subtle.generateKey({ name: "AES-GCM", length: 256 }, true, ["encrypt", "decrypt"]);
+}
+async function exportEncKey(key) {
+  const raw = await crypto.subtle.exportKey("raw", key);
+  return btoa(String.fromCharCode(...new Uint8Array(raw)));
+}
+async function importEncKey(b64) {
+  const raw = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+  return crypto.subtle.importKey("raw", raw, { name: "AES-GCM" }, false, ["decrypt"]);
+}
+async function encryptField(text, key) {
+  if (text == null) return null;
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const ct = await crypto.subtle.encrypt(
+    { name: "AES-GCM", iv },
+    key,
+    new TextEncoder().encode(String(text))
+  );
+  const out = new Uint8Array(12 + ct.byteLength);
+  out.set(iv);
+  out.set(new Uint8Array(ct), 12);
+  return btoa(String.fromCharCode(...out));
+}
+async function decryptField(b64, key) {
+  if (b64 == null) return null;
+  try {
+    const buf = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+    const dec = await crypto.subtle.decrypt(
+      { name: "AES-GCM", iv: buf.slice(0, 12) },
+      key,
+      buf.slice(12)
+    );
+    return new TextDecoder().decode(dec);
+  } catch {
+    return b64; // old plaintext share — return as-is
+  }
+}
+async function encryptNoteFields(note, key) {
+  return {
+    ...note,
+    note:         await encryptField(note.note, key),
+    track_title:  await encryptField(note.track_title, key),
+    track_artist: await encryptField(note.track_artist, key),
+    sender_name:  await encryptField(note.sender_name, key),
+  };
+}
+async function decryptNoteFields(note, key) {
+  return {
+    ...note,
+    note:         await decryptField(note.note, key),
+    track_title:  await decryptField(note.track_title, key),
+    track_artist: await decryptField(note.track_artist, key),
+    sender_name:  await decryptField(note.sender_name, key),
+  };
+}
+
 function parsePlaylistId(input) {
   if (!input) return null;
   const s = String(input).trim();
@@ -662,9 +724,27 @@ $("copyShare").addEventListener("click", async () => {
   store.shares[newId] = activeShare;
   store.active = newId;
 
-  // ── Step 5: Push notes to Supabase BEFORE consuming credit ──
+  // ── Step 5: Encrypt everything before it leaves the device ──
+  $("shareInfo").textContent = "Encrypting…";
+  const encKey = await generateEncKey();
+  const keyB64 = await exportEncKey(encKey);
+
+  // Encrypt share meta — only personal strings, structural fields stay plaintext
+  const shareToPush = {
+    ...activeShare,
+    sender_name:    await encryptField(activeShare.sender_name || senderName, encKey),
+    recipient_name: activeShare.recipient_name
+      ? await encryptField(activeShare.recipient_name, encKey)
+      : null,
+  };
+  // Encrypt each note's personal fields
+  const notesToPush = await Promise.all(
+    activeShare.notes.map(n => encryptNoteFields(n, encKey))
+  );
+
+  // ── Step 6: Push encrypted data to Supabase BEFORE consuming credit ──
   $("shareInfo").textContent = "Sending…";
-  const metaOk = await pushShareMeta(activeShare, session.access_token);
+  const metaOk = await pushShareMeta(shareToPush, session.access_token);
   if (!metaOk) {
     // Restore old ID so the user's local state is unchanged and they can retry.
     activeShare.id = oldId;
@@ -678,31 +758,29 @@ $("copyShare").addEventListener("click", async () => {
   }
 
   const noteResults = await Promise.all(
-    activeShare.notes.map((note) => pushNote(activeShare, note, session.access_token))
+    notesToPush.map(note => pushNote(activeShare, note, session.access_token))
   );
   const failedCount = noteResults.filter((ok) => !ok).length;
   if (failedCount > 0) {
-    // Some notes failed — abort. Credit not touched, user can retry.
     $("shareInfo").textContent = `${failedCount} note${failedCount > 1 ? "s" : ""} failed to send. Check your connection and try again.`;
     shareBtn.disabled = false;
     return;
   }
 
-  // ── Step 6: Notes confirmed in Supabase — now consume the credit ──
+  // ── Step 7: Notes confirmed in Supabase — now consume the credit ──
   const { data: creditResult, error: creditErr } = await supabaseRpc("use_credit", { p_user_id: session.user.id }, session.access_token);
   if (creditErr || !creditResult?.ok) {
-    // Extremely unlikely (we already checked availability), but handle gracefully.
-    // Notes are already pushed and the link works — don't block the user.
     console.warn("Credit deduction failed after successful push:", creditErr);
   }
 
-  // ── Step 7: Finalise local state and show the link ──
+  // ── Step 8: Finalise local state and show the link ──
+  // Key lives only in the URL fragment — never stored anywhere server-side.
   await saveStore(store);
   shareBtn.disabled = false;
   setMode("inactive");
   notifyContentRefresh();
 
-  const url = shareUrl(activeShare.id);
+  const url = `${shareUrl(activeShare.id)}#k=${keyB64}`;
   try {
     await navigator.clipboard.writeText(url);
     $("shareInfo").innerHTML = `Copied! Send this to a friend:<br/><a href="${url}" target="_blank">${url}</a>`;
@@ -730,22 +808,27 @@ $("resetShare").addEventListener("click", async () => {
 });
 
 $("importBtn").addEventListener("click", async () => {
-  let v = $("importId").value.trim();
-  if (!v) return;
-  // Accept: raw ID, /share/ID path, or ?id=ID query param
-  const mPath = v.match(/\/share\/([a-z0-9_-]+)/i);
-  const mQuery = v.match(/[?&]id=([a-z0-9_-]+)/i);
-  if (mPath) v = mPath[1];
+  const raw = $("importId").value.trim();
+  if (!raw) return;
+
+  // Extract share ID from whatever format was pasted
+  let v = raw;
+  const mPath  = raw.match(/\/share\/([a-z0-9_-]+)/i);
+  const mQuery = raw.match(/[?&]id=([a-z0-9_-]+)/i);
+  if (mPath)  v = mPath[1];
   else if (mQuery) v = mQuery[1];
+
+  // Extract encryption key from URL fragment if present
+  const mKey = raw.match(/#k=([A-Za-z0-9+/=]+)/);
+  const importKeyB64 = mKey ? mKey[1] : null;
+
   $("importStatus").textContent = "Fetching…";
 
   const { store } = await loadStore();
-  // Same id as active = no-op
   if (store.active === v) {
     $("importStatus").textContent = "This letter is already active.";
     return;
   }
-  // Already known? Just reactivate.
   if (store.shares[v]) {
     await activateShare(v);
     $("importStatus").textContent = "Reactivated.";
@@ -758,19 +841,37 @@ $("importBtn").addEventListener("click", async () => {
     return;
   }
 
-  // Archive whatever is currently active before installing the new one
+  // Decrypt if a key was found in the pasted URL
+  let decryptedRemote = remote;
+  let decryptedMeta   = meta ? { ...meta } : null;
+  if (importKeyB64) {
+    try {
+      const importKey = await importEncKey(importKeyB64);
+      decryptedRemote = await Promise.all(remote.map(n => decryptNoteFields(n, importKey)));
+      if (decryptedMeta) {
+        decryptedMeta.sender_name    = await decryptField(decryptedMeta.sender_name, importKey);
+        decryptedMeta.recipient_name = decryptedMeta.recipient_name
+          ? await decryptField(decryptedMeta.recipient_name, importKey)
+          : null;
+      }
+    } catch {
+      $("importStatus").textContent = "Couldn't decrypt — paste the full share link, not just the ID.";
+      return;
+    }
+  }
+
   await archiveActive(store);
 
   const newShare = {
     id: v,
-    mode: "editing", // receiver experiences popups
-    type: meta?.share_type || (new Set(remote.map((r) => r.track_id)).size > 1 ? "multi" : "single"),
-    playlist_id: meta?.playlist_id || remote.find((r) => r.playlist_id)?.playlist_id || null,
-    playlist_url: meta?.playlist_url || null,
-    sender_name: meta?.sender_name || remote[0]?.sender_name || "someone",
+    mode: "editing",
+    type: decryptedMeta?.share_type || (new Set(decryptedRemote.map((r) => r.track_id)).size > 1 ? "multi" : "single"),
+    playlist_id: decryptedMeta?.playlist_id || decryptedRemote.find((r) => r.playlist_id)?.playlist_id || null,
+    playlist_url: decryptedMeta?.playlist_url || null,
+    sender_name: decryptedMeta?.sender_name || decryptedRemote[0]?.sender_name || "someone",
     imported: true,
     created_at: Date.now(),
-    notes: sanitizeNotes(remote.map((r) => ({
+    notes: sanitizeNotes(decryptedRemote.map((r) => ({
       id: r.id,
       track_id: r.track_id,
       track_title: r.track_title,
