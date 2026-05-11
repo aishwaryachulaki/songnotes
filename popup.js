@@ -2,7 +2,8 @@ const $ = (id) => document.getElementById(id);
 const { SUPABASE_URL, SUPABASE_KEY, SHARE_ORIGIN: CONFIGURED_ORIGIN } = window.KS_CONFIG;
 
 // ---------- auth ----------
-let _session = null; // cached session from chrome.storage
+let _session = null;       // cached session from chrome.storage
+let _sessionExpired = false; // true when a session existed but the refresh token died
 
 async function getSession() {
   if (_session && _session.expires_at > Date.now() / 1000 + 30) return _session;
@@ -32,6 +33,7 @@ async function getSession() {
     } catch {}
     // Refresh failed — session is dead
     await chrome.storage.local.remove("ks_session");
+    _sessionExpired = true;
     return null;
   }
   _session = s;
@@ -198,13 +200,17 @@ function parsePlaylistId(input) {
 // ks_shares = {
 //   active: "<id>",
 //   shares: {
-//     [id]: { id, mode: "editing"|"preview"|"inactive",
+//     [id]: { id, mode: "editing"|"inactive",
 //             type: "single"|"multi"|"playlist",
-//             playlist_id, playlist_url, sender_name,
+//             playlist_id, playlist_url,
+//             sender_name, recipient_name,
+//             enc_key: string|null,    // base64 AES-256-GCM key; present on sent shares
+//             note_count: number,      // saved at archive time (notes array is stripped when enc_key set)
+//             song_count: number,      // saved at archive time
 //             notes: [{id, track_id, track_title, track_artist, note, timestamp, sender_name, created_at}],
 //             imported: bool, created_at }
 //   },
-//   previous: ["<id>", ...]   // archived (most recent first)
+//   previous: ["<id>", ...]   // archived share IDs (most recent first)
 // }
 async function loadStore() {
   const data = await chrome.storage.local.get(["ks_shares", "ks_sender"]);
@@ -212,7 +218,12 @@ async function loadStore() {
   return { store, sender: data.ks_sender || "" };
 }
 async function saveStore(store) {
-  await chrome.storage.local.set({ ks_shares: store });
+  try {
+    await chrome.storage.local.set({ ks_shares: store });
+  } catch (err) {
+    console.error("Keepsake: storage write failed —", err);
+    throw new Error("storage_full");
+  }
 }
 function ensureActive(store, sender) {
   if (!store.active || !store.shares[store.active]) {
@@ -316,9 +327,11 @@ async function pushNote(share, note, accessToken) {
     return res.ok;
   } catch { return false; }
 }
-async function deleteNoteRemote(id) {
+async function deleteNoteRemote(id, accessToken) {
   // Works for imported notes (id === Supabase row id).
   // For locally-created notes the id won't match any row — silently no-ops.
+  // Requires the user's access token so Supabase RLS can verify ownership.
+  if (!accessToken) return;
   try {
     await fetch(
       `${SUPABASE_URL}/rest/v1/annotations?id=eq.${encodeURIComponent(id)}`,
@@ -326,7 +339,7 @@ async function deleteNoteRemote(id) {
         method: "DELETE",
         headers: {
           apikey: SUPABASE_KEY,
-          Authorization: `Bearer ${SUPABASE_KEY}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       }
     );
@@ -353,18 +366,10 @@ function shareUrl(id) {
 }
 
 // ---------- rendering ----------
-function setMode(mode) {
-  // Banner has been removed from the DOM; this is a no-op kept for call-site compatibility.
-  const m = mode === "inactive" ? "inactive" : "editing";
-  const banner = $("modeBanner");
-  if (!banner) return;
-  banner.classList.remove("mode-editing", "mode-preview", "mode-inactive");
-  banner.classList.add(`mode-${m}`);
-  const labels = {
-    editing: "Editing — your popups will appear as you listen",
-    inactive: "Shared ✓ — popups are off for you now",
-  };
-  $("modeLabel").textContent = labels[m];
+function setMode(_mode) {
+  // Mode banner was removed from the UI. Call sites are kept as documentation
+  // of intent ("editing" = popups on, "inactive" = popups off) and may be
+  // wired to UI elements again in a future redesign.
 }
 
 async function renderNotes() {
@@ -395,11 +400,17 @@ async function renderNotes() {
           (n) => n.id !== deletedId
         );
       }
-      await saveStore(store);
+      try {
+        await saveStore(store);
+      } catch {
+        $("status").textContent = "Couldn't save — storage is full.";
+        return;
+      }
       // Keep the module-level reference consistent with the saved store.
       activeShare.notes = store.shares[activeShare.id]?.notes ?? [];
       // Best-effort remote delete (works when id is a Supabase row id).
-      deleteNoteRemote(deletedId);
+      // Fire-and-forget — local delete already happened above.
+      getSession().then(s => deleteNoteRemote(deletedId, s?.access_token));
       renderNotes();
       renderSummary();
       notifyContentRefresh();
@@ -441,8 +452,11 @@ async function renderPrevious() {
 
   prev.forEach((id) => {
     const s = store.shares[id];
-    const noteCount = s.notes.length;
-    const songCount = new Set(s.notes.map((n) => n.track_id)).size;
+    // Notes may have been stripped after archiving — fall back to saved counts.
+    const noteCount = s.notes.length || s.note_count || 0;
+    const songCount = s.notes.length
+      ? new Set(s.notes.map((n) => n.track_id)).size
+      : (s.song_count || 0);
     const title = s.recipient_name
       ? `Notes for ${s.recipient_name}`
       : "Notes (unknown recipient)";
@@ -463,14 +477,39 @@ async function renderPrevious() {
         <div class="prev-title">${escapeHtml(title)}</div>
         <div class="prev-sub">${escapeHtml(sub)}</div>
       </div>
-      <button class="prev-activate" data-id="${id}">Reactivate</button>
+      <div class="prev-actions">
+        ${s.enc_key ? `<button class="prev-copy" data-id="${id}" title="Copy share link">Copy link</button>` : ""}
+        <button class="prev-activate" data-id="${id}">Reactivate</button>
+      </div>
     `;
     list.appendChild(row);
   });
 
+  list.querySelectorAll(".prev-copy").forEach((b) =>
+    b.addEventListener("click", async (e) => {
+      const sid = e.currentTarget.dataset.id;
+      const { store: s } = await loadStore();
+      const share = s.shares[sid];
+      if (!share?.enc_key) return;
+      const url = `${shareUrl(share.id)}&e=1#k=${share.enc_key}`;
+      try {
+        await navigator.clipboard.writeText(url);
+        e.currentTarget.textContent = "Copied!";
+        setTimeout(() => { e.currentTarget.textContent = "Copy link"; }, 2000);
+      } catch {
+        e.currentTarget.textContent = "Copy link";
+      }
+    }),
+  );
+
   list.querySelectorAll(".prev-activate").forEach((b) =>
     b.addEventListener("click", async (e) => {
-      await activateShare(e.currentTarget.dataset.id);
+      const btn = e.currentTarget;
+      btn.disabled = true;
+      btn.textContent = "Loading…";
+      await activateShare(btn.dataset.id);
+      btn.disabled = false;
+      btn.textContent = "Reactivate";
     }),
   );
 
@@ -492,20 +531,50 @@ function showComposer(show) {
 // ---------- share lifecycle ----------
 async function archiveActive(store) {
   if (!store.active) return;
+  const share = store.shares[store.active];
+  if (share?.enc_key) {
+    // Share was sent — notes live in Supabase, no need to keep them locally.
+    // Save counts first so renderPrevious can still show "3 notes · 2 songs".
+    share.note_count = share.notes.length;
+    share.song_count = new Set(share.notes.map((n) => n.track_id)).size;
+    share.notes = [];
+  }
   store.previous = [store.active, ...(store.previous || []).filter((x) => x !== store.active)];
 }
 async function activateShare(id) {
   const { store } = await loadStore();
   if (!store.shares[id]) return;
+
+  const share = store.shares[id];
+
+  // Notes were stripped on archive — fetch + decrypt from Supabase before activating.
+  if (share.enc_key && !share.notes?.length) {
+    try {
+      const [, remote] = await Promise.all([fetchShareMeta(id), fetchShareNotes(id)]);
+      if (remote.length) {
+        const importKey = await importEncKey(share.enc_key);
+        share.notes = await Promise.all(remote.map((n) => decryptNoteFields(n, importKey)));
+        store.shares[id] = share;
+      }
+    } catch {
+      // Supabase unreachable — activate anyway with empty notes rather than blocking.
+      // User will see "No notes on this song" in the overlay but can retry later.
+      console.warn("Keepsake: could not fetch notes for reactivated share", id);
+    }
+  }
+
   if (store.active && store.active !== id) {
     await archiveActive(store);
   }
   store.previous = (store.previous || []).filter((x) => x !== id);
   store.active = id;
-  await saveStore(store);
+  // Always reactivate in editing mode so popups fire when the user listens.
+  share.mode = "editing";
+  store.shares[id] = share;
+  await saveStore(store).catch(console.error);
   activeShare = store.shares[id];
   $("recipientName").value = activeShare.recipient_name || "";
-  setMode(activeShare.mode || "editing");
+  setMode("editing");
   renderNotes();
   renderSummary();
   renderPrevious();
@@ -519,7 +588,7 @@ async function init() {
   shareOrigin = CONFIGURED_ORIGIN || "";
 
   activeShare = ensureActive(store, senderName);
-  await saveStore(store);
+  await saveStore(store).catch(console.error);
 
   const state = await fetchTrack();
   if (state && state.trackId) {
@@ -562,6 +631,10 @@ async function init() {
   } else {
     $("authGate").classList.remove("hidden");
     $("authBar").classList.add("hidden");
+    if (_sessionExpired) {
+      $("authGate").querySelector(".auth-gate-text").textContent =
+        "Your session expired — please sign in again.";
+    }
   }
 }
 
@@ -574,6 +647,7 @@ $("signOutLink").addEventListener("click", async (e) => {
   e.preventDefault();
   await chrome.storage.local.remove("ks_session");
   _session = null;
+  _sessionExpired = false;
   $("authGate").classList.remove("hidden");
   $("authBar").classList.add("hidden");
 });
@@ -587,7 +661,7 @@ $("saveName").addEventListener("click", async () => {
     activeShare.sender_name = v;
     const { store } = await loadStore();
     store.shares[activeShare.id] = activeShare;
-    await saveStore(store);
+    await saveStore(store).catch(console.error);
   }
   showComposer(true);
 });
@@ -601,7 +675,7 @@ $("recipientName").addEventListener("input", async () => {
   activeShare.recipient_name = $("recipientName").value.trim() || null;
   const { store } = await loadStore();
   store.shares[activeShare.id] = activeShare;
-  await saveStore(store);
+  await saveStore(store).catch(console.error);
 });
 
 $("useCurrent").addEventListener("click", async () => {
@@ -633,7 +707,15 @@ $("save").addEventListener("click", async () => {
   activeShare.type = deriveType(activeShare);
   const { store } = await loadStore();
   store.shares[activeShare.id] = activeShare;
-  await saveStore(store);
+  try {
+    await saveStore(store);
+  } catch {
+    // Roll back the in-memory push so the UI stays consistent with storage.
+    activeShare.notes.pop();
+    btn.disabled = false;
+    $("status").textContent = "Couldn't save — storage is full. Delete some old notes and try again.";
+    return;
+  }
   setMode("editing");
 
   btn.disabled = false;
@@ -653,7 +735,7 @@ $("playlistUrl").addEventListener("change", async () => {
   activeShare.type = deriveType(activeShare);
   const { store } = await loadStore();
   store.shares[activeShare.id] = activeShare;
-  await saveStore(store);
+  await saveStore(store).catch(console.error);
   renderSummary();
 });
 
@@ -728,6 +810,9 @@ $("copyShare").addEventListener("click", async () => {
   $("shareInfo").textContent = "Encrypting…";
   const encKey = await generateEncKey();
   const keyB64 = await exportEncKey(encKey);
+  // Store the key locally so reactivation can decrypt notes fetched from Supabase.
+  activeShare.enc_key = keyB64;
+  store.shares[newId] = activeShare;
 
   // Encrypt share meta — only personal strings, structural fields stay plaintext
   const shareToPush = {
@@ -751,7 +836,7 @@ $("copyShare").addEventListener("click", async () => {
     delete store.shares[newId];
     store.shares[oldId] = activeShare;
     store.active = oldId;
-    await saveStore(store);
+    await saveStore(store).catch(console.error); // best-effort rollback
     $("shareInfo").textContent = "Couldn't reach the server. Check your connection and try again.";
     shareBtn.disabled = false;
     return;
@@ -775,12 +860,26 @@ $("copyShare").addEventListener("click", async () => {
 
   // ── Step 8: Finalise local state and show the link ──
   // Key lives only in the URL fragment — never stored anywhere server-side.
-  await saveStore(store);
+  try {
+    await saveStore(store);
+  } catch {
+    // Notes are already in Supabase — the share was sent successfully.
+    // Local state just couldn't be persisted. Show the link anyway so
+    // the user can still copy and send it; warn about the storage issue.
+    shareBtn.disabled = false;
+    const url = `${shareUrl(activeShare.id)}&e=1#k=${keyB64}`;
+    $("shareInfo").innerHTML = `Share sent! But storage is full — your local notes may be out of sync. Link: <a href="${url}" target="_blank">${url}</a>`;
+    return;
+  }
   shareBtn.disabled = false;
   setMode("inactive");
   notifyContentRefresh();
 
-  const url = `${shareUrl(activeShare.id)}#k=${keyB64}`;
+  // &e=1 signals to the share page that this link is encrypted.
+  // If a messaging app or email client strips the URL fragment (#k=…),
+  // the share page detects e=1 without a key and shows a helpful
+  // "part of your link got cut off" message instead of a generic error.
+  const url = `${shareUrl(activeShare.id)}&e=1#k=${keyB64}`;
   try {
     await navigator.clipboard.writeText(url);
     $("shareInfo").innerHTML = `Copied! Send this to a friend:<br/><a href="${url}" target="_blank">${url}</a>`;
@@ -796,7 +895,7 @@ $("resetShare").addEventListener("click", async () => {
   store.active = null;
   ensureActive(store, senderName);
   activeShare = store.shares[store.active];
-  await saveStore(store);
+  await saveStore(store).catch(console.error);
   $("shareInfo").textContent = "";
   $("playlistUrl").value = "";
   $("recipientName").value = "";
@@ -869,6 +968,8 @@ $("importBtn").addEventListener("click", async () => {
     playlist_id: decryptedMeta?.playlist_id || decryptedRemote.find((r) => r.playlist_id)?.playlist_id || null,
     playlist_url: decryptedMeta?.playlist_url || null,
     sender_name: decryptedMeta?.sender_name || decryptedRemote[0]?.sender_name || "someone",
+    recipient_name: decryptedMeta?.recipient_name || null,
+    enc_key: importKeyB64 || null, // stored so reactivation can decrypt from Supabase
     imported: true,
     created_at: Date.now(),
     notes: sanitizeNotes(decryptedRemote.map((r) => ({
@@ -885,7 +986,12 @@ $("importBtn").addEventListener("click", async () => {
   store.shares[v] = newShare;
   store.active = v;
   store.previous = (store.previous || []).filter((x) => x !== v);
-  await saveStore(store);
+  try {
+    await saveStore(store);
+  } catch {
+    $("importStatus").textContent = "Couldn't import — storage is full. Delete some old notes and try again.";
+    return;
+  }
   activeShare = newShare;
   setMode("editing");
   $("importStatus").textContent = `Imported ${remote.length} note${remote.length === 1 ? "" : "s"}.`;

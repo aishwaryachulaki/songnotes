@@ -69,6 +69,7 @@
       font-weight: 400;
       margin-bottom: 6px;
     }
+    .nav-right { display: flex; align-items: center; gap: 16px; }
     .nav-back {
       font-family: 'Montserrat', sans-serif;
       font-size: 10px;
@@ -81,6 +82,19 @@
       transition: opacity 0.15s;
     }
     .nav-back:hover { opacity: 1; }
+    .nav-cta {
+      background: rgba(217,107,124,0.12);
+      color: var(--rose);
+      border: 1px solid rgba(217,107,124,0.24);
+      border-radius: 20px;
+      padding: 8px 20px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px; font-weight: 600;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      white-space: nowrap; text-decoration: none;
+      transition: background 0.15s;
+    }
+    .nav-cta:hover { background: rgba(217,107,124,0.2); }
 
     /* ── Page ── */
     .page {
@@ -220,7 +234,10 @@
 
 <nav>
   <a class="nav-logo" href="index.html">keepsake.<span class="logo-spark">✦</span></a>
-  <a class="nav-back" href="index.html">← Back to home</a>
+  <div class="nav-right">
+    <a class="nav-back" href="index.html">← Home</a>
+    <a class="nav-cta" href="auth.html">Sign in</a>
+  </div>
 </nav>
 
 <div class="page">
@@ -366,7 +383,7 @@
 
 <img class="faq-floral" src="lifetime-flower.png" alt="" aria-hidden="true" />
 
-<footer>Keepsake &nbsp;·&nbsp; Works on Spotify Web Player &nbsp;·&nbsp; No account required</footer>
+<footer>Keepsake &nbsp;·&nbsp; Works on Spotify Web Player &nbsp;·&nbsp; <a href="index.html" style="color:inherit;text-decoration:none;">Home</a> &nbsp;·&nbsp; <a href="auth.html" style="color:inherit;text-decoration:none;">Sign in</a> &nbsp;·&nbsp; <a href="privacy.html" style="color:inherit;text-decoration:none;">Privacy</a></footer>
 
 <script>
   document.querySelectorAll('.faq-item').forEach(item => {

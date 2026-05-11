@@ -40,14 +40,25 @@
 
     /* ── Nav ── */
     .nav { display: flex; align-items: center; justify-content: space-between; }
-    .nav-logo { display: flex; align-items: center; gap: 10px; }
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      text-decoration: none; color: inherit;
+    }
     .nav-logo-icon {
       width: 36px; height: 36px; background: var(--blush);
       border-radius: 50%; display: flex; align-items: center;
       justify-content: center; font-size: 16px;
     }
     .nav-logo-text { font-size: 18px; font-weight: 700; color: var(--ink); }
-    .nav-right { display: flex; align-items: center; gap: 12px; }
+    .nav-right { display: flex; align-items: center; gap: 16px; }
+    .nav-faq {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--ink-mid);
+      text-decoration: none; opacity: 0.65;
+      transition: opacity 0.15s;
+    }
+    .nav-faq:hover { opacity: 1; }
     .nav-email { font-size: 12px; color: var(--ink-mid); }
     .btn-signout {
       font-family: 'Montserrat', sans-serif;
@@ -222,6 +233,10 @@
 
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+  function escHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  }
+
   const BUNDLES = [
     { letters: 5,  price_paise: 15000, label: "₹150", name: "Small moments",       desc: "For quick thoughts you don't want to lose." },
     { letters: 12, price_paise: 29900, label: "₹299", name: "A little collection",  desc: "For when songs start meaning more." },
@@ -287,10 +302,10 @@
       ? purchases.map(p => `
           <div class="purchase-row">
             <div>
-              <div class="purchase-desc">${p.is_lifetime ? "Lifetime plan" : `${p.credits_added} letter${p.credits_added > 1 ? "s" : ""} bundle`}</div>
-              <div class="purchase-date">${new Date(p.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</div>
+              <div class="purchase-desc">${p.is_lifetime ? "Lifetime plan" : `${escHtml(String(p.credits_added))} letter${p.credits_added > 1 ? "s" : ""} bundle`}</div>
+              <div class="purchase-date">${escHtml(new Date(p.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }))}</div>
             </div>
-            <div class="purchase-amount">₹${Math.round(p.amount_paise / 100)}</div>
+            <div class="purchase-amount">₹${escHtml(String(Math.round(p.amount_paise / 100)))}</div>
           </div>
         `).join("")
       : `<div class="empty-history">
@@ -303,12 +318,13 @@
 
     document.getElementById("page").innerHTML = `
       <div class="nav">
-        <div class="nav-logo">
+        <a class="nav-logo" href="index.html">
           <div class="nav-logo-icon">🎵</div>
           <span class="nav-logo-text">Keepsake</span>
-        </div>
+        </a>
         <div class="nav-right">
-          <span class="nav-email">${currentUser.email}</span>
+          <a class="nav-faq" href="faq.html">FAQ</a>
+          <span class="nav-email">${escHtml(currentUser.email)}</span>
           <button class="btn-signout" id="signoutBtn">Sign out</button>
         </div>
       </div>
@@ -349,6 +365,9 @@
       </div>
 
       <div class="trust-line">🔒 Secure payments · UPI, cards, netbanking</div>
+      <div style="text-align:center;font-size:12px;color:var(--ink-lt);margin-top:-8px">
+        <a href="privacy.html" target="_blank" style="color:var(--ink-lt)">Privacy Policy</a>
+      </div>
 
       <div id="paymentMsg"></div>
 
@@ -396,9 +415,9 @@
           p_amount_paise: amountPaise,
         });
         if (error) {
-          msg.innerHTML = `<div class="msg error">Payment recorded but credit update failed — contact support with payment ID: ${response.razorpay_payment_id}</div>`;
+          msg.innerHTML = `<div class="msg error">Payment recorded but credit update failed — contact support with payment ID: ${escHtml(response.razorpay_payment_id)}</div>`;
         } else {
-          msg.innerHTML = `<div class="msg success">✓ ${isLifetime ? "Lifetime plan activated!" : `${numCredits} letter${numCredits > 1 ? "s" : ""} added!`}</div>`;
+          msg.innerHTML = `<div class="msg success">✓ ${isLifetime ? "Lifetime plan activated!" : `${escHtml(String(numCredits))} letter${numCredits > 1 ? "s" : ""} added!`}</div>`;
           await loadAndRender();
         }
       },

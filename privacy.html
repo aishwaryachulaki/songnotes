@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Privacy Policy — Keepsake</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@500;600;700&display=swap" />
+  <style>
+    :root {
+      --butter:   #F4D9A6;
+      --cream:    #FFFBF4;
+      --blush:    #E36888;
+      --tangerine:#F08C21;
+      --ink:      #3a2418;
+      --ink-mid:  #8a5a48;
+      --ink-lt:   #c4977a;
+      --border:   rgba(58,36,24,0.10);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--butter);
+      font-family: 'Lora', Georgia, serif;
+      color: var(--ink);
+      min-height: 100vh;
+      padding: 48px 20px 80px;
+      line-height: 1.75;
+    }
+
+    .page {
+      max-width: 680px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    /* ── Header ── */
+    .site-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 48px;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+    .logo-mark {
+      width: 34px; height: 34px;
+      background: var(--blush);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+    .logo-text {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 17px;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      background: var(--cream);
+      border-radius: 16px;
+      padding: 36px 36px 32px;
+      margin-bottom: 32px;
+      border: 1.5px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::after {
+      content: '✦';
+      position: absolute;
+      right: 28px;
+      top: 28px;
+      font-size: 32px;
+      color: var(--blush);
+      opacity: 0.18;
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--blush);
+      margin-bottom: 10px;
+    }
+    .hero h1 {
+      font-size: 26px;
+      font-weight: 700;
+      line-height: 1.25;
+      color: var(--ink);
+      margin-bottom: 14px;
+    }
+    .hero-meta {
+      font-size: 13px;
+      color: var(--ink-mid);
+    }
+
+    /* ── Sections ── */
+    .section {
+      background: var(--cream);
+      border-radius: 14px;
+      padding: 30px 32px;
+      margin-bottom: 12px;
+      border: 1.5px solid var(--border);
+    }
+
+    .section-label {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      color: var(--blush);
+      margin-bottom: 8px;
+    }
+
+    h2 {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 14px;
+      line-height: 1.3;
+    }
+
+    p {
+      font-size: 14.5px;
+      color: var(--ink);
+      margin-bottom: 12px;
+    }
+    p:last-child { margin-bottom: 0; }
+
+    ul {
+      margin: 10px 0 12px 0;
+      padding-left: 20px;
+    }
+    ul:last-child { margin-bottom: 0; }
+    li {
+      font-size: 14.5px;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+    li:last-child { margin-bottom: 0; }
+
+    strong { font-weight: 600; }
+
+    .highlight {
+      background: rgba(227,104,136,0.07);
+      border-left: 3px solid var(--blush);
+      border-radius: 0 8px 8px 0;
+      padding: 12px 16px;
+      margin: 14px 0;
+      font-size: 14px;
+      color: var(--ink);
+    }
+    .highlight:last-child { margin-bottom: 0; }
+
+    a {
+      color: var(--tangerine);
+      text-decoration: none;
+    }
+    a:hover { text-decoration: underline; }
+
+    .third-party-row {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 4px;
+    }
+    .third-party-item {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .tp-name {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 600;
+      font-size: 12px;
+      color: var(--blush);
+      min-width: 90px;
+      padding-top: 2px;
+      flex-shrink: 0;
+    }
+    .tp-desc {
+      font-size: 14px;
+      color: var(--ink);
+      line-height: 1.55;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      text-align: center;
+      margin-top: 32px;
+      font-size: 12.5px;
+      color: var(--ink-lt);
+    }
+    .footer a { color: var(--ink-lt); }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <header class="site-header">
+    <a href="index.html" class="logo">
+      <div class="logo-mark">♪</div>
+      <span class="logo-text">Keepsake</span>
+    </a>
+    <a href="index.html" style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-lt);text-decoration:none;opacity:0.7;">← Home</a>
+  </header>
+
+  <div class="hero">
+    <div class="hero-eyebrow">Legal</div>
+    <h1>Privacy Policy</h1>
+    <p class="hero-meta">Last updated: May 2026 &nbsp;·&nbsp; Applies to the Keepsake Chrome extension and all associated web pages.</p>
+  </div>
+
+  <!-- 1. What Keepsake is -->
+  <div class="section">
+    <div class="section-label">Overview</div>
+    <h2>What Keepsake does</h2>
+    <p>Keepsake is a Chrome extension that lets you attach personal notes to specific moments in Spotify songs and share them with someone as a link. When the recipient opens the link and listens in Spotify, your notes appear at exactly the right timestamp.</p>
+    <p>This policy explains precisely what information is collected, where it goes, and what we never touch.</p>
+  </div>
+
+  <!-- 2. What we collect -->
+  <div class="section">
+    <div class="section-label">Data Collection</div>
+    <h2>What we collect and why</h2>
+
+    <p><strong>Your email address and account credentials</strong><br>
+    Required to create and identify your account. Authentication is handled by Supabase. We store your email to display it in the extension and to associate your credits and purchase history with your account.</p>
+
+    <p><strong>Your notes and the songs they're attached to</strong><br>
+    The notes you write, the sender name you choose, the recipient name you enter, and the song title and artist scraped from the Spotify page are stored locally on your device until you send a share. When you choose to share, this content is encrypted on your device before it leaves — see the section on encryption below.</p>
+
+    <p><strong>Purchase and credit history</strong><br>
+    When you buy a note bundle or lifetime plan, the payment ID, amount paid, and number of credits added are stored in our database. This is used to maintain your credit balance and show your purchase history. Your full card or UPI details are never seen by us — they go directly to Razorpay.</p>
+
+    <div class="highlight">
+      <strong>What we never collect:</strong> your Spotify credentials, your Spotify listening history, what songs you play, or any data from Spotify beyond what's visible on the page while the extension is active. Keepsake does not use the Spotify API and does not connect to your Spotify account.
+    </div>
+  </div>
+
+  <!-- 3. Encryption -->
+  <div class="section">
+    <div class="section-label">Security</div>
+    <h2>End-to-end encryption of shared notes</h2>
+    <p>When you send a share, all personal content — your note text, your name, the recipient's name, and the song details — is encrypted on your device using AES-256-GCM before being uploaded to our servers. The encryption key is generated fresh for each share and exists only in the share link itself (in the URL fragment, after the <code>#</code>).</p>
+    <div class="highlight">
+      The key is never sent to our servers. This means that even we cannot read your notes. Only someone who has the full share link can decrypt and read them.
+    </div>
+    <p>This encryption applies to all shares created with the current version of Keepsake. Older shares created before this feature was introduced are stored as plaintext in our database.</p>
+  </div>
+
+  <!-- 4. Local storage -->
+  <div class="section">
+    <div class="section-label">On-Device Storage</div>
+    <h2>What's stored on your device</h2>
+    <p>The Chrome extension uses <strong>chrome.storage.local</strong> to store the following on your device only:</p>
+    <ul>
+      <li>Your authentication session token (so you stay signed in)</li>
+      <li>Your draft notes — notes you've written but not yet sent</li>
+      <li>Your sender name</li>
+      <li>Shares you've received and imported</li>
+    </ul>
+    <p>This data never leaves your device except as part of the explicit actions you take (signing in, sending a share, importing a share). Uninstalling the extension removes all locally stored data.</p>
+  </div>
+
+  <!-- 5. Third parties -->
+  <div class="section">
+    <div class="section-label">Third-Party Services</div>
+    <h2>Services we use</h2>
+    <div class="third-party-row">
+      <div class="third-party-item">
+        <span class="tp-name">Supabase</span>
+        <span class="tp-desc">Our database and authentication provider. Stores your account, encrypted share content, credits, and purchase records. Hosted on AWS in the US. <a href="https://supabase.com/privacy" target="_blank" rel="noopener">Supabase Privacy Policy →</a></span>
+      </div>
+      <div class="third-party-item">
+        <span class="tp-name">Razorpay</span>
+        <span class="tp-desc">Handles all payment processing. Razorpay receives your payment details directly — we only receive a payment confirmation ID. Used for India-based UPI, card, and netbanking payments. <a href="https://razorpay.com/privacy/" target="_blank" rel="noopener">Razorpay Privacy Policy →</a></span>
+      </div>
+      <div class="third-party-item">
+        <span class="tp-name">Google Fonts</span>
+        <span class="tp-desc">Loaded on our web pages (not inside the extension itself) for typography. Google may log the request. <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google Privacy Policy →</a></span>
+      </div>
+      <div class="third-party-item">
+        <span class="tp-name">Spotify</span>
+        <span class="tp-desc">Keepsake reads the song title and artist from the Spotify Web Player page you already have open. It does not connect to Spotify's API, does not access your Spotify account, and does not store your listening history.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. Your rights -->
+  <div class="section">
+    <div class="section-label">Your Rights</div>
+    <h2>What you can do with your data</h2>
+    <ul>
+      <li><strong>Sign out</strong> — removes your session token from the device immediately.</li>
+      <li><strong>Delete notes</strong> — individual notes can be deleted from the extension popup at any time.</li>
+      <li><strong>Request deletion</strong> — email us to have your account and all associated data permanently deleted from our servers. We will process this within 30 days.</li>
+      <li><strong>Data portability</strong> — your note content is stored on your device in chrome.storage.local. You can request an export of any server-side data by emailing us.</li>
+    </ul>
+    <p style="margin-top: 14px;">To exercise any of these rights, contact us at <a href="mailto:aishwaryachulaki@gmail.com">aishwaryachulaki@gmail.com</a>.</p>
+  </div>
+
+  <!-- 7. Data retention -->
+  <div class="section">
+    <div class="section-label">Data Retention</div>
+    <h2>How long we keep your data</h2>
+    <ul>
+      <li><strong>Account data</strong> — retained until you request deletion.</li>
+      <li><strong>Encrypted share content</strong> — retained until the sender deletes the share or requests account deletion.</li>
+      <li><strong>Purchase records</strong> — retained for as long as your account exists, for accounting and support purposes.</li>
+      <li><strong>Local device data</strong> — retained until you sign out, uninstall the extension, or clear browser storage.</li>
+    </ul>
+  </div>
+
+  <!-- 8. Children -->
+  <div class="section">
+    <div class="section-label">Age Restrictions</div>
+    <h2>Children's privacy</h2>
+    <p>Keepsake is not directed at children under 13. We do not knowingly collect personal information from anyone under 13. If you believe a child under 13 has provided personal information, please contact us and we will delete it promptly.</p>
+  </div>
+
+  <!-- 9. Changes -->
+  <div class="section">
+    <div class="section-label">Updates</div>
+    <h2>Changes to this policy</h2>
+    <p>If we make material changes to this policy — such as collecting new types of data or sharing data with new third parties — we will update the date at the top and, where feasible, notify signed-in users. Continued use of Keepsake after changes are posted constitutes acceptance of the updated policy.</p>
+    <p>Minor clarifications and corrections may be made without notice.</p>
+  </div>
+
+  <!-- 10. Contact -->
+  <div class="section">
+    <div class="section-label">Contact</div>
+    <h2>Get in touch</h2>
+    <p>If you have questions about this policy or how your data is handled, email us at <a href="mailto:aishwaryachulaki@gmail.com">aishwaryachulaki@gmail.com</a>. We'll respond within a reasonable time.</p>
+  </div>
+
+  <div class="footer">
+    <p>© 2026 Keepsake &nbsp;·&nbsp; <a href="index.html">Home</a> &nbsp;·&nbsp; <a href="faq.html">FAQ</a> &nbsp;·&nbsp; <a href="auth.html">Sign in</a></p>
+  </div>
+
+</div>
+</body>
+</html>

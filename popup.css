@@ -315,14 +315,22 @@ body {
 .prev-meta { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
 .prev-title { font-size: 12px; font-weight: 700; color: var(--ink); }
 .prev-sub { font-size: 10px; color: var(--ink-mid); }
+.prev-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
 .prev-activate {
   font-size: 10px; padding: 4px 10px; border-radius: 6px;
   color: var(--blush); border: 1.5px solid var(--blush);
   background: transparent; cursor: pointer; font: inherit;
-  font-weight: 600; white-space: nowrap; flex-shrink: 0;
+  font-weight: 600; white-space: nowrap;
   transition: background 0.15s, color 0.15s;
 }
 .prev-activate:hover { background: var(--blush); color: #fff; }
+.prev-copy {
+  font-size: 10px; padding: 4px 8px; border-radius: 6px;
+  color: var(--ink-mid); border: 1.5px solid rgba(58,36,24,0.15);
+  background: transparent; cursor: pointer; font: inherit;
+  white-space: nowrap; transition: border-color 0.15s, color 0.15s;
+}
+.prev-copy:hover { color: var(--ink); border-color: rgba(58,36,24,0.35); }
 .prev-more {
   font-size: 11px; color: var(--tangerine);
   text-align: center; cursor: pointer;

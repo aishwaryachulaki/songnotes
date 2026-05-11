@@ -258,6 +258,25 @@
     }
     .btn-install:hover { opacity: 0.9; transform: translateY(-1px); }
 
+    /* ── Nav ── */
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 24px; max-width: 560px; margin: 0 auto;
+    }
+    .nav-logo {
+      font-family: Georgia, serif;
+      font-style: italic; font-size: 20px;
+      color: var(--ink); text-decoration: none; opacity: 0.75;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .nav-logo span { font-style: normal; font-size: 11px; color: var(--tangerine); }
+    .nav-get {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--blush);
+      text-decoration: none; opacity: 0.8; transition: opacity 0.15s;
+    }
+    .nav-get:hover { opacity: 1; }
+
     /* ── States ── */
     .state {
       text-align: center;
@@ -267,7 +286,7 @@
       line-height: 1.6;
     }
     .state strong { color: var(--ink); display: block; font-size: 20px; margin-bottom: 8px; }
-    .state.loading { color: var(--rose); font-family: 'Lora', Georgia, serif; font-style: italic; font-size: 16px; }
+    .state.loading { color: var(--blush); font-family: 'Lora', Georgia, serif; font-style: italic; font-size: 16px; }
     .loading-dot {
       display: inline-block;
       animation: ks-pulse 1.6s ease-in-out infinite;
@@ -290,6 +309,10 @@
   </style>
 </head>
 <body>
+<nav>
+  <a class="nav-logo" href="index.html">keepsake.<span>✦</span></a>
+  <a class="nav-get" href="auth.html">Get Keepsake →</a>
+</nav>
 <div class="page" id="page">
   <div class="state" id="loading">
     <strong>Opening your letter…</strong>
@@ -472,6 +495,9 @@
       `;
     }
 
+    // Spotify attribution — required by Spotify Developer Policy Section II.4
+    html += `<p class="spotify-note">Music data from <a href="https://spotify.com" target="_blank" rel="noopener" style="color:inherit">Spotify</a></p>`;
+
     // Import section — filled in after extension detection below
     html += `<div id="importArea" class="import-area"></div>`;
 
@@ -567,6 +593,16 @@
     // Extract encryption key from URL fragment — never sent to any server.
     const fragment = new URLSearchParams(window.location.hash.slice(1));
     const keyB64 = fragment.get("k");
+
+    // e=1 is added by the sender to mark this as an encrypted link.
+    // If it's present but the key is missing from the fragment, the most
+    // likely cause is a messaging app or email client stripping the #… part.
+    const isEncrypted = new URLSearchParams(window.location.search).get("e") === "1";
+    if (isEncrypted && !keyB64) {
+      page.innerHTML = `<div class="state"><strong>Part of your link got cut off</strong>Ask the sender to resend it, or try opening it in a different browser.</div>`;
+      return;
+    }
+
     let encKey = null;
     if (keyB64) {
       try {
@@ -613,7 +649,7 @@
           ${isTimeout
             ? "This is taking longer than usual. Check your connection and try again."
             : "Something went wrong. Check your connection and try again."}
-          <a href="" style="display:block;margin-top:14px;color:var(--rose);font-weight:600;font-size:13px;">Try again</a>
+          <a href="" style="display:block;margin-top:14px;color:var(--blush);font-weight:600;font-size:13px;">Try again</a>
         </div>`;
     }
   })();
