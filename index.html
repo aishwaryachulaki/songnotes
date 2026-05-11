@@ -91,24 +91,20 @@
     }
     .nav-cta:hover { background: rgba(217,107,124,0.2); }
 
-    /* ── First screen — everything above the fold ── */
-    .first-screen {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
     /* ── Page top: asymmetric two-column editorial ── */
     .page-top {
       display: grid;
-      grid-template-columns: 1.2fr 1fr;
+      /*
+        1.8fr left gives the envelope ~709px at 1240px content width.
+        At the image's 1.248 aspect ratio that renders 568px tall —
+        ~20% taller than before, matching the illustration's presence.
+      */
+      grid-template-columns: 1.1fr 1fr;
       gap: 16px;
-      padding: 0 32px 8px;
+      padding: 0 20px 40px;
       max-width: 1440px;
-      width: 100%;
       margin: 0 auto;
       align-items: stretch;
-      flex: 1;
     }
 
     /* ─────────────────────────────────────────────────────────
@@ -119,22 +115,19 @@
        Text appears printed on the letter already inside the image.
     ───────────────────────────────────────────────────────── */
     .env-col {
-      overflow: hidden; /* clips envelope if taller than the flex container */
+      /* height driven by the envelope image */
     }
 
     /* Positioning context for the text overlay */
     .env-wrap {
       position: relative;
       width: 100%;
-      height: 100%;
       overflow: visible;
     }
 
     .env-img {
       width: 100%;
-      height: 100%;
-      object-fit: contain;
-      object-position: center;
+      height: auto;
       display: block;
     }
 
@@ -307,8 +300,8 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 8px;
-      padding: 10px 0 18px;
+      gap: 14px;
+      padding: 12px 0 52px;
     }
     .scroll-cue-text {
       font-family: 'Spectral', Georgia, serif;
@@ -429,15 +422,14 @@
     }
 
     @media (max-width: 700px) {
-      .first-screen { min-height: auto; }
       .page-top {
         grid-template-columns: 1fr;
-        gap: 16px;
-        padding-bottom: 16px;
-        flex: none;
+        gap: 20px;
+        padding-bottom: 32px;
       }
-      .env-img { height: auto; object-fit: unset; }
-      .illus-frame { min-height: 280px; }
+      .illus-frame { min-height: 320px; }
+      /* Safe zone stays strict on mobile */
+      .env-overlay { top: 13%; left: 11%; right: 11%; bottom: 13%; }
     }
 
     @media (max-width: 520px) {
@@ -558,8 +550,6 @@
 </head>
 <body>
 
-<div class="first-screen">
-
 <!-- NAV -->
 <nav>
   <a class="nav-logo" href="index.html">keepsake.<span class="logo-spark">✦</span></a>
@@ -645,8 +635,6 @@
   <p class="scroll-cue-text">It unfolds below.</p>
   <div class="scroll-arrow" aria-hidden="true">↓</div>
 </div>
-
-</div><!-- /.first-screen -->
 
 <!-- FEATURES -->
 <section class="features">
