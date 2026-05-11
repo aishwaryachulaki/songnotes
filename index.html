@@ -94,17 +94,12 @@
     /* ── Page top: asymmetric two-column editorial ── */
     .page-top {
       display: grid;
-      /*
-        1.8fr left gives the envelope ~709px at 1240px content width.
-        At the image's 1.248 aspect ratio that renders 568px tall —
-        ~20% taller than before, matching the illustration's presence.
-      */
       grid-template-columns: 1.1fr 1fr;
       gap: 16px;
-      padding: 0 20px 40px;
+      padding: 0 32px 40px;
       max-width: 1440px;
       margin: 0 auto;
-      align-items: stretch;
+      align-items: center; /* illustration sits centred against the envelope, not stretched */
     }
 
     /* ─────────────────────────────────────────────────────────
@@ -241,17 +236,18 @@
     .btn-primary:hover { background: rgba(217,107,124,0.2); }
 
     /* ── Right column: illustration frame ── */
+    /* The illustration is sized like the letter tucked inside the envelope —
+       not full column height. aspect-ratio keeps it proportional at any screen width. */
     .illus-col {
       display: flex;
-      align-items: stretch;
+      align-items: center;
     }
     .illus-frame {
       position: relative;
       border-radius: 22px;
       overflow: hidden;
       width: 100%;
-      flex: 1;
-      height: 100%;
+      aspect-ratio: 4 / 5;   /* taller than wide — letter-paper proportions */
       box-shadow: 0 8px 40px rgba(58,36,24,0.14);
     }
     .illus-frame > img {
