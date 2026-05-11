@@ -113,6 +113,36 @@
     ───────────────────────────────────────────────────────── */
     .env-col {
       min-height: 0;
+      position: relative;
+    }
+
+    /* Warm ambient haze behind the envelope — large, diffused, no hard edge */
+    .env-col::before {
+      content: '';
+      position: absolute;
+      inset: -12% -8%;
+      background: radial-gradient(ellipse 75% 65% at 52% 46%,
+        rgba(252, 210, 130, 0.28) 0%,
+        rgba(248, 190,  90, 0.10) 45%,
+        transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Wide, soft grounding shadow under the envelope — warm brown, not grey */
+    .env-col::after {
+      content: '';
+      position: absolute;
+      bottom: 3%;
+      left: 8%;
+      right: 8%;
+      height: 56px;
+      background: radial-gradient(ellipse 90% 100% at 50% 100%,
+        rgba(110, 58, 24, 0.20) 0%,
+        transparent 68%);
+      filter: blur(18px);
+      pointer-events: none;
+      z-index: 0;
     }
 
     .env-wrap {
@@ -121,6 +151,7 @@
       margin-left: -10%;
       overflow: visible;
       height: 100%; /* fill column height set by page-top flex:1 */
+      z-index: 1;   /* sit above the ::before / ::after glows */
     }
 
     .env-img {
@@ -241,13 +272,26 @@
     .btn-primary:hover { background: rgba(217,107,124,0.2); }
 
     /* ── Right column: illustration frame ── */
-    /* The illustration is sized like the letter tucked inside the envelope —
-       62% of the column height, centred vertically. */
     .illus-col {
       display: flex;
       align-items: center;
       justify-content: center;
+      position: relative;
     }
+
+    /* Softer, smaller atmospheric glow behind the illustration */
+    .illus-col::before {
+      content: '';
+      position: absolute;
+      inset: -8% -6%;
+      background: radial-gradient(ellipse 65% 60% at 50% 50%,
+        rgba(248, 200, 130, 0.16) 0%,
+        rgba(244, 180,  90, 0.06) 50%,
+        transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
     .illus-frame {
       position: relative;
       border-radius: 22px;
@@ -255,6 +299,7 @@
       width: 92%;
       aspect-ratio: 1 / 1;
       box-shadow: 0 8px 40px rgba(58,36,24,0.14);
+      z-index: 1; /* sit above the ::before glow */
     }
     .illus-frame > img {
       position: absolute;
