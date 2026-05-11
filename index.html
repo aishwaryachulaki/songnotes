@@ -94,14 +94,9 @@
     /* ── Page top: asymmetric two-column editorial ── */
     .page-top {
       display: grid;
-      /*
-        1.8fr left gives the envelope ~709px at 1240px content width.
-        At the image's 1.248 aspect ratio that renders 568px tall —
-        ~20% taller than before, matching the illustration's presence.
-      */
       grid-template-columns: 1.1fr 1fr;
-      gap: 16px;
-      padding: 0 20px 40px;
+      gap: 40px;
+      padding: 0 32px 48px;
       max-width: 1440px;
       margin: 0 auto;
       align-items: stretch;
@@ -418,6 +413,7 @@
     /* ── Responsive ── */
     @media (max-width: 900px) {
       nav, .page-top, .features { padding-left: 24px; padding-right: 24px; }
+      .page-top { gap: 28px; }
       .stamp-grid { grid-template-columns: 1fr 1fr; }
     }
 
@@ -428,13 +424,12 @@
         padding-bottom: 32px;
       }
       .illus-frame { min-height: 320px; }
-      /* Safe zone stays strict on mobile */
-      .env-overlay { top: 13%; left: 11%; right: 11%; bottom: 13%; }
     }
 
     @media (max-width: 520px) {
       nav { padding: 16px 20px; }
       .page-top, .features { padding-left: 16px; padding-right: 16px; }
+      .page-top { gap: 16px; }
       .stamp-grid { grid-template-columns: 1fr; }
     }
 
