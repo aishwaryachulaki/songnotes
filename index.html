@@ -36,13 +36,19 @@
 
     /* ── Nav ── */
     nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 200;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 22px 32px;
-      max-width: 1440px;
-      width: 100%;
-      margin: 0 auto;
+      padding: 18px 32px;
+      max-width: 100%;
+      background: rgba(244, 217, 166, 0.82);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
     }
     .nav-logo {
       font-family: 'Spectral', Georgia, serif;
@@ -343,13 +349,22 @@
       font-style: italic;
     }
 
-    /* ── First-screen wrapper — nav + hero + scroll cue fill the viewport ── */
+    /* ── First-screen wrapper — hero + scroll cue fill the viewport below fixed nav ── */
     .first-screen {
       height: 100vh;
+      padding-top: 64px; /* clear the fixed nav */
       display: flex;
       flex-direction: column;
-      overflow: hidden; /* hard cap at viewport height so scroll cue is always visible */
+      overflow: hidden;
       background-image: url('background.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    /* ── Second page wrapper ── */
+    .page-rest {
+      background-image: url('background1.png');
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -616,8 +631,7 @@
 </head>
 <body>
 
-<div class="first-screen">
-<!-- NAV -->
+<!-- NAV — fixed, persists across all sections -->
 <nav>
   <a class="nav-logo" href="index.html">keepsake.<span class="logo-spark">✦</span></a>
   <div class="nav-right">
@@ -626,6 +640,8 @@
     <a class="nav-cta" href="#">✧ download</a>
   </div>
 </nav>
+
+<div class="first-screen">
 
 <!--
   PAGE TOP
@@ -704,6 +720,8 @@
 </div>
 
 </div><!-- /.first-screen -->
+
+<div class="page-rest">
 
 <!-- FEATURES -->
 <section class="features">
@@ -801,6 +819,8 @@
 
 <!-- FOOTER -->
 <footer>Keepsake &nbsp;·&nbsp; Works on Spotify Web Player &nbsp;·&nbsp; <a href="faq.html" style="color:inherit;text-decoration:none;">FAQ</a> &nbsp;·&nbsp; <a href="auth.html" style="color:inherit;text-decoration:none;">Sign in</a> &nbsp;·&nbsp; <a href="privacy.html" style="color:inherit;text-decoration:none;">Privacy</a></footer>
+
+</div><!-- /.page-rest -->
 
 <!-- Grain overlay -->
 <svg xmlns="http://www.w3.org/2000/svg"
