@@ -99,7 +99,7 @@
       padding: 0 32px 40px;
       max-width: 1440px;
       margin: 0 auto;
-      align-items: center; /* illustration sits centred against the envelope, not stretched */
+      align-items: stretch; /* both columns match the envelope height */
     }
 
     /* ─────────────────────────────────────────────────────────
@@ -114,9 +114,12 @@
     }
 
     /* Positioning context for the text overlay */
+    /* Scale envelope beyond column boundary to fill the whitespace
+       that exists in the image file around the actual envelope graphic. */
     .env-wrap {
       position: relative;
-      width: 100%;
+      width: 120%;
+      margin-left: -10%;
       overflow: visible;
     }
 
@@ -237,17 +240,17 @@
 
     /* ── Right column: illustration frame ── */
     /* The illustration is sized like the letter tucked inside the envelope —
-       not full column height. aspect-ratio keeps it proportional at any screen width. */
+       62% of the column height, centred vertically. */
     .illus-col {
       display: flex;
-      align-items: center;
+      align-items: center;  /* vertically centre the smaller frame */
     }
     .illus-frame {
       position: relative;
       border-radius: 22px;
       overflow: hidden;
       width: 100%;
-      aspect-ratio: 4 / 5;   /* taller than wide — letter-paper proportions */
+      height: 62%;          /* ~letter-paper height relative to the full envelope column */
       box-shadow: 0 8px 40px rgba(58,36,24,0.14);
     }
     .illus-frame > img {
