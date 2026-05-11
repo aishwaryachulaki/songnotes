@@ -36,19 +36,13 @@
 
     /* ── Nav ── */
     nav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 200;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 18px 32px;
-      max-width: 100%;
-      background: rgba(244, 217, 166, 0.82);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
+      padding: 22px 32px;
+      max-width: 1440px;
+      width: 100%;
+      margin: 0 auto;
     }
     .nav-logo {
       font-family: 'Spectral', Georgia, serif;
@@ -349,10 +343,9 @@
       font-style: italic;
     }
 
-    /* ── First-screen wrapper — hero + scroll cue fill the viewport below fixed nav ── */
+    /* ── First-screen wrapper — nav + hero + scroll cue fill the viewport ── */
     .first-screen {
       height: 100vh;
-      padding-top: 64px; /* clear the fixed nav */
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -631,7 +624,8 @@
 </head>
 <body>
 
-<!-- NAV — fixed, persists across all sections -->
+<div class="first-screen">
+<!-- NAV -->
 <nav>
   <a class="nav-logo" href="index.html">keepsake.<span class="logo-spark">✦</span></a>
   <div class="nav-right">
@@ -640,8 +634,6 @@
     <a class="nav-cta" href="#">✧ download</a>
   </div>
 </nav>
-
-<div class="first-screen">
 
 <!--
   PAGE TOP
