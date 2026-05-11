@@ -243,14 +243,15 @@
        62% of the column height, centred vertically. */
     .illus-col {
       display: flex;
-      align-items: center;  /* vertically centre the smaller frame */
+      align-items: center;
+      justify-content: center;
     }
     .illus-frame {
       position: relative;
       border-radius: 22px;
       overflow: hidden;
-      width: 100%;
-      height: 62%;          /* ~letter-paper height relative to the full envelope column */
+      width: 82%;
+      aspect-ratio: 1 / 1;  /* square — letter/postcard proportions */
       box-shadow: 0 8px 40px rgba(58,36,24,0.14);
     }
     .illus-frame > img {
