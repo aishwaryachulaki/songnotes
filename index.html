@@ -100,34 +100,34 @@
       gap: 16px;
       padding: 0 32px 8px;
       max-width: 1440px;
+      width: 100%;
       margin: 0 auto;
-      align-items: stretch; /* both columns match the envelope height */
+      align-items: stretch;
+      flex: 1;       /* grow to fill first-screen between nav and scroll cue */
+      min-height: 0; /* allow flex shrink below content size */
     }
 
     /* ─────────────────────────────────────────────────────────
        LEFT COLUMN
-       The envelope image fills the column.
-       A single absolutely-positioned overlay carries all text —
-       transparent background, no border, no shadow.
-       Text appears printed on the letter already inside the image.
+       The envelope fills the full column height.
     ───────────────────────────────────────────────────────── */
     .env-col {
-      /* height driven by the envelope image */
+      min-height: 0;
     }
 
-    /* Positioning context for the text overlay */
-    /* Scale envelope beyond column boundary to fill the whitespace
-       that exists in the image file around the actual envelope graphic. */
     .env-wrap {
       position: relative;
       width: 120%;
       margin-left: -10%;
       overflow: visible;
+      height: 100%; /* fill column height set by page-top flex:1 */
     }
 
     .env-img {
       width: 100%;
-      height: auto;
+      height: 100%;
+      object-fit: cover;   /* fill container; whitespace edges crop first */
+      object-position: center;
       display: block;
     }
 
@@ -252,8 +252,8 @@
       position: relative;
       border-radius: 22px;
       overflow: hidden;
-      width: 76%;
-      aspect-ratio: 1 / 1;  /* square — letter/postcard proportions */
+      width: 92%;
+      aspect-ratio: 1 / 1;
       box-shadow: 0 8px 40px rgba(58,36,24,0.14);
     }
     .illus-frame > img {
