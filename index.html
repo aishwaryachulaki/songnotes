@@ -96,7 +96,7 @@
       display: grid;
       grid-template-columns: 1.1fr 1fr;
       gap: 16px;
-      padding: 0 32px 40px;
+      padding: 0 32px 8px;
       max-width: 1440px;
       margin: 0 auto;
       align-items: stretch; /* both columns match the envelope height */
@@ -250,7 +250,7 @@
       position: relative;
       border-radius: 22px;
       overflow: hidden;
-      width: 82%;
+      width: 76%;
       aspect-ratio: 1 / 1;  /* square — letter/postcard proportions */
       box-shadow: 0 8px 40px rgba(58,36,24,0.14);
     }
@@ -295,13 +295,21 @@
       font-style: italic;
     }
 
+    /* ── First-screen wrapper — nav + hero + scroll cue fill the viewport ── */
+    .first-screen {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
     /* ── Scroll cue ── */
     .scroll-cue {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 14px;
-      padding: 12px 0 52px;
+      gap: 8px;
+      padding: 8px 0 12px;
+      margin-top: auto; /* push to bottom of first-screen */
     }
     .scroll-cue-text {
       font-family: 'Spectral', Georgia, serif;
@@ -550,6 +558,7 @@
 </head>
 <body>
 
+<div class="first-screen">
 <!-- NAV -->
 <nav>
   <a class="nav-logo" href="index.html">keepsake.<span class="logo-spark">✦</span></a>
@@ -635,6 +644,8 @@
   <p class="scroll-cue-text">It unfolds below.</p>
   <div class="scroll-arrow" aria-hidden="true">↓</div>
 </div>
+
+</div><!-- /.first-screen -->
 
 <!-- FEATURES -->
 <section class="features">
