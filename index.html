@@ -94,7 +94,7 @@
     /* ── Page top: asymmetric two-column editorial ── */
     .page-top {
       display: grid;
-      grid-template-columns: 1.6fr 1fr;
+      grid-template-columns: 1.1fr 1fr;
       gap: 16px;
       padding: 0 32px 48px;
       max-width: 1440px;
@@ -114,9 +114,13 @@
     }
 
     /* Positioning context for the text overlay */
+    /* Expand the envelope image beyond the column boundary so the
+       graphic fills the space — the image file has whitespace around
+       the actual envelope that would otherwise leave gaps. */
     .env-wrap {
       position: relative;
-      width: 100%;
+      width: 118%;
+      margin-left: -9%;
       overflow: visible;
     }
 
