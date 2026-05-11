@@ -299,9 +299,10 @@
 
     /* ── First-screen wrapper — nav + hero + scroll cue fill the viewport ── */
     .first-screen {
-      min-height: 100vh;
+      height: 100vh;
       display: flex;
       flex-direction: column;
+      overflow: hidden; /* hard cap at viewport height so scroll cue is always visible */
     }
 
     /* ── Scroll cue ── */
