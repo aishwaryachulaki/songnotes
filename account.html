@@ -5,91 +5,110 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Keepsake — My Account</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,500&family=Montserrat:wght@500;600;700&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@1,400&family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@500;600;700&display=swap" />
   <style>
     :root {
-      --blush:     #E36888;
+      --rose:      #D96B7C;
       --tangerine: #F08C21;
       --cream:     #FFFBF4;
       --bg:        #F4D9A6;
-      --ink:       #3a2418;
-      --ink-mid:   #8a5a48;
-      --ink-lt:    #c4977a;
+      --ink:       #3A2E2A;
+      --ink-mid:   #6B5A52;
+      --ink-lt:    #A08878;
+      --border:    rgba(58,36,24,0.09);
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
       background: var(--bg) url('background.png') center / cover no-repeat fixed;
       font-family: 'Lora', Georgia, serif;
       min-height: 100vh;
       color: var(--ink);
-      padding: 32px 16px 64px;
+      padding: 0 16px 80px;
       position: relative;
     }
-    body::after {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: url('cardboard-texture.jpg');
-      background-repeat: repeat;
-      background-size: 400px 400px;
-      opacity: 0.12;
-      pointer-events: none;
-      z-index: 0;
+
+    .page {
+      max-width: 660px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      position: relative;
+      z-index: 1;
     }
-    .page { max-width: 640px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; position: relative; z-index: 1; }
 
     /* ── Nav ── */
-    .nav { display: flex; align-items: center; justify-content: space-between; }
+    .nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 22px 0 10px;
+    }
     .nav-logo {
-      display: flex; align-items: center; gap: 10px;
-      text-decoration: none; color: inherit;
+      font-family: 'Spectral', Georgia, serif;
+      font-style: italic; font-weight: 400; font-size: 26px;
+      color: #C04E6A; text-decoration: none; letter-spacing: -0.01em;
+      display: flex; align-items: center; gap: 5px;
+      text-shadow: 0 1px 12px rgba(140,50,60,0.13);
     }
-    .nav-logo-icon {
-      width: 36px; height: 36px; background: var(--blush);
-      border-radius: 50%; display: flex; align-items: center;
-      justify-content: center; font-size: 16px;
+    .nav-logo .logo-spark {
+      font-style: normal; font-family: sans-serif;
+      font-size: 11px; color: var(--tangerine); font-weight: 400;
+      vertical-align: super; line-height: 0;
     }
-    .nav-logo-text { font-size: 18px; font-weight: 700; color: var(--ink); }
-    .nav-right { display: flex; align-items: center; gap: 16px; }
-    .nav-faq {
+    .nav-right { display: flex; align-items: center; gap: 14px; }
+    .nav-email {
       font-family: 'Montserrat', sans-serif;
-      font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
-      text-transform: uppercase; color: var(--ink-mid);
-      text-decoration: none; opacity: 0.65;
-      transition: opacity 0.15s;
+      font-size: 10px; color: var(--ink-mid); letter-spacing: 0.03em;
+      opacity: 0.7;
     }
-    .nav-faq:hover { opacity: 1; }
-    .nav-email { font-size: 12px; color: var(--ink-mid); }
+    .nav-link {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px; font-weight: 600; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--ink-mid);
+      text-decoration: none; opacity: 0.65; transition: opacity 0.15s;
+    }
+    .nav-link:hover { opacity: 1; }
     .btn-signout {
       font-family: 'Montserrat', sans-serif;
-      font-size: 11px; font-weight: 600;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
       padding: 6px 16px; border-radius: 20px;
-      background: transparent; border: 1.5px solid var(--blush);
-      color: var(--blush); cursor: pointer;
-      transition: background 0.15s, color 0.15s;
+      background: rgba(217,107,124,0.10);
+      border: 1.5px solid rgba(217,107,124,0.30);
+      color: var(--rose); cursor: pointer;
+      transition: background 0.15s;
     }
-    .btn-signout:hover { background: var(--blush); color: #fff; }
+    .btn-signout:hover { background: rgba(217,107,124,0.18); }
 
     /* ── Hero credits card ── */
     .hero-card {
-      background: #F5E6C0;
+      background: var(--cream);
+      border: 1.5px solid var(--border);
       border-radius: 18px; padding: 28px 32px;
       position: relative; overflow: hidden; min-height: 170px;
+      box-shadow: 0 4px 24px rgba(58,36,24,0.07);
     }
     .hero-content { max-width: 55%; position: relative; z-index: 1; }
     .hero-eyebrow {
-      font-size: 9px; font-weight: 700; letter-spacing: 0.15em;
-      text-transform: uppercase; color: var(--blush); margin-bottom: 14px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9px; font-weight: 700; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--rose); margin-bottom: 12px;
     }
     .hero-number {
+      font-family: 'Lora', Georgia, serif;
       font-size: 72px; font-weight: 700; color: var(--ink);
       line-height: 1; margin-bottom: 12px;
     }
-    .hero-status { font-size: 13px; color: var(--ink-mid); line-height: 1.5; margin-bottom: 8px; }
+    .hero-status {
+      font-size: 12.5px; color: var(--ink-mid); line-height: 1.55; margin-bottom: 8px;
+    }
     .hero-cta {
-      font-size: 13px; color: var(--blush); font-style: italic;
+      font-family: 'Spectral', Georgia, serif;
+      font-size: 13px; color: var(--rose); font-style: italic;
       text-decoration: none; cursor: pointer;
       background: none; border: none; padding: 0; font: inherit;
+      font-family: 'Spectral', Georgia, serif;
+      font-style: italic;
     }
     .hero-cta:hover { text-decoration: underline; }
     .hero-flower {
@@ -99,79 +118,104 @@
       pointer-events: none;
     }
     .sparkle {
-      position: absolute; color: var(--blush); opacity: 0.45;
+      position: absolute; color: var(--rose); opacity: 0.3;
       pointer-events: none; user-select: none; font-style: normal;
     }
 
     /* ── Tagline ── */
-    .tagline { text-align: center; padding: 4px 0; }
-    .tagline-sparkle { font-size: 14px; color: var(--ink-mid); margin-bottom: 8px; }
-    .tagline-main { font-size: 15px; color: var(--ink); line-height: 1.6; }
-    .tagline-sub { font-size: 14px; color: var(--blush); font-style: italic; margin-top: 4px; }
+    .tagline { text-align: center; padding: 6px 0 2px; }
+    .tagline-sparkle { font-size: 11px; color: var(--rose); opacity: 0.45; margin-bottom: 8px; }
+    .tagline-main {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 14px; color: var(--ink-mid); line-height: 1.6;
+    }
+    .tagline-sub {
+      font-family: 'Spectral', Georgia, serif;
+      font-size: 14px; color: var(--rose); font-style: italic; margin-top: 3px;
+      opacity: 0.82;
+    }
 
     /* ── Section header ── */
-    .section-header { display: flex; align-items: center; gap: 8px; }
+    .section-header { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
     .section-header span {
-      font-size: 8px; font-weight: 700; letter-spacing: 0.15em;
-      text-transform: uppercase; color: var(--blush); white-space: nowrap;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 8.5px; font-weight: 700; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--rose); white-space: nowrap;
+      opacity: 0.75;
     }
     .section-header::after {
-      content: ''; flex: 1; height: 1px; background: rgba(227,104,136,0.28);
+      content: ''; flex: 1; height: 1px;
+      background: rgba(217,107,124,0.22);
     }
 
     /* ── Pricing grid ── */
-    .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
     .bundle {
       background: var(--cream);
-      border: 1.5px solid rgba(58,36,24,0.08);
+      border: 1.5px solid var(--border);
       border-radius: 14px; padding: 20px 18px 18px;
       display: flex; flex-direction: column; gap: 8px;
       cursor: pointer; position: relative; overflow: hidden;
       transition: border-color 0.15s, box-shadow 0.15s;
+      box-shadow: 0 2px 12px rgba(58,36,24,0.05);
     }
     .bundle:hover {
-      border-color: var(--blush);
-      box-shadow: 0 0 0 3px rgba(227,104,136,0.1);
+      border-color: rgba(217,107,124,0.45);
+      box-shadow: 0 0 0 3px rgba(217,107,124,0.09);
     }
     .bundle-sparkles {
       position: absolute; top: 10px; right: 10px;
-      width: 38px; height: 38px;
+      width: 36px; height: 36px;
       background: url('credits-sparkles.png') center / contain no-repeat;
-      pointer-events: none;
+      pointer-events: none; opacity: 0.85;
     }
     .bundle-name {
       font-family: 'Montserrat', sans-serif;
-      font-size: 11px; font-weight: 600; color: var(--blush);
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--rose);
     }
     .bundle-count {
+      font-family: 'Lora', Georgia, serif;
       font-size: 26px; font-weight: 700; color: var(--ink); line-height: 1.1;
     }
-    .bundle-rule { border: none; border-top: 1px solid rgba(227,104,136,0.2); }
-    .bundle-price { font-size: 22px; font-weight: 700; color: var(--blush); }
-    .bundle-desc { font-size: 11px; color: var(--ink-mid); line-height: 1.4; }
+    .bundle-rule { border: none; border-top: 1px solid rgba(217,107,124,0.18); }
+    .bundle-price {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 22px; font-weight: 700; color: var(--rose);
+    }
+    .bundle-desc { font-size: 11px; color: var(--ink-mid); line-height: 1.45; }
 
     /* ── Lifetime card ── */
     .lifetime-card {
       background: #F9DDE5;
+      border: 1.5px solid rgba(217,107,124,0.18);
       border-radius: 14px; padding: 28px 32px;
       position: relative; overflow: hidden;
       cursor: pointer; transition: filter 0.15s;
+      box-shadow: 0 2px 16px rgba(58,36,24,0.06);
     }
     .lifetime-card:hover { filter: brightness(0.97); }
     .lifetime-content { max-width: 58%; position: relative; z-index: 1; }
     .lifetime-title {
-      font-size: 26px; font-weight: 700; color: var(--ink); line-height: 1.2; margin-bottom: 4px;
+      font-family: 'Lora', Georgia, serif;
+      font-size: 26px; font-weight: 700; color: var(--ink);
+      line-height: 1.2; margin-bottom: 4px;
     }
     .lifetime-sub {
-      font-size: 16px; color: var(--blush); font-style: italic; margin-bottom: 16px;
+      font-family: 'Spectral', Georgia, serif;
+      font-size: 16px; color: var(--rose); font-style: italic; margin-bottom: 16px;
     }
     .lifetime-rule {
-      border: none; border-top: 1px solid rgba(227,104,136,0.3);
+      border: none; border-top: 1px solid rgba(217,107,124,0.25);
       margin-bottom: 16px; max-width: 80%;
     }
     .lifetime-price-row { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
-    .lifetime-price { font-size: 36px; font-weight: 700; color: var(--ink); line-height: 1; }
-    .lifetime-desc { font-size: 12px; color: var(--ink-mid); line-height: 1.6; }
+    .lifetime-price {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 36px; font-weight: 700; color: var(--ink); line-height: 1;
+    }
+    .lifetime-desc { font-size: 12px; color: var(--ink-mid); line-height: 1.65; }
     .lifetime-flower {
       position: absolute; right: 0; top: 0;
       height: 100%; width: 44%;
@@ -182,41 +226,73 @@
     /* ── Trust line ── */
     .trust-line {
       display: flex; align-items: center; justify-content: center; gap: 6px;
-      font-size: 12px; color: var(--ink-mid);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10.5px; color: var(--ink-lt); letter-spacing: 0.03em;
     }
 
-    /* ── Purchase history card ── */
+    /* ── Purchase history ── */
     .history-card {
       background: var(--cream);
-      border-radius: 14px; padding: 20px 22px;
+      border: 1.5px solid var(--border);
+      border-radius: 14px; padding: 20px 24px;
+      box-shadow: 0 2px 12px rgba(58,36,24,0.05);
     }
     .purchase-row {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 12px 0; border-bottom: 1px solid rgba(58,36,24,0.07); font-size: 13px;
+      padding: 12px 0; border-bottom: 1px solid rgba(58,36,24,0.06);
+      font-size: 13px;
     }
     .purchase-row:last-child { border-bottom: none; }
-    .purchase-desc { color: var(--ink); font-weight: 600; }
-    .purchase-date { font-size: 11px; color: var(--ink-lt); margin-top: 2px; }
-    .purchase-amount { font-weight: 700; color: var(--blush); }
+    .purchase-desc { font-weight: 600; color: var(--ink); }
+    .purchase-date {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px; color: var(--ink-lt); margin-top: 3px; letter-spacing: 0.03em;
+    }
+    .purchase-amount {
+      font-family: 'Lora', Georgia, serif;
+      font-weight: 700; color: var(--rose);
+    }
     .empty-history { display: flex; align-items: center; gap: 16px; padding: 8px 0; }
     .empty-history-img {
-      width: 48px; height: 48px; flex-shrink: 0;
-      background: url('prev-thumb.png') center / contain no-repeat; opacity: 0.7;
+      width: 44px; height: 44px; flex-shrink: 0;
+      background: url('prev-thumb.png') center / contain no-repeat; opacity: 0.55;
     }
-    .empty-history-title { font-size: 14px; font-weight: 600; color: var(--ink); }
-    .empty-history-sub { font-size: 12px; color: var(--ink-mid); margin-top: 2px; }
+    .empty-history-title {
+      font-size: 13.5px; font-weight: 600; color: var(--ink);
+    }
+    .empty-history-sub {
+      font-family: 'Spectral', Georgia, serif;
+      font-style: italic; font-size: 12.5px; color: var(--ink-mid); margin-top: 2px;
+    }
+
+    /* ── Footer links ── */
+    .footer-links {
+      text-align: center;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px; color: var(--ink-lt); letter-spacing: 0.04em;
+      opacity: 0.7;
+    }
+    .footer-links a { color: var(--ink-lt); text-decoration: none; }
+    .footer-links a:hover { text-decoration: underline; }
 
     /* ── Messages ── */
-    .msg { font-size: 12px; padding: 10px 14px; border-radius: 8px; text-align: center; }
-    .msg.error { background: rgba(227,104,136,0.12); color: var(--blush); }
-    .msg.success {
-      background: rgba(227,104,136,0.1); color: var(--blush);
-      font-weight: 600; font-family: 'Montserrat', sans-serif;
+    .msg {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px; padding: 10px 14px;
+      border-radius: 8px; text-align: center; letter-spacing: 0.02em;
     }
+    .msg.error   { background: rgba(217,107,124,0.10); color: var(--rose); }
+    .msg.success { background: rgba(217,107,124,0.10); color: var(--rose); font-weight: 700; }
 
     /* ── Loading state ── */
-    .state { text-align: center; padding: 60px 20px; color: var(--ink-mid); font-size: 14px; line-height: 1.6; }
-    .state strong { display: block; font-size: 20px; color: var(--ink); margin-bottom: 8px; }
+    .state {
+      text-align: center; padding: 80px 20px;
+      color: var(--ink-mid); font-size: 14px; line-height: 1.6;
+    }
+    .state strong {
+      font-family: 'Lora', Georgia, serif;
+      display: block; font-size: 20px; color: var(--ink); margin-bottom: 8px;
+    }
   </style>
 </head>
 <body>
@@ -238,9 +314,9 @@
   }
 
   const BUNDLES = [
-    { letters: 5,  price_paise: 15000, label: "₹150", name: "Small moments",       desc: "For quick thoughts you don't want to lose." },
-    { letters: 12, price_paise: 29900, label: "₹299", name: "A little collection",  desc: "For when songs start meaning more." },
-    { letters: 25, price_paise: 54900, label: "₹549", name: "Memory stack",         desc: "For the ones you'll come back to." },
+    { letters: 5,  price_paise: 15000, label: "₹150", name: "Small moments",      desc: "For quick thoughts you don't want to lose." },
+    { letters: 12, price_paise: 29900, label: "₹299", name: "A little collection", desc: "For when songs start meaning more." },
+    { letters: 25, price_paise: 54900, label: "₹549", name: "Memory stack",        desc: "For the ones you'll come back to." },
   ];
 
   let currentUser = null;
@@ -311,19 +387,16 @@
       : `<div class="empty-history">
            <div class="empty-history-img"></div>
            <div>
-             <div class="empty-history-title">No notes collected yet</div>
+             <div class="empty-history-title">No purchases yet</div>
              <div class="empty-history-sub">Your past purchases will appear here.</div>
            </div>
          </div>`;
 
     document.getElementById("page").innerHTML = `
       <div class="nav">
-        <a class="nav-logo" href="index.html">
-          <div class="nav-logo-icon">🎵</div>
-          <span class="nav-logo-text">Keepsake</span>
-        </a>
+        <a class="nav-logo" href="index.html">keepsake.<span class="logo-spark">✦</span></a>
         <div class="nav-right">
-          <a class="nav-faq" href="faq.html">FAQ</a>
+          <a class="nav-link" href="faq.html">FAQ</a>
           <span class="nav-email">${escHtml(currentUser.email)}</span>
           <button class="btn-signout" id="signoutBtn">Sign out</button>
         </div>
@@ -347,6 +420,7 @@
         <div class="tagline-sub">Don't run out mid-memory.</div>
       </div>
 
+      <div class="section-header"><span>Top up your notes</span></div>
       <div class="pricing-grid" id="bundleGrid">${bundleCards}</div>
 
       <div class="lifetime-card" id="lifetimeCard">
@@ -365,14 +439,17 @@
       </div>
 
       <div class="trust-line">🔒 Secure payments · UPI, cards, netbanking</div>
-      <div style="text-align:center;font-size:12px;color:var(--ink-lt);margin-top:-8px">
-        <a href="privacy.html" target="_blank" style="color:var(--ink-lt)">Privacy Policy</a>
-      </div>
 
       <div id="paymentMsg"></div>
 
       <div class="section-header"><span>Purchase history</span></div>
       <div class="history-card">${purchaseRows}</div>
+
+      <div class="footer-links">
+        <a href="privacy.html" target="_blank">Privacy Policy</a>
+        &nbsp;·&nbsp;
+        <a href="index.html">Home</a>
+      </div>
     `;
 
     document.getElementById("signoutBtn").addEventListener("click", async () => {
@@ -393,8 +470,6 @@
     });
   }
 
-  // TODO (production): create order_id server-side via Supabase Edge Function
-  // and verify razorpay_signature before calling add_credits.
   function openRazorpay(amountPaise, numCredits, isLifetime, description) {
     const options = {
       key: RAZORPAY_KEY,
@@ -403,7 +478,7 @@
       name: "Keepsake",
       description,
       prefill: { email: currentUser.email },
-      theme: { color: "#E36888" },
+      theme: { color: "#D96B7C" },
       handler: async function (response) {
         const msg = document.getElementById("paymentMsg");
         msg.innerHTML = `<div class="msg">Processing…</div>`;
@@ -417,7 +492,7 @@
         if (error) {
           msg.innerHTML = `<div class="msg error">Payment recorded but credit update failed — contact support with payment ID: ${escHtml(response.razorpay_payment_id)}</div>`;
         } else {
-          msg.innerHTML = `<div class="msg success">✓ ${isLifetime ? "Lifetime plan activated!" : `${escHtml(String(numCredits))} letter${numCredits > 1 ? "s" : ""} added!`}</div>`;
+          msg.innerHTML = `<div class="msg success">✦ ${isLifetime ? "Lifetime plan activated!" : `${escHtml(String(numCredits))} letter${numCredits > 1 ? "s" : ""} added!`}</div>`;
           await loadAndRender();
         }
       },
