@@ -423,6 +423,33 @@
       font-weight: 700;
       color: var(--ink);
     }
+    .features-title em {
+      font-style: italic;
+      color: var(--rose);
+    }
+
+    /* ── Features tagline ── */
+    .features-tagline {
+      text-align: center;
+      margin-top: 64px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+    .features-tagline-text {
+      font-family: 'Spectral', Georgia, serif;
+      font-style: italic;
+      font-size: clamp(22px, 2.6vw, 32px);
+      color: var(--rose);
+      line-height: 1.4;
+      opacity: 0.85;
+    }
+    .features-tagline-spark {
+      color: var(--rose);
+      font-size: 16px;
+      opacity: 0.6;
+    }
 
     /* ── Stamp grid ── */
     .stamp-grid {
@@ -719,7 +746,7 @@
 <section class="features">
   <div class="features-header">
     <div class="features-eyebrow">How it works</div>
-    <h2 class="features-title">Write it into a song. Send the link. Let it find them.</h2>
+    <h2 class="features-title">Write it into a <em>song.</em> Send it <em>softly.</em> Let it arrive on <em>cue.</em></h2>
   </div>
 
   <div class="stamp-grid">
@@ -752,6 +779,12 @@
     </div>
 
   </div>
+
+  <div class="features-tagline">
+    <p class="features-tagline-text">A little timing.<br>A lot of meaning.</p>
+    <span class="features-tagline-spark">✦</span>
+  </div>
+
 </section>
 
 <!-- FAQ -->
