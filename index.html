@@ -353,6 +353,18 @@
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
+      position: relative;
+    }
+
+    /* Fade bottom of first-screen into the transition color */
+    .first-screen::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 140px;
+      background: linear-gradient(to bottom, transparent, #F2DDB8);
+      pointer-events: none;
+      z-index: 10;
     }
 
     /* ── Second page wrapper ── */
@@ -361,6 +373,18 @@
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
+      position: relative;
+    }
+
+    /* Fade top of page-rest up from the same transition color */
+    .page-rest::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 140px;
+      background: linear-gradient(to bottom, #F2DDB8, transparent);
+      pointer-events: none;
+      z-index: 10;
     }
 
     /* ── Scroll cue ── */
