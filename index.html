@@ -395,7 +395,134 @@
     .features {
       max-width: 1440px;
       margin: 0 auto;
-      padding: 64px 20px 72px;
+      padding: 64px 20px 80px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .features-header { margin-bottom: 44px; }
+    .stamp-grid { margin-bottom: 0; }
+
+    /* ── Extension preview mockup ── */
+    .ext-preview {
+      margin: 56px auto 0;
+      width: 100%;
+      max-width: 680px;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 12px 48px rgba(58,36,24,0.13);
+    }
+
+    /* Browser chrome bar */
+    .ext-browser-bar {
+      background: #e8e0d8;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .ext-dots {
+      display: flex;
+      gap: 6px;
+    }
+    .ext-dots span {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: rgba(58,36,24,0.18);
+      display: block;
+    }
+    .ext-url {
+      flex: 1;
+      background: rgba(255,255,255,0.6);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 11px;
+      color: var(--ink-mid);
+      letter-spacing: 0.02em;
+    }
+
+    /* Spotify-like player body */
+    .ext-player {
+      background: #1a1010;
+      padding: 28px 32px 32px;
+      position: relative;
+    }
+    .ext-track-info {
+      margin-bottom: 18px;
+    }
+    .ext-track-name {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+    .ext-track-artist {
+      font-size: 12px;
+      color: rgba(255,255,255,0.45);
+      letter-spacing: 0.04em;
+    }
+    .ext-progress-wrap {
+      margin-bottom: 6px;
+      position: relative;
+      height: 3px;
+      background: rgba(255,255,255,0.12);
+      border-radius: 3px;
+    }
+    .ext-progress-fill {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 38%;
+      background: rgba(255,255,255,0.55);
+      border-radius: 3px;
+    }
+    .ext-progress-dot {
+      position: absolute;
+      left: 38%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: #fff;
+    }
+    .ext-progress-times {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: rgba(255,255,255,0.3);
+      margin-top: 8px;
+    }
+
+    /* The note popup — styled like the real extension popup */
+    .ext-note-popup {
+      margin-top: 24px;
+      background: rgba(90,46,46,0.92);
+      border-radius: 12px;
+      padding: 16px 20px;
+      max-width: 340px;
+      backdrop-filter: blur(4px);
+      border-left: 3px solid rgba(227,104,136,0.6);
+    }
+    .ext-note-meta {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: rgba(255,255,255,0.45);
+      margin-bottom: 8px;
+    }
+    .ext-note-text {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 14px;
+      font-style: italic;
+      color: #fff;
+      line-height: 1.65;
+      margin-bottom: 8px;
+    }
+    .ext-note-sig {
+      font-size: 11px;
+      color: var(--blush);
+      font-style: italic;
     }
     .features-header {
       text-align: center;
@@ -770,6 +897,30 @@
       </div>
     </div>
 
+  </div>
+
+  <!-- Extension preview mockup -->
+  <div class="ext-preview">
+    <div class="ext-browser-bar">
+      <div class="ext-dots"><span></span><span></span><span></span></div>
+      <div class="ext-url">open.spotify.com/track/…</div>
+    </div>
+    <div class="ext-player">
+      <div class="ext-track-info">
+        <div class="ext-track-name">your favourite song</div>
+        <div class="ext-track-artist">the artist · playing now</div>
+      </div>
+      <div class="ext-progress-wrap">
+        <div class="ext-progress-fill"></div>
+        <div class="ext-progress-dot"></div>
+      </div>
+      <div class="ext-progress-times"><span>1:24</span><span>3:42</span></div>
+      <div class="ext-note-popup">
+        <div class="ext-note-meta">✦ a note · 1:24</div>
+        <div class="ext-note-text">this part — every time I hear it,<br>I think of that night in october.</div>
+        <div class="ext-note-sig">— a note from you</div>
+      </div>
+    </div>
   </div>
 
   <div class="features-tagline">
