@@ -4,101 +4,28 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Keepsake — Sign in</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@1,400&family=Lora:ital,wght@0,600;0,700;1,400&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --butter:    #F2D88F;
-      --blush:     #E36888;
-      --tangerine: #F08C21;
-      --sea:       #6698CC;
+      --butter:    #F4D9A6;
       --cream:     #FFFBF4;
-      --ink:       #3a2418;
-      --ink-mid:   #8a5a48;
-      --ink-lt:    #c4977a;
+      --rose:      #D96B7C;
+      --tangerine: #F08C21;
+      --ink:       #3A2E2A;
+      --ink-mid:   #6B5A52;
+      --ink-lt:    #A08878;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
       background: var(--butter) url('background.png') center / cover no-repeat fixed;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      font-family: 'Lora', Georgia, serif;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       color: var(--ink);
     }
-    .auth-main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 24px 16px 48px;
-    }
-    .card {
-      background: var(--cream);
-      border-radius: 16px;
-      padding: 32px 28px;
-      width: 100%;
-      max-width: 400px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      box-shadow: 0 8px 32px rgba(58,36,24,0.12);
-    }
-    .logo {
-      font-size: 13px;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--tangerine);
-    }
-    h1 { font-size: 22px; font-weight: 800; color: var(--ink); line-height: 1.2; }
-    .sub { font-size: 13px; color: var(--ink-mid); line-height: 1.5; }
-
-    /* ── Tab switcher ── */
-    .tabs { display: flex; gap: 4px; background: rgba(58,36,24,0.07); border-radius: 10px; padding: 4px; }
-    .tab {
-      flex: 1; padding: 7px 6px; border: none; border-radius: 7px;
-      font: inherit; font-size: 12px; font-weight: 600; cursor: pointer;
-      background: transparent; color: var(--ink-mid); transition: all 0.15s;
-    }
-    .tab.active { background: #fff; color: var(--ink); box-shadow: 0 1px 4px rgba(58,36,24,0.1); }
-
-    /* ── Forms ── */
-    .panel { display: flex; flex-direction: column; gap: 12px; }
-    .panel.hidden { display: none; }
-
-    label { font-size: 11px; font-weight: 600; color: var(--ink-mid); text-transform: uppercase; letter-spacing: 0.08em; display: block; margin-bottom: 4px; }
-    input[type="email"], input[type="password"] {
-      width: 100%; padding: 10px 12px; border-radius: 9px;
-      border: 1.5px solid rgba(58,36,24,0.15); font: inherit; font-size: 14px;
-      background: #fff; color: var(--ink);
-    }
-    input:focus { outline: none; border-color: var(--tangerine); box-shadow: 0 0 0 3px rgba(240,140,33,0.15); }
-
-    .btn {
-      width: 100%; padding: 12px; border: none; border-radius: 9px;
-      font: inherit; font-size: 14px; font-weight: 700; cursor: pointer;
-      transition: opacity 0.15s, transform 0.12s;
-    }
-    .btn:hover { opacity: 0.88; transform: translateY(-1px); }
-    .btn:disabled { opacity: 0.5; cursor: default; transform: none; }
-    .btn-primary { background: var(--tangerine); color: #fff; }
-    .btn-google {
-      background: #fff; color: var(--ink);
-      border: 1.5px solid rgba(58,36,24,0.15);
-      display: flex; align-items: center; justify-content: center; gap: 10px;
-    }
-    .btn-google:hover { background: #fafafa; }
-
-    .divider { display: flex; align-items: center; gap: 10px; color: var(--ink-lt); font-size: 11px; }
-    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: rgba(58,36,24,0.12); }
-
-    .toggle-link { font-size: 12px; text-align: center; color: var(--ink-mid); }
-    .toggle-link a { color: var(--tangerine); font-weight: 600; cursor: pointer; text-decoration: none; }
-    .toggle-link a:hover { text-decoration: underline; }
-
-    .msg { font-size: 12px; padding: 10px 12px; border-radius: 8px; text-align: center; }
-    .msg.error { background: rgba(227,104,136,0.12); color: var(--blush); }
-    .msg.success { background: rgba(240,140,33,0.1); color: var(--tangerine); font-weight: 600; }
 
     /* ── Nav ── */
     nav {
@@ -107,113 +34,270 @@
     }
     .nav-logo {
       font-family: 'Spectral', Georgia, serif;
-      font-style: italic; font-weight: 400; font-size: 24px;
-      color: var(--blush); text-decoration: none; letter-spacing: -0.01em;
+      font-style: italic; font-weight: 400; font-size: 26px;
+      color: #C04E6A; text-decoration: none; letter-spacing: -0.01em;
       display: flex; align-items: center; gap: 5px;
+      text-shadow: 0 1px 12px rgba(140,50,60,0.13);
     }
     .nav-logo .logo-spark {
       font-style: normal; font-family: sans-serif;
-      font-size: 13px; color: var(--tangerine); font-weight: 400; margin-bottom: 5px;
+      font-size: 11px; color: var(--tangerine); font-weight: 400;
+      vertical-align: super; line-height: 0;
     }
     .nav-back {
-      font-family: sans-serif; font-size: 11px; font-weight: 600;
-      letter-spacing: 0.08em; text-transform: uppercase;
+      font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 600;
+      letter-spacing: 0.09em; text-transform: uppercase;
       color: var(--ink-mid); text-decoration: none; opacity: 0.6;
       transition: opacity 0.15s;
     }
     .nav-back:hover { opacity: 1; }
 
+    /* ── Auth main ── */
+    .auth-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px 56px;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--cream);
+      border: 1.5px solid rgba(58,36,24,0.09);
+      border-radius: 20px;
+      padding: 36px 32px 32px;
+      width: 100%;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      box-shadow: 0 8px 48px rgba(58,36,24,0.10);
+      position: relative;
+      overflow: hidden;
+    }
+    .card::after {
+      content: '✦';
+      position: absolute;
+      top: 22px; right: 26px;
+      font-size: 24px;
+      color: var(--rose);
+      opacity: 0.12;
+      pointer-events: none;
+    }
+
+    /* ── Card heading ── */
+    .card-title {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.2;
+    }
+    .card-sub {
+      font-family: 'Spectral', Georgia, serif;
+      font-style: italic;
+      font-size: 14px;
+      color: var(--rose);
+      opacity: 0.82;
+      margin-top: 5px;
+    }
+
+    /* ── Tabs — underline style ── */
+    .tabs {
+      display: flex;
+      border-bottom: 1.5px solid rgba(58,36,24,0.08);
+    }
+    .tab {
+      flex: 1;
+      padding: 8px 4px 10px;
+      border: none;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1.5px;
+      background: transparent;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-lt);
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .tab:hover { color: var(--ink-mid); }
+    .tab.active { color: var(--rose); border-bottom-color: var(--rose); }
+
+    /* ── Forms ── */
+    .panel { display: flex; flex-direction: column; gap: 14px; }
+    .panel.hidden { display: none; }
+
+    label {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px; font-weight: 600;
+      color: var(--ink-mid);
+      text-transform: uppercase; letter-spacing: 0.09em;
+      display: block; margin-bottom: 5px;
+    }
+    input[type="email"], input[type="password"] {
+      width: 100%; padding: 11px 14px;
+      border-radius: 10px;
+      border: 1.5px solid rgba(58,36,24,0.12);
+      font-family: 'Lora', Georgia, serif;
+      font-size: 14px;
+      background: rgba(58,36,24,0.025);
+      color: var(--ink);
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    input:focus {
+      outline: none;
+      border-color: var(--rose);
+      box-shadow: 0 0 0 3px rgba(217,107,124,0.12);
+    }
+    input::placeholder { color: var(--ink-lt); font-style: italic; }
+
+    /* ── Buttons ── */
+    .btn {
+      width: 100%; padding: 12px;
+      border: none; border-radius: 24px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.12s;
+    }
+    .btn:hover { opacity: 0.88; transform: translateY(-1px); }
+    .btn:disabled { opacity: 0.45; cursor: default; transform: none; }
+    .btn-primary { background: var(--rose); color: #fff; }
+    .btn-google {
+      background: var(--cream); color: var(--ink);
+      border: 1.5px solid rgba(58,36,24,0.13);
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+    }
+    .btn-google:hover { background: #fff; }
+
+    /* ── Misc ── */
+    .toggle-link {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px; text-align: center;
+      color: var(--ink-mid);
+    }
+    .toggle-link a { color: var(--rose); font-weight: 600; cursor: pointer; text-decoration: none; }
+    .toggle-link a:hover { text-decoration: underline; }
+
+    .hint {
+      font-family: 'Spectral', Georgia, serif;
+      font-style: italic;
+      font-size: 12px;
+      text-align: center;
+      color: var(--ink-lt);
+    }
+
+    .msg { font-size: 12px; padding: 10px 12px; border-radius: 8px; text-align: center; font-family: 'Montserrat', sans-serif; letter-spacing: 0.02em; }
+    .msg.error   { background: rgba(217,107,124,0.10); color: var(--rose); }
+    .msg.success { background: rgba(240,140,33,0.10); color: var(--tangerine); font-weight: 600; }
+
     /* ── Success state ── */
     .success-state { text-align: center; display: flex; flex-direction: column; gap: 14px; align-items: center; }
-    .success-icon { font-size: 48px; }
-    .success-state h2 { font-size: 20px; font-weight: 800; }
-    .success-state p { font-size: 13px; color: var(--ink-mid); line-height: 1.5; }
+    .success-icon { font-size: 44px; }
+    .success-state h2 { font-family: 'Lora', Georgia, serif; font-size: 20px; font-weight: 700; }
+    .success-state p { font-size: 13px; color: var(--ink-mid); line-height: 1.5; font-family: 'Spectral', Georgia, serif; font-style: italic; }
+
+    .privacy-note {
+      margin-top: 16px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10.5px;
+      text-align: center;
+      color: var(--ink-lt);
+      letter-spacing: 0.02em;
+    }
+    .privacy-note a { color: var(--ink-lt); text-decoration: underline; text-underline-offset: 2px; }
   </style>
 </head>
 <body>
+
 <nav>
   <a class="nav-logo" href="index.html">keepsake.<span class="logo-spark">✦</span></a>
   <a class="nav-back" href="index.html">← Home</a>
 </nav>
+
 <div class="auth-main">
-<div class="card" id="card">
-  <div class="logo">♪ Keepsake</div>
-  <div>
-    <h1>Sign in</h1>
-    <p class="sub" style="margin-top:6px">to send letters and manage your credits</p>
-  </div>
+  <div class="card" id="card">
 
-  <!-- Tab switcher -->
-  <div class="tabs">
-    <button class="tab active" data-tab="google">Google</button>
-    <button class="tab" data-tab="email">Email</button>
-    <button class="tab" data-tab="magic">Magic link</button>
-  </div>
-
-  <!-- Google panel -->
-  <div class="panel" id="panel-google">
-    <div id="googleMsg"></div>
-    <button class="btn btn-google" id="googleBtn">
-      <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
-        <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615Z" fill="#4285F4"/>
-        <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18Z" fill="#34A853"/>
-        <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332Z" fill="#FBBC05"/>
-        <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58Z" fill="#EA4335"/>
-      </svg>
-      Continue with Google
-    </button>
-    <p class="sub" style="font-size:11px;text-align:center;color:var(--ink-lt)">Fastest — no password needed</p>
-  </div>
-
-  <!-- Email panel -->
-  <div class="panel hidden" id="panel-email">
-    <div id="emailMsg"></div>
     <div>
-      <label>Email</label>
-      <input type="email" id="emailInput" placeholder="you@example.com" autocomplete="email" />
+      <h1 class="card-title">Sign in</h1>
+      <p class="card-sub">to send letters and manage your credits</p>
     </div>
-    <div>
-      <label id="pwLabel">Password</label>
-      <input type="password" id="pwInput" placeholder="••••••••" autocomplete="current-password" />
+
+    <!-- Tab switcher -->
+    <div class="tabs">
+      <button class="tab active" data-tab="google">Google</button>
+      <button class="tab" data-tab="email">Email</button>
+      <button class="tab" data-tab="magic">Magic link</button>
     </div>
-    <button class="btn btn-primary" id="emailBtn">Sign in</button>
-    <div class="toggle-link">
-      <span id="toggleText">Don't have an account?</span>
-      <a id="toggleMode"> Sign up</a>
+
+    <!-- Google panel -->
+    <div class="panel" id="panel-google">
+      <div id="googleMsg"></div>
+      <button class="btn btn-google" id="googleBtn">
+        <svg width="17" height="17" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+          <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615Z" fill="#4285F4"/>
+          <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18Z" fill="#34A853"/>
+          <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332Z" fill="#FBBC05"/>
+          <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58Z" fill="#EA4335"/>
+        </svg>
+        Continue with Google
+      </button>
+      <p class="hint">Fastest — no password needed</p>
     </div>
+
+    <!-- Email panel -->
+    <div class="panel hidden" id="panel-email">
+      <div id="emailMsg"></div>
+      <div>
+        <label>Email</label>
+        <input type="email" id="emailInput" placeholder="you@example.com" autocomplete="email" />
+      </div>
+      <div>
+        <label id="pwLabel">Password</label>
+        <input type="password" id="pwInput" placeholder="••••••••" autocomplete="current-password" />
+      </div>
+      <button class="btn btn-primary" id="emailBtn">Sign in</button>
+      <div class="toggle-link">
+        <span id="toggleText">Don't have an account?</span>
+        <a id="toggleMode"> Sign up</a>
+      </div>
+    </div>
+
+    <!-- Magic link panel -->
+    <div class="panel hidden" id="panel-magic">
+      <div id="magicMsg"></div>
+      <div>
+        <label>Email</label>
+        <input type="email" id="magicInput" placeholder="you@example.com" autocomplete="email" />
+      </div>
+      <button class="btn btn-primary" id="magicBtn">Send magic link</button>
+      <p class="hint">We'll email you a one-click sign-in link</p>
+    </div>
+
   </div>
 
-  <!-- Magic link panel -->
-  <div class="panel hidden" id="panel-magic">
-    <div id="magicMsg"></div>
-    <div>
-      <label>Email</label>
-      <input type="email" id="magicInput" placeholder="you@example.com" autocomplete="email" />
-    </div>
-    <button class="btn btn-primary" id="magicBtn">Send magic link</button>
-    <p class="sub" style="font-size:11px;text-align:center;color:var(--ink-lt)">We'll email you a one-click sign-in link</p>
-  </div>
+  <p class="privacy-note">
+    By signing in you agree to our <a href="privacy.html" target="_blank">Privacy Policy</a>
+  </p>
 </div>
 
-<p style="text-align:center;font-size:11.5px;color:var(--ink-lt);margin-top:16px">
-  By signing in you agree to our <a href="privacy.html" target="_blank" style="color:var(--ink-lt)">Privacy Policy</a>
-</p>
-</div><!-- /.auth-main -->
-
-<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@1,400&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
   const SUPABASE_URL = "https://kkasgbkgwjxiutdalbbm.supabase.co";
   const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtrYXNnYmtnd2p4aXV0ZGFsYmJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyNjU3OTQsImV4cCI6MjA5Mjg0MTc5NH0.z1JLMTzz3X_swbWHdt2z4UDKyUwjEfNYys5kdDMq3R4";
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  // ── Auth state change — fires after OAuth redirect returns or sign-in ──
   let redirecting = false;
   sb.auth.onAuthStateChange((event, session) => {
     if (redirecting) return;
     if (session && (event === "SIGNED_IN" || event === "TOKEN_REFRESHED" || event === "INITIAL_SESSION")) {
       redirecting = true;
-      // Broadcast to auth-bridge.js content script so extension picks up the session
       window.dispatchEvent(new CustomEvent("keepsake:auth", {
         detail: {
           access_token: session.access_token,
@@ -227,12 +311,11 @@
           }
         }
       }));
-      // Show brief confirmation then go straight to account page
       document.getElementById("card").innerHTML = `
         <div class="success-state">
           <div class="success-icon">✉</div>
           <h2>You're in!</h2>
-          <p style="color:var(--ink-mid)">Taking you to your account…</p>
+          <p>Taking you to your account…</p>
         </div>
       `;
       setTimeout(() => {
@@ -241,7 +324,7 @@
     }
   });
 
-  // ── Tab switching ──
+  // Tab switching
   document.querySelectorAll(".tab").forEach(btn => {
     btn.addEventListener("click", () => {
       document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
@@ -251,7 +334,7 @@
     });
   });
 
-  // ── Google ──
+  // Google
   document.getElementById("googleBtn").addEventListener("click", async () => {
     const { error } = await sb.auth.signInWithOAuth({
       provider: "google",
@@ -260,15 +343,15 @@
     if (error) showMsg("googleMsg", error.message, "error");
   });
 
-  // ── Email / Password ──
-  let emailMode = "signin"; // or "signup"
+  // Email / Password
+  let emailMode = "signin";
   document.getElementById("toggleMode").addEventListener("click", () => {
     emailMode = emailMode === "signin" ? "signup" : "signin";
-    document.getElementById("emailBtn").textContent = emailMode === "signin" ? "Sign in" : "Create account";
-    document.getElementById("toggleText").textContent = emailMode === "signin" ? "Don't have an account?" : "Already have an account?";
-    document.getElementById("toggleMode").textContent = emailMode === "signin" ? " Sign up" : " Sign in";
-    document.getElementById("pwLabel").textContent = emailMode === "signin" ? "Password" : "Choose a password";
-    document.getElementById("pwInput").autocomplete = emailMode === "signin" ? "current-password" : "new-password";
+    document.getElementById("emailBtn").textContent     = emailMode === "signin" ? "Sign in" : "Create account";
+    document.getElementById("toggleText").textContent   = emailMode === "signin" ? "Don't have an account?" : "Already have an account?";
+    document.getElementById("toggleMode").textContent   = emailMode === "signin" ? " Sign up" : " Sign in";
+    document.getElementById("pwLabel").textContent      = emailMode === "signin" ? "Password" : "Choose a password";
+    document.getElementById("pwInput").autocomplete     = emailMode === "signin" ? "current-password" : "new-password";
   });
 
   document.getElementById("emailBtn").addEventListener("click", async (e) => {
@@ -289,7 +372,7 @@
     e.target.disabled = false;
   });
 
-  // ── Magic link ──
+  // Magic link
   document.getElementById("magicBtn").addEventListener("click", async (e) => {
     e.target.disabled = true;
     const email = document.getElementById("magicInput").value.trim();
