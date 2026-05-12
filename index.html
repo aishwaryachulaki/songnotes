@@ -758,15 +758,22 @@
       font-weight: 700;
       color: var(--ink);
       text-align: center;
+      line-height: 1.2;
       margin-bottom: 32px;
     }
     .faq-list {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
     }
+    /* Cycle through stamp colours */
+    .faq-item:nth-child(3n+1) {
+      background: #F5D0C4 url('stamp-pink.png') right center / auto 100% no-repeat;
+    }
+    .faq-item:nth-child(3n+2) { background: #F5E8B4; }
+    .faq-item:nth-child(3n+3) { background: #E2DDA4; }
+
     .faq-item {
-      background: var(--cream);
       border-radius: 10px;
       overflow: hidden;
     }
@@ -784,12 +791,23 @@
       font-family: 'Lora', Georgia, serif;
       font-size: 14px;
       font-weight: 600;
-      color: var(--ink);
     }
+    /* Per-colour text */
+    .faq-item:nth-child(3n+1) .faq-q,
+    .faq-item:nth-child(3n+1) .faq-a  { color: #5c2d2d; }
+    .faq-item:nth-child(3n+1) .faq-toggle { color: #5c2d2d; }
+
+    .faq-item:nth-child(3n+2) .faq-q,
+    .faq-item:nth-child(3n+2) .faq-a  { color: #4a3800; }
+    .faq-item:nth-child(3n+2) .faq-toggle { color: #4a3800; }
+
+    .faq-item:nth-child(3n+3) .faq-q,
+    .faq-item:nth-child(3n+3) .faq-a  { color: #363614; }
+    .faq-item:nth-child(3n+3) .faq-toggle { color: #363614; }
+
     .faq-toggle {
       font-size: 22px;
       font-weight: 300;
-      color: var(--rose);
       flex-shrink: 0;
       line-height: 1;
       transition: transform 0.25s ease;
@@ -802,7 +820,6 @@
       transition: max-height 0.3s ease, padding 0.3s ease;
       padding: 0 22px;
       font-size: 13.5px;
-      color: var(--ink-mid);
       line-height: 1.7;
     }
     .faq-item.open .faq-a {
@@ -1039,7 +1056,7 @@
   <img class="faq-floral" src="lifetime-flower.png" alt="" aria-hidden="true" />
   <div class="faq-section">
 
-    <h2 class="faq-heading">Questions? We've got you.</h2>
+    <h2 class="faq-heading">Questions?<br>We've got you.</h2>
 
     <div class="faq-list">
 
