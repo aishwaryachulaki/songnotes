@@ -115,22 +115,16 @@
     }
     .faq-heading {
       font-family: 'Lora', Georgia, serif;
-      font-size: clamp(26px, 3.5vw, 40px);
+      font-size: clamp(22px, 2.5vw, 28px);
       font-weight: 700;
       color: var(--ink);
       text-align: center;
-      margin-bottom: 12px;
-    }
-    .faq-sub {
-      text-align: center;
-      font-size: 0.9rem;
-      color: var(--ink-mid);
-      line-height: 1.7;
-      margin-bottom: 52px;
+      line-height: 1.35;
+      margin-bottom: 40px;
     }
 
     /* ── Accordion ── */
-    .faq-group { margin-bottom: 40px; }
+    .faq-group { margin-bottom: 32px; }
     .faq-group-label {
       font-family: 'Montserrat', sans-serif;
       font-size: 9px;
@@ -145,10 +139,14 @@
     .faq-list {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
     }
+    /* Cycle through stamp colours */
+    .faq-item:nth-child(3n+1) { background: #F5D0C4 url('faq-bg-pink.png') center / cover no-repeat; }
+    .faq-item:nth-child(3n+2) { background: #F5E8B4 url('faq-bg-yellow.png') center / cover no-repeat; }
+    .faq-item:nth-child(3n+3) { background: #E2DDA4 url('faq-bg-olive.png') center / cover no-repeat; }
+
     .faq-item {
-      background: var(--cream);
       border-radius: 10px;
       overflow: hidden;
     }
@@ -166,12 +164,23 @@
       font-family: 'Lora', Georgia, serif;
       font-size: 14.5px;
       font-weight: 600;
-      color: var(--ink);
     }
+    /* Per-colour text */
+    .faq-item:nth-child(3n+1) .faq-q,
+    .faq-item:nth-child(3n+1) .faq-a  { color: #5c2d2d; }
+    .faq-item:nth-child(3n+1) .faq-toggle { color: #5c2d2d; }
+
+    .faq-item:nth-child(3n+2) .faq-q,
+    .faq-item:nth-child(3n+2) .faq-a  { color: #4a3800; }
+    .faq-item:nth-child(3n+2) .faq-toggle { color: #4a3800; }
+
+    .faq-item:nth-child(3n+3) .faq-q,
+    .faq-item:nth-child(3n+3) .faq-a  { color: #363614; }
+    .faq-item:nth-child(3n+3) .faq-toggle { color: #363614; }
+
     .faq-toggle {
       font-size: 22px;
       font-weight: 300;
-      color: var(--rose);
       flex-shrink: 0;
       line-height: 1;
       font-family: sans-serif;
@@ -184,7 +193,6 @@
       transition: max-height 0.3s ease, padding 0.3s ease;
       padding: 0 22px;
       font-size: 13.5px;
-      color: var(--ink-mid);
       line-height: 1.75;
     }
     .faq-item.open .faq-a {
@@ -242,9 +250,7 @@
 
 <div class="page">
 
-  <div class="faq-eyebrow">FAQ</div>
-  <h1 class="faq-heading">Questions? We've got you.</h1>
-  <p class="faq-sub">Here are some common things people ask.<br>If you need anything else, feel free to reach out.</p>
+  <h1 class="faq-heading">Questions?<br>We've got you.</h1>
 
   <!-- Group 1: Getting started -->
   <div class="faq-group">
