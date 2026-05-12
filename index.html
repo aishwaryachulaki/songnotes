@@ -420,6 +420,213 @@
       color: var(--rose);
     }
 
+    /* ── Screenshot placeholders ── */
+    .screen-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 56px;
+    }
+    .screen-card {
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 8px 40px rgba(58,36,24,0.18);
+      position: relative;
+    }
+    .screen-chrome {
+      background: #2a1f1a;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .screen-dot {
+      width: 9px; height: 9px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .screen-url {
+      flex: 1;
+      background: rgba(255,255,255,0.08);
+      border-radius: 4px;
+      height: 18px;
+      margin-left: 8px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 8px;
+      color: rgba(255,255,255,0.28);
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      letter-spacing: 0.03em;
+    }
+    .screen-body {
+      background: #121212;
+      padding: 0;
+      min-height: 260px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    .screen-inner {
+      flex: 1;
+      position: relative;
+      min-height: 220px;
+    }
+    .screen-label {
+      position: absolute;
+      top: 12px;
+      left: 14px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 7px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.2);
+    }
+    .placeholder-badge {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 6.5px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.06);
+      border-radius: 4px;
+      padding: 2px 6px;
+    }
+    /* Spotify player bar */
+    .spotify-bar {
+      background: #181818;
+      padding: 10px 16px 12px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      flex-shrink: 0;
+    }
+    .spotify-track {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 8.5px;
+      color: rgba(255,255,255,0.45);
+      letter-spacing: 0.04em;
+      margin-bottom: 6px;
+    }
+    .spotify-track strong { color: rgba(255,255,255,0.82); }
+    .spotify-progress {
+      height: 3px;
+      background: rgba(255,255,255,0.12);
+      border-radius: 2px;
+      position: relative;
+    }
+    .spotify-progress-fill {
+      position: absolute;
+      left: 0; top: 0; height: 100%;
+      background: #1DB954;
+      border-radius: 2px;
+    }
+    /* Extension write popup */
+    .ext-popup {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      width: 188px;
+      background: var(--cream);
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.55);
+      overflow: hidden;
+    }
+    .ext-popup-header {
+      background: var(--rose);
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .ext-popup-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 7.5px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: white;
+    }
+    .ext-popup-body { padding: 10px 12px; }
+    .ext-timestamp {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 7px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      color: var(--rose);
+      background: rgba(217,107,124,0.12);
+      border-radius: 4px;
+      padding: 2px 7px;
+      display: inline-block;
+      margin-bottom: 7px;
+    }
+    .ext-textarea {
+      width: 100%;
+      height: 44px;
+      background: rgba(58,36,24,0.06);
+      border-radius: 6px;
+      border: 1px solid rgba(58,36,24,0.12);
+      margin-bottom: 7px;
+      padding: 6px 8px;
+    }
+    .ext-textarea-text {
+      font-size: 7.5px;
+      color: var(--ink-mid);
+      font-style: italic;
+      line-height: 1.45;
+      font-family: 'Lora', Georgia, serif;
+    }
+    .ext-send {
+      width: 100%;
+      background: var(--rose);
+      color: white;
+      border-radius: 5px;
+      padding: 5px 8px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 7px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-align: center;
+    }
+    /* Note arrival overlay */
+    .note-arrive {
+      position: absolute;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 82%;
+      background: rgba(90,46,46,0.90);
+      border-radius: 12px;
+      padding: 13px 16px;
+    }
+    .note-arrive-meta {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 7.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: rgba(255,255,255,0.42);
+      margin-bottom: 7px;
+    }
+    .note-arrive-text {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 13px;
+      color: white;
+      font-style: italic;
+      line-height: 1.55;
+      margin-bottom: 6px;
+    }
+    .note-arrive-from {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 10px;
+      color: var(--rose);
+      font-style: italic;
+    }
+
     /* ── Features tagline ── */
     .features-tagline {
       text-align: center;
@@ -767,6 +974,69 @@
         <div class="stamp-num">03</div>
         <div class="stamp-title">It appears, right on cue</div>
         <p class="stamp-desc">The moment the song reaches your timestamp, your words show up. Exactly when you meant them to.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Screenshot placeholders — swap src for real images when ready -->
+  <div class="screen-row">
+
+    <!-- Write panel -->
+    <div class="screen-card">
+      <div class="screen-chrome">
+        <div class="screen-dot" style="background:#E36888;"></div>
+        <div class="screen-dot" style="background:#F08C21;"></div>
+        <div class="screen-dot" style="background:#B6BE5A;"></div>
+        <div class="screen-url">open.spotify.com</div>
+      </div>
+      <div class="screen-body">
+        <div class="screen-inner">
+          <div class="screen-label">01 — pin a note</div>
+          <div class="placeholder-badge">screenshot soon</div>
+          <div class="ext-popup">
+            <div class="ext-popup-header">
+              <span class="ext-popup-title">♪ keepsake</span>
+              <span style="color:rgba(255,255,255,0.5);font-size:9px;line-height:1;">✕</span>
+            </div>
+            <div class="ext-popup-body">
+              <div class="ext-timestamp">✦ at 1:24</div>
+              <div class="ext-textarea">
+                <p class="ext-textarea-text">this part always reminds me of you...</p>
+              </div>
+              <div class="ext-send">send note ✧</div>
+            </div>
+          </div>
+        </div>
+        <div class="spotify-bar">
+          <div class="spotify-track"><strong>Funeral</strong> · Phoebe Bridgers</div>
+          <div class="spotify-progress"><div class="spotify-progress-fill" style="width:35%;"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Receive panel -->
+    <div class="screen-card">
+      <div class="screen-chrome">
+        <div class="screen-dot" style="background:#E36888;"></div>
+        <div class="screen-dot" style="background:#F08C21;"></div>
+        <div class="screen-dot" style="background:#B6BE5A;"></div>
+        <div class="screen-url">open.spotify.com</div>
+      </div>
+      <div class="screen-body">
+        <div class="screen-inner">
+          <div class="screen-label">03 — it arrives</div>
+          <div class="placeholder-badge">screenshot soon</div>
+          <div class="note-arrive">
+            <div class="note-arrive-meta">A note · 1:24</div>
+            <p class="note-arrive-text">this part always reminds me of you.</p>
+            <div class="note-arrive-from">— from maya</div>
+          </div>
+        </div>
+        <div class="spotify-bar">
+          <div class="spotify-track"><strong>Funeral</strong> · Phoebe Bridgers</div>
+          <div class="spotify-progress"><div class="spotify-progress-fill" style="width:35%;"></div></div>
+        </div>
       </div>
     </div>
 
