@@ -391,46 +391,15 @@
       50%       { transform: translateY(-6px); }
     }
 
-    /* ── Section divider ── */
-    .section-divider {
-      display: flex;
-      align-items: center;
-      gap: 18px;
-      max-width: 560px;
-      margin: 0 auto;
-      padding: 0 32px;
-    }
-    .section-divider::before,
-    .section-divider::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: rgba(58,36,24,0.10);
-    }
-    .section-divider-spark {
-      font-size: 11px;
-      color: var(--rose);
-      opacity: 0.38;
-      letter-spacing: 0.3em;
-    }
-
     /* ── Features section ── */
     .features {
       max-width: 1440px;
       margin: 0 auto;
-      padding: 40px 20px 44px;
+      padding: 28px 20px 36px;
     }
     .features-header {
       text-align: center;
       margin-bottom: 32px;
-    }
-    .features-eyebrow {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--rose);
-      margin-bottom: 10px;
     }
     .features-title {
       font-family: 'Lora', Georgia, serif;
@@ -765,7 +734,7 @@
     .faq-wrap {
       position: relative;
       overflow: hidden;
-      padding: 48px 32px 72px;
+      padding: 28px 32px 64px;
     }
     .faq-section {
       max-width: 700px;
@@ -788,14 +757,7 @@
       font-weight: 700;
       color: var(--ink);
       text-align: center;
-      margin-bottom: 10px;
-    }
-    .faq-sub {
-      text-align: center;
-      font-size: 0.88rem;
-      color: var(--ink-mid);
-      line-height: 1.7;
-      margin-bottom: 40px;
+      margin-bottom: 32px;
     }
     .faq-list {
       display: flex;
@@ -964,12 +926,9 @@
 
 <div class="page-rest">
 
-<div class="section-divider" style="padding-top:20px;padding-bottom:4px;"><span class="section-divider-spark">✦ · ✦</span></div>
-
 <!-- FEATURES -->
 <section class="features">
   <div class="features-header">
-    <div class="features-eyebrow">How it works</div>
     <h2 class="features-title">Write it into a <em>song.</em> Send it <em>softly.</em> Let it arrive on <em>cue.</em></h2>
   </div>
 
@@ -1074,16 +1033,12 @@
 
 </section>
 
-<div class="section-divider"><span class="section-divider-spark">✦ · ✦</span></div>
-
 <!-- FAQ -->
 <div class="faq-wrap">
   <img class="faq-floral" src="lifetime-flower.png" alt="" aria-hidden="true" />
   <div class="faq-section">
 
-    <div class="faq-eyebrow">FAQ</div>
     <h2 class="faq-heading">Questions? We've got you.</h2>
-    <p class="faq-sub">Here are some common things people ask.<br>If you need anything else, feel free to reach out.</p>
 
     <div class="faq-list">
 
@@ -1130,8 +1085,6 @@
 
   </div>
 </div>
-
-<div class="section-divider"><span class="section-divider-spark">✦ · ✦</span></div>
 
 <!-- FOOTER -->
 <footer>Keepsake &nbsp;·&nbsp; Works on Spotify Web Player &nbsp;·&nbsp; <a href="faq.html" style="color:inherit;text-decoration:none;">FAQ</a> &nbsp;·&nbsp; <a href="auth.html" style="color:inherit;text-decoration:none;">Sign in</a> &nbsp;·&nbsp; <a href="privacy.html" style="color:inherit;text-decoration:none;">Privacy</a></footer>
