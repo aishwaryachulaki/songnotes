@@ -156,8 +156,8 @@
       margin-bottom: 10px;
     }
 
-    /* Middle: title + artist, flex:1 pushes footer to bottom */
-    .share-body { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+    /* Body: title + artist sit just below the label, flex:1 pushes footer to bottom */
+    .share-body { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; }
 
     .share-type-pill {
       display: inline-block;
@@ -203,6 +203,13 @@
       transition: background 0.15s; white-space: nowrap;
     }
     .btn-sm:hover { background: rgba(217,107,124,0.20); }
+    .btn-sm-outline {
+      background: transparent;
+      border-color: rgba(58,36,24,0.20);
+      color: inherit;
+      opacity: 0.55;
+    }
+    .btn-sm-outline:hover { background: rgba(58,36,24,0.06); opacity: 0.9; }
 
     /* ── Pagination ── */
     .pagination {
@@ -539,6 +546,13 @@
     const sentList = page.querySelector(".sent-list");
     if (sentList) {
       sentList.addEventListener("click", async (e) => {
+        // Copy link
+        const copyBtn = e.target.closest("[data-copy]");
+        if (copyBtn) {
+          showToast("Open via the extension to copy the share link ✦");
+          return;
+        }
+
         // Close button
         const closeBtn = e.target.closest("[data-relive-close]");
         if (closeBtn) {
@@ -738,7 +752,6 @@
         <div class="share-card" data-share-id="${esc(share.id)}">
           <div class="share-label">For ${recipient}</div>
           <div class="share-body">
-            ${isPlaylist ? `<div class="share-type-pill">Playlist · ${noteCount}</div>` : ""}
             <div class="share-track">${trackTitle}</div>
             ${trackArtist ? `<div class="share-artist">${trackArtist}</div>` : ""}
           </div>
@@ -748,6 +761,7 @@
               <div class="share-note-count">${noteLabel}</div>
             </div>
             <div class="share-actions">
+              <button class="btn-sm btn-sm-outline" data-copy="${esc(share.id)}">Link</button>
               ${canRelive ? `<button class="btn-sm" data-relive="${esc(share.id)}">Relive ✦</button>` : ""}
             </div>
           </div>
