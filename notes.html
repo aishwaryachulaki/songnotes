@@ -121,10 +121,11 @@
 
     .share-card {
       border-radius: 14px;
-      padding: 18px 18px 14px;
+      padding: 16px 16px 14px;
       position: relative; overflow: hidden;
       transition: filter 0.15s;
       display: flex; flex-direction: column;
+      aspect-ratio: 1;
       cursor: default;
     }
     .share-card:hover { filter: brightness(0.97); }
@@ -139,40 +140,55 @@
     .received-list .share-card:nth-child(3n+2) { background: url('faq-bg-olive.png')  center / cover no-repeat; color: #363614; }
     .received-list .share-card:nth-child(3n+3) { background: url('faq-bg-yellow.png') center / cover no-repeat; color: #4a3800; }
 
+    /* ✦ top-right */
     .share-card::after {
       content: '✦';
-      position: absolute; right: 14px; top: 12px;
-      font-size: 16px; opacity: 0.09; pointer-events: none;
+      position: absolute; right: 14px; top: 13px;
+      font-size: 15px; opacity: 0.18; pointer-events: none;
     }
 
+    /* Top row: "For name" */
     .share-label {
       font-family: 'Montserrat', sans-serif;
-      font-size: 8px; font-weight: 700; letter-spacing: 0.14em;
-      text-transform: uppercase; color: var(--rose); margin-bottom: 6px;
+      font-size: 8px; font-weight: 700; letter-spacing: 0.13em;
+      text-transform: uppercase; color: var(--rose);
+      padding-right: 22px; /* clear the ✦ */
+      margin-bottom: 10px;
     }
+
+    /* Middle: title + artist, flex:1 pushes footer to bottom */
+    .share-body { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+
     .share-type-pill {
       display: inline-block;
       font-family: 'Montserrat', sans-serif;
       font-size: 7.5px; font-weight: 700; letter-spacing: 0.10em;
       text-transform: uppercase; padding: 2px 7px; border-radius: 8px;
       background: rgba(217,107,124,0.12); color: var(--rose);
-      margin-bottom: 7px;
+      margin-bottom: 8px; align-self: flex-start;
     }
     .share-track {
       font-family: 'Lora', Georgia, serif;
-      font-size: 15px; font-weight: 700; line-height: 1.25;
-      margin-bottom: 3px;
-      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+      font-size: 16px; font-weight: 700; line-height: 1.25;
+      margin-bottom: 4px;
+      display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
     }
     .share-artist {
-      font-size: 11px; opacity: 0.55; margin-bottom: 0;
+      font-size: 11px; opacity: 0.55;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
+
+    /* Bottom row: meta (date + notes stacked) + action button */
     .share-footer {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-top: 10px; gap: 4px;
+      display: flex; align-items: flex-end; justify-content: space-between;
+      margin-top: 12px; gap: 6px;
     }
+    .share-meta { display: flex; flex-direction: column; gap: 2px; }
     .share-date {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 8px; letter-spacing: 0.03em; opacity: 0.45;
+    }
+    .share-note-count {
       font-family: 'Montserrat', sans-serif;
       font-size: 8px; letter-spacing: 0.03em; opacity: 0.45;
     }
@@ -180,7 +196,7 @@
     .btn-sm {
       font-family: 'Montserrat', sans-serif;
       font-size: 8.5px; font-weight: 700; letter-spacing: 0.08em;
-      text-transform: uppercase; padding: 4px 11px; border-radius: 20px;
+      text-transform: uppercase; padding: 5px 12px; border-radius: 20px;
       background: rgba(217,107,124,0.12);
       border: 1.5px solid rgba(217,107,124,0.30);
       color: var(--rose); cursor: pointer;
@@ -721,11 +737,16 @@
       return `
         <div class="share-card" data-share-id="${esc(share.id)}">
           <div class="share-label">For ${recipient}</div>
-          ${isPlaylist ? `<div class="share-type-pill">Playlist · ${noteCount}</div>` : ""}
-          <div class="share-track">${trackTitle}</div>
-          ${trackArtist ? `<div class="share-artist">${trackArtist}</div>` : ""}
+          <div class="share-body">
+            ${isPlaylist ? `<div class="share-type-pill">Playlist · ${noteCount}</div>` : ""}
+            <div class="share-track">${trackTitle}</div>
+            ${trackArtist ? `<div class="share-artist">${trackArtist}</div>` : ""}
+          </div>
           <div class="share-footer">
-            <div class="share-date">${dateStr} · ${noteLabel}</div>
+            <div class="share-meta">
+              <div class="share-date">${dateStr}</div>
+              <div class="share-note-count">${noteLabel}</div>
+            </div>
             <div class="share-actions">
               ${canRelive ? `<button class="btn-sm" data-relive="${esc(share.id)}">Relive ✦</button>` : ""}
             </div>
@@ -792,11 +813,16 @@
       return `
         <div class="share-card">
           <div class="share-label">From ${senderName}</div>
-          ${isPlaylist ? `<div class="share-type-pill">Playlist · ${noteCount}</div>` : ""}
-          <div class="share-track">${trackTitle}</div>
-          ${trackArtist ? `<div class="share-artist">${trackArtist}</div>` : ""}
+          <div class="share-body">
+            ${isPlaylist ? `<div class="share-type-pill">Playlist · ${noteCount}</div>` : ""}
+            <div class="share-track">${trackTitle}</div>
+            ${trackArtist ? `<div class="share-artist">${trackArtist}</div>` : ""}
+          </div>
           <div class="share-footer">
-            <div class="share-date">${dateStr} · ${noteLabel}</div>
+            <div class="share-meta">
+              <div class="share-date">${dateStr}</div>
+              <div class="share-note-count">${noteLabel}</div>
+            </div>
           </div>
         </div>
       `;
