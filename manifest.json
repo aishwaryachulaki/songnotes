@@ -1,17 +1,22 @@
 {
   "manifest_version": 3,
   "name": "Keepsake",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Attach personal notes to moments in Spotify songs and share them as a link.",
   "homepage_url": "https://aishwaryachulaki.github.io/songnotes/index.html",
   "support_url": "https://aishwaryachulaki.github.io/songnotes/faq.html",
-  "permissions": ["storage", "activeTab", "tabs"],
+  "permissions": ["storage", "activeTab", "tabs", "sidePanel"],
   "host_permissions": [
     "https://open.spotify.com/*",
     "https://aishwaryachulaki.github.io/*"
   ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
   "action": {
-    "default_popup": "popup.html",
     "default_icon": "icon.png",
     "default_title": "Keepsake"
   },

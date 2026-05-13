@@ -1032,4 +1032,39 @@ $("importBtn").addEventListener("click", async () => {
   notifyContentRefresh();
 });
 
-init();
+init().then(startLiveTracking);
+
+// ---- Live track polling ----
+// The side panel stays open indefinitely, so we poll for track changes
+// rather than relying on the user to reopen the panel for each song.
+// Runs every 2 s; skips when the document is hidden (tab in background).
+// Only re-renders when the track actually changes — no UI flicker.
+function startLiveTracking() {
+  setInterval(async () => {
+    if (document.hidden) return;
+    const state = await fetchTrack();
+    if (!state) return;
+    const newId = state.trackId || null;
+    const curId = currentTrack?.trackId ?? null;
+    if (newId === curId) return; // nothing changed
+
+    currentTrack = state.trackId ? state : null;
+
+    if (state.trackId) {
+      $("trackTitle").textContent = state.title || "Unknown track";
+      $("trackArtist").textContent = state.artist || "";
+    } else if (state.notOnSpotify) {
+      $("trackTitle").textContent = "No song playing";
+      $("trackArtist").textContent = "Open Spotify Web Player to start";
+    } else if (!state.playerVisible) {
+      $("trackTitle").textContent = "Player not detected";
+      $("trackArtist").textContent = "Spotify may have updated — check for a Keepsake update";
+    } else {
+      $("trackTitle").textContent = "Nothing playing";
+      $("trackArtist").textContent = "Play a song to get started";
+    }
+
+    renderNotes();
+    renderSummary();
+  }, 2000);
+}
