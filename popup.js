@@ -580,7 +580,6 @@ async function activateShare(id) {
 async function init() {
   const { store, sender } = await loadStore();
   senderName = sender;
-  chrome.storage.local.remove("ks_share_origin");
   shareOrigin = CONFIGURED_ORIGIN || "";
 
   activeShare = ensureActive(store, senderName);

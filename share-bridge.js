@@ -58,7 +58,6 @@
 
   document.documentElement.setAttribute("data-keepsake-installed", "1");
   window.dispatchEvent(new CustomEvent("keepsake:ready"));
-  try { chrome.storage.local.set({ ks_share_origin: window.location.origin }); } catch (e) {}
 
   window.addEventListener("keepsake:import", (e) => {
     inject(e.detail || window.__KS_PAYLOAD);

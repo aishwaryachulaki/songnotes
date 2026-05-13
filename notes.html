@@ -361,7 +361,6 @@
   let currentUser = null;
   let sentShares = [];
   let receivedItems = [];
-  let hasArchivedCol = false;
   let hasReceivedTable = false;
   let activeTab = "received";
   let sentPage = 0;
@@ -380,22 +379,12 @@
   })();
 
   async function loadAll() {
-    // Load sent shares — sender_content is the plaintext copy written at send time.
-    // annotations is kept as fallback for older plaintext shares.
     const sentRes = await sb
       .from("shares")
-      .select("*, sender_content, annotations(id, track_title, track_artist, track_id, note, timestamp)")
+      .select("*, annotations(id, track_title, track_artist, track_id, note, timestamp)")
       .order("created_at", { ascending: false });
 
     sentShares = sentRes.data || [];
-
-    // Check if archived column exists
-    if (sentShares.length > 0) {
-      hasArchivedCol = "archived" in sentShares[0];
-    } else {
-      const probe = await sb.from("shares").select("archived").limit(1);
-      hasArchivedCol = !probe.error;
-    }
 
     // Load received shares
     const recRes = await sb
