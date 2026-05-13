@@ -814,7 +814,11 @@ $("copyShare").addEventListener("click", async () => {
   const shareToPush = {
     ...activeShare,
     sender_name:    activeShare.sender_name || senderName,
-    recipient_name: activeShare.recipient_name || null,
+    // Encrypt recipient_name so the server never sees who the letter is for.
+    // The import flow already decrypts this field, so no changes needed there.
+    recipient_name: activeShare.recipient_name
+      ? await encryptField(activeShare.recipient_name, encKey)
+      : null,
     // Sender copy — encrypted with the same enc_key as the share.
     // Decrypted client-side on notes.html via the extension or a pasted share link.
     // Server only ever sees the encrypted blob.
