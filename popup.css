@@ -97,7 +97,7 @@ body {
 
 /* ── Now Playing card ── */
 .stamp-track {
-  background: var(--blush) url('faq-bg-pink.png') center / cover no-repeat;
+  background: var(--blush) url('now-playing-bg.png') center / cover no-repeat;
   border-radius: 16px;
   padding: 16px 18px 18px;
   position: relative;
