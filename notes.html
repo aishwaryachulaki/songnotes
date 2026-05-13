@@ -170,30 +170,33 @@
       transition: background 0.15s;
     }
     .btn-sm:hover { background: rgba(217,107,124,0.20); }
-    .btn-sm-ghost {
-      font-family: 'Montserrat', sans-serif;
-      font-size: 9.5px; font-weight: 600; letter-spacing: 0.09em;
-      text-transform: uppercase; padding: 5px 13px; border-radius: 20px;
-      background: transparent;
-      border: 1.5px solid rgba(58,36,24,0.18);
-      color: inherit; cursor: pointer; opacity: 0.50;
-      transition: opacity 0.15s;
+    /* ── Expanded notes view ── */
+    .notes-expanded {
+      margin-top: 16px;
+      border-top: 1px solid rgba(58,36,24,0.12);
+      padding-top: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
-    .btn-sm-ghost:hover { opacity: 0.85; }
-
-    /* ── Deleted card state ── */
-    .share-card.deleted {
-      opacity: 0.50;
-      filter: grayscale(0.25);
+    .note-entry {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
     }
-    .share-card.deleted:hover { opacity: 0.65; filter: none; }
-    .deleted-badge {
-      display: inline-block;
+    .note-timestamp {
       font-family: 'Montserrat', sans-serif;
-      font-size: 8px; font-weight: 700; letter-spacing: 0.12em;
-      text-transform: uppercase; padding: 2px 8px; border-radius: 10px;
-      background: rgba(58,36,24,0.10); color: inherit;
-      margin-bottom: 10px; opacity: 0.6;
+      font-size: 8.5px; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; opacity: 0.45;
+    }
+    .note-song {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 12px; font-weight: 600; opacity: 0.70;
+    }
+    .note-text {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 14px; line-height: 1.65;
+      font-style: italic;
     }
 
     /* ── Empty state ── */
@@ -391,30 +394,27 @@
       window.location.href = "auth.html";
     });
 
-    // Sent list events
+    // Sent list — expand/collapse notes
     const sentList = page.querySelector(".sent-list");
     if (sentList) {
-      sentList.addEventListener("click", async (e) => {
-        const copyBtn = e.target.closest("[data-copy]");
-        if (copyBtn) {
-          showToast("Open via the extension to copy the share link ✦");
-          return;
-        }
-        const toggleBtn = e.target.closest("[data-toggle-delete]");
-        if (toggleBtn && hasArchivedCol) {
-          const id = toggleBtn.dataset.toggleDelete;
-          const share = sentShares.find(s => s.id === id);
-          if (!share) return;
-          toggleBtn.disabled = true;
-          const nowDeleted = !share.archived;
-          const { error } = await sb.from("shares").update({ archived: nowDeleted }).eq("id", id);
-          if (error) { showToast("Couldn't update — try again."); return; }
-          share.archived = nowDeleted;
-          showToast(nowDeleted ? "Link deactivated — tap Reactivate to restore." : "Reactivated ✦ Link is live again.");
-          render();
-        }
+      sentList.addEventListener("click", (e) => {
+        const reliveBtn = e.target.closest("[data-relive]");
+        if (!reliveBtn) return;
+        const id = reliveBtn.dataset.relive;
+        const expanded = document.getElementById(`notes-${id}`);
+        if (!expanded) return;
+        const isOpen = expanded.style.display !== "none";
+        expanded.style.display = isOpen ? "none" : "flex";
+        reliveBtn.textContent = isOpen ? "Relive ✦" : "Close";
       });
     }
+  }
+
+  function formatTimestamp(seconds) {
+    if (seconds == null || isNaN(seconds)) return "";
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return `${m}:${s.toString().padStart(2, "0")}`;
   }
 
   function renderSent() {
@@ -434,26 +434,33 @@
       const trackArtist = anns[0]?.track_artist || "";
       const noteLabel = noteCount === 1 ? "1 note inside" : `${noteCount} notes inside`;
       const dateStr = new Date(share.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
-      const isDeleted = hasArchivedCol && share.archived;
+
+      // Build expanded notes view — group by track for playlists
+      const notesHtml = anns.map(ann => {
+        const ts = formatTimestamp(ann.timestamp);
+        return `
+          <div class="note-entry">
+            ${isPlaylist && ann.track_title ? `<div class="note-song">${esc(ann.track_title)}${ann.track_artist ? ` — ${esc(ann.track_artist)}` : ""}</div>` : ""}
+            ${ts ? `<div class="note-timestamp">${ts}</div>` : ""}
+            <div class="note-text">${esc(ann.note || "")}</div>
+          </div>
+        `;
+      }).join("");
 
       return `
-        <div class="share-card ${isDeleted ? "deleted" : ""}">
+        <div class="share-card">
           <div class="share-label">For ${share.recipient_name ? esc(share.recipient_name) : "someone special"}</div>
-          ${isDeleted ? `<div class="deleted-badge">Link deactivated</div>` : ""}
-          ${isPlaylist && !isDeleted ? `<div class="share-type-pill">Playlist · ${noteCount} song${noteCount !== 1 ? "s" : ""}</div>` : ""}
+          ${isPlaylist ? `<div class="share-type-pill">Playlist · ${noteCount} song${noteCount !== 1 ? "s" : ""}</div>` : ""}
           <div class="share-track">${esc(trackTitle)}</div>
           ${trackArtist ? `<div class="share-artist">${esc(trackArtist)}</div>` : ""}
-          ${noteCount > 0 ? `<div class="share-notes-count">${noteLabel}</div>` : ""}
           <div class="share-footer">
-            <div class="share-date">${dateStr}</div>
+            <div class="share-date">${dateStr} · ${noteLabel}</div>
             <div class="share-actions">
-              ${!isDeleted ? `<button class="btn-sm" data-copy="${esc(share.id)}">Copy link</button>` : ""}
-              ${hasArchivedCol
-                ? isDeleted
-                  ? `<button class="btn-sm" data-toggle-delete="${esc(share.id)}">Reactivate</button>`
-                  : `<button class="btn-sm-ghost" data-toggle-delete="${esc(share.id)}">Delete</button>`
-                : ""}
+              <button class="btn-sm" data-relive="${esc(share.id)}">Relive ✦</button>
             </div>
+          </div>
+          <div class="notes-expanded" id="notes-${esc(share.id)}" style="display:none;">
+            ${notesHtml || `<div style="font-size:13px;opacity:0.5;">No note content available.</div>`}
           </div>
         </div>
       `;
