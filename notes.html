@@ -257,6 +257,33 @@
       display: block; font-size: 20px; color: var(--ink); margin-bottom: 8px;
     }
 
+    /* ── Paste-link fallback ── */
+    .paste-link-wrap {
+      margin-top: 14px;
+      border-top: 1px solid rgba(58,36,24,0.12);
+      padding-top: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .paste-link-label {
+      font-family: 'Spectral', Georgia, serif;
+      font-style: italic; font-size: 13px; opacity: 0.65;
+    }
+    .paste-link-row { display: flex; gap: 8px; }
+    .paste-link-input {
+      flex: 1; font-family: 'Lora', Georgia, serif;
+      font-size: 12px; padding: 7px 12px; border-radius: 10px;
+      border: 1.5px solid rgba(58,36,24,0.18);
+      background: rgba(255,251,244,0.7); color: var(--ink);
+      outline: none;
+    }
+    .paste-link-input:focus { border-color: rgba(217,107,124,0.40); }
+    .paste-link-error {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px; color: var(--rose); opacity: 0.8;
+    }
+
     /* ── Footer ── */
     .footer-links {
       text-align: center;
@@ -278,6 +305,49 @@
 <script>
   const SUPABASE_URL = "https://kkasgbkgwjxiutdalbbm.supabase.co";
   const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtrYXNnYmtnd2p4aXV0ZGFsYmJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyNjU3OTQsImV4cCI6MjA5Mjg0MTc5NH0.z1JLMTzz3X_swbWHdt2z4UDKyUwjEfNYys5kdDMq3R4";
+
+  // ── Crypto helpers (mirrors popup.js) ──
+  async function importEncKey(b64) {
+    const raw = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+    return crypto.subtle.importKey("raw", raw, { name: "AES-GCM" }, false, ["decrypt"]);
+  }
+  async function decryptField(b64, key) {
+    if (!b64) return null;
+    try {
+      const buf = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+      const dec = await crypto.subtle.decrypt({ name: "AES-GCM", iv: buf.slice(0, 12) }, key, buf.slice(12));
+      return new TextDecoder().decode(dec);
+    } catch { return null; }
+  }
+
+  // ── Extension detection ──
+  let extensionPresent = false;
+  window.addEventListener("keepsake:extension_present", () => { extensionPresent = true; }, { once: true });
+
+  // Ask extension for a share's enc_key; resolves with key b64 or null
+  function getKeyFromExtension(shareId) {
+    return new Promise((resolve) => {
+      if (!extensionPresent) { resolve(null); return; }
+      const handler = (e) => {
+        if (e.detail?.shareId === shareId) {
+          window.removeEventListener("keepsake:share_key_response", handler);
+          resolve(e.detail.encKey || null);
+        }
+      };
+      window.addEventListener("keepsake:share_key_response", handler);
+      window.dispatchEvent(new CustomEvent("keepsake:get_share_key", { detail: { shareId } }));
+      setTimeout(() => { window.removeEventListener("keepsake:share_key_response", handler); resolve(null); }, 1500);
+    });
+  }
+
+  // Extract enc_key from a pasted share URL (#k=...)
+  function keyFromUrl(url) {
+    try {
+      const hash = url.includes("#") ? url.split("#")[1] : "";
+      const params = new URLSearchParams(hash);
+      return params.get("k") || null;
+    } catch { return null; }
+  }
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   function esc(s) {
@@ -395,20 +465,125 @@
       window.location.href = "auth.html";
     });
 
-    // Sent list — expand/collapse notes
+    // Sent list — relive / paste-link / decrypt
     const sentList = page.querySelector(".sent-list");
     if (sentList) {
-      sentList.addEventListener("click", (e) => {
+      sentList.addEventListener("click", async (e) => {
+        // Close button
+        const closeBtn = e.target.closest("[data-relive-close]");
+        if (closeBtn) {
+          const id = closeBtn.dataset.reliveClose;
+          document.getElementById(`relive-${id}`)?.remove();
+          const btn = document.querySelector(`[data-relive="${id}"]`);
+          if (btn) btn.textContent = "Relive ✦";
+          return;
+        }
+
+        // Relive button — try extension first, fall back to paste UI
         const reliveBtn = e.target.closest("[data-relive]");
         if (!reliveBtn) return;
         const id = reliveBtn.dataset.relive;
-        const expanded = document.getElementById(`notes-${id}`);
-        if (!expanded) return;
-        const isOpen = expanded.style.display !== "none";
-        expanded.style.display = isOpen ? "none" : "flex";
-        reliveBtn.textContent = isOpen ? "Relive ✦" : "Close";
+        const share = sentShares.find(s => s.id === id);
+        if (!share || !share.sender_content) return;
+
+        // Already open → close
+        if (document.getElementById(`relive-${id}`)) {
+          document.getElementById(`relive-${id}`)?.remove();
+          reliveBtn.textContent = "Relive ✦";
+          return;
+        }
+
+        reliveBtn.textContent = "Opening…";
+        reliveBtn.disabled = true;
+
+        const keyB64 = await getKeyFromExtension(id);
+        if (keyB64) {
+          await expandWithKey(id, share, keyB64, reliveBtn);
+        } else {
+          // Extension not present or key not found — show paste UI
+          showPasteUI(id, share, reliveBtn);
+        }
+      });
+
+      // Paste-link submit
+      sentList.addEventListener("click", async (e) => {
+        const submitBtn = e.target.closest("[data-paste-submit]");
+        if (!submitBtn) return;
+        const id = submitBtn.dataset.pasteSubmit;
+        const share = sentShares.find(s => s.id === id);
+        const input = document.getElementById(`paste-input-${id}`);
+        const errEl = document.getElementById(`paste-err-${id}`);
+        const reliveBtn = document.querySelector(`[data-relive="${id}"]`);
+        if (!input || !share) return;
+
+        const keyB64 = keyFromUrl(input.value.trim());
+        if (!keyB64) {
+          errEl.textContent = "Couldn't find the key — make sure you paste the full link, including the part after #.";
+          return;
+        }
+        errEl.textContent = "";
+        submitBtn.disabled = true;
+        await expandWithKey(id, share, keyB64, reliveBtn);
       });
     }
+  }
+
+  async function expandWithKey(id, share, keyB64, reliveBtn) {
+    try {
+      const cryptoKey = await importEncKey(keyB64);
+      const json = await decryptField(share.sender_content, cryptoKey);
+      if (!json) throw new Error("decrypt failed");
+      const notes = JSON.parse(json);
+      const isPlaylist = share.share_type === "playlist";
+
+      const notesHtml = notes.map(n => {
+        const ts = formatTimestamp(n.timestamp);
+        return `
+          <div class="note-entry">
+            ${isPlaylist && n.track_title ? `<div class="note-song">${esc(n.track_title)}${n.track_artist ? ` — ${esc(n.track_artist)}` : ""}</div>` : ""}
+            ${ts ? `<div class="note-timestamp">${ts}</div>` : ""}
+            <div class="note-text">${esc(n.note || "")}</div>
+          </div>`;
+      }).join("");
+
+      const wrap = document.createElement("div");
+      wrap.className = "notes-expanded";
+      wrap.id = `relive-${id}`;
+      wrap.innerHTML = `
+        ${notesHtml || `<div style="font-size:13px;opacity:0.5;">No notes found.</div>`}
+        <div style="margin-top:4px;">
+          <button class="btn-sm-ghost" data-relive-close="${esc(id)}" style="opacity:0.45;font-size:9px;">Close</button>
+        </div>`;
+
+      // Remove any paste UI first, then insert expanded notes
+      document.getElementById(`relive-${id}`)?.remove();
+      const card = reliveBtn?.closest(".share-card");
+      if (card) card.appendChild(wrap);
+      if (reliveBtn) { reliveBtn.textContent = "Relive ✦"; reliveBtn.disabled = false; }
+    } catch {
+      if (reliveBtn) { reliveBtn.textContent = "Relive ✦"; reliveBtn.disabled = false; }
+      showPasteUI(id, share, reliveBtn, "Couldn't decrypt — try pasting the share link.");
+    }
+  }
+
+  function showPasteUI(id, share, reliveBtn, prefillError = "") {
+    if (reliveBtn) { reliveBtn.textContent = "Relive ✦"; reliveBtn.disabled = false; }
+    if (document.getElementById(`relive-${id}`)) return;
+
+    const wrap = document.createElement("div");
+    wrap.className = "paste-link-wrap";
+    wrap.id = `relive-${id}`;
+    wrap.innerHTML = `
+      <div class="paste-link-label">Paste your share link to read your notes</div>
+      <div class="paste-link-row">
+        <input class="paste-link-input" id="paste-input-${esc(id)}" type="text" placeholder="https://…#k=…" />
+        <button class="btn-sm" data-paste-submit="${esc(id)}">Decrypt</button>
+      </div>
+      <div class="paste-link-error" id="paste-err-${esc(id)}">${prefillError}</div>
+    `;
+    const card = reliveBtn?.closest(".share-card");
+    if (card) card.appendChild(wrap);
+    document.getElementById(`paste-input-${id}`)?.focus();
   }
 
   function formatTimestamp(seconds) {
@@ -430,27 +605,14 @@
     const cards = sentShares.map(share => {
       // Prefer sender_content (plaintext, written at send time).
       // Fall back to annotations for older shares that predate this column.
-      const notes = (share.sender_content && share.sender_content.length > 0)
-        ? share.sender_content
-        : (share.annotations || []);
-      const noteCount = notes.length;
+      const anns = share.annotations || [];
+      const noteCount = anns.length;
       const isPlaylist = share.share_type === "playlist";
-      const trackTitle = notes[0]?.track_title || (isPlaylist ? "Playlist share" : "Untitled note");
-      const trackArtist = notes[0]?.track_artist || "";
+      const trackTitle = anns[0]?.track_title || (isPlaylist ? "Playlist share" : "Untitled note");
+      const trackArtist = anns[0]?.track_artist || "";
       const noteLabel = noteCount === 1 ? "1 note inside" : `${noteCount} notes inside`;
       const dateStr = new Date(share.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
-
-      // Build expanded notes view
-      const notesHtml = notes.map(n => {
-        const ts = formatTimestamp(n.timestamp);
-        return `
-          <div class="note-entry">
-            ${isPlaylist && n.track_title ? `<div class="note-song">${esc(n.track_title)}${n.track_artist ? ` — ${esc(n.track_artist)}` : ""}</div>` : ""}
-            ${ts ? `<div class="note-timestamp">${ts}</div>` : ""}
-            <div class="note-text">${esc(n.note || "")}</div>
-          </div>
-        `;
-      }).join("");
+      const canRelive = !!share.sender_content;
 
       return `
         <div class="share-card">
@@ -461,11 +623,10 @@
           <div class="share-footer">
             <div class="share-date">${dateStr} · ${noteLabel}</div>
             <div class="share-actions">
-              <button class="btn-sm" data-relive="${esc(share.id)}">Relive ✦</button>
+              ${canRelive
+                ? `<button class="btn-sm" data-relive="${esc(share.id)}">Relive ✦</button>`
+                : `<span style="font-size:10px;opacity:0.4;font-family:'Montserrat',sans-serif;">Resend to enable Relive</span>`}
             </div>
-          </div>
-          <div class="notes-expanded" id="notes-${esc(share.id)}" style="display:none;">
-            ${notesHtml || `<div style="font-size:13px;opacity:0.5;">No note content available.</div>`}
           </div>
         </div>
       `;

@@ -41,6 +41,11 @@
       ],
       "js": ["auth-bridge.js"],
       "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://aishwaryachulaki.github.io/*/notes.html*"],
+      "js": ["notes-bridge.js"],
+      "run_at": "document_idle"
     }
   ]
 }
