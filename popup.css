@@ -98,7 +98,7 @@ body {
 /* ── Now Playing card ── */
 .stamp-track {
   background:
-    linear-gradient(rgba(209,88,110,0.72), rgba(209,88,110,0.72)),
+    linear-gradient(rgba(209,88,110,0.45), rgba(209,88,110,0.45)),
     url('faq-bg-pink.png') center / cover no-repeat;
   border-radius: 16px;
   padding: 16px 18px 18px;
