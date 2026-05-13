@@ -409,11 +409,11 @@ body {
 .import-block summary {
   font-family: 'Montserrat', sans-serif;
   font-size: 9px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase;
-  color: var(--ink-lt); cursor: pointer;
-  opacity: 0.6; user-select: none; list-style: none;
-  transition: opacity 0.15s;
+  color: var(--ink-mid); cursor: pointer;
+  user-select: none; list-style: none;
+  transition: color 0.15s;
 }
-.import-block summary:hover { opacity: 1; }
+.import-block summary:hover { color: var(--ink); }
 .import-block input[type="text"] {
   flex: 1; background: rgba(58,36,24,0.04);
   border: 1.5px solid rgba(58,36,24,0.12);
