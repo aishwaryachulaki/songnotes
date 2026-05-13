@@ -854,6 +854,17 @@ $("copyShare").addEventListener("click", async () => {
   );
   const failedCount = noteResults.filter((ok) => !ok).length;
   if (failedCount > 0) {
+    // Roll back the ID swap. The orphaned meta row in Supabase under newId has
+    // no annotations attached and is unreachable, so leaving it is harmless.
+    // saveStore was never called with newId, so chrome.storage still holds oldId —
+    // we only need to repair the in-memory references before the user retries.
+    activeShare.id = oldId;
+    activeShare.mode = "editing";
+    activeShare.enc_key = null;
+    delete store.shares[newId];
+    store.shares[oldId] = activeShare;
+    store.active = oldId;
+    await saveStore(store).catch(console.error);
     $("shareInfo").textContent = `${failedCount} note${failedCount > 1 ? "s" : ""} failed to send. Check your connection and try again.`;
     shareBtn.disabled = false;
     return;
