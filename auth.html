@@ -300,6 +300,11 @@
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   let redirecting = false;
+
+  function doRedirect() {
+    window.location.href = "https://aishwaryachulaki.github.io/songnotes/account.html";
+  }
+
   sb.auth.onAuthStateChange((event, session) => {
     if (redirecting) return;
     if (session && (event === "SIGNED_IN" || event === "TOKEN_REFRESHED" || event === "INITIAL_SESSION")) {
@@ -324,9 +329,13 @@
           <p>Taking you to your account…</p>
         </div>
       `;
-      setTimeout(() => {
-        window.location.href = "https://aishwaryachulaki.github.io/songnotes/account.html";
-      }, 1000);
+      // Wait for the extension bridge to confirm the session is written to
+      // storage before navigating — falls back to 1.5s if bridge isn't present.
+      const fallback = setTimeout(doRedirect, 1500);
+      window.addEventListener("keepsake:auth_saved", () => {
+        clearTimeout(fallback);
+        doRedirect();
+      }, { once: true });
     }
   });
 
@@ -374,7 +383,9 @@
       : sb.auth.signUp({ email, password });
     const { error } = await fn;
     if (error) { showMsg("emailMsg", error.message, "error"); e.target.disabled = false; return; }
-    if (emailMode === "signup") showMsg("emailMsg", "Account created! Check your email to confirm.", "success");
+    // Only show the "check your email" message if onAuthStateChange hasn't
+    // already taken over (which happens when Supabase auto-confirms the signup).
+    if (emailMode === "signup" && !redirecting) showMsg("emailMsg", "Account created! Check your email to confirm.", "success");
     e.target.disabled = false;
   });
 
