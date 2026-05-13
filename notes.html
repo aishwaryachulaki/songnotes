@@ -103,13 +103,26 @@
     .tab.active { color: var(--rose); border-bottom-color: var(--rose); }
     .tab:hover:not(.active) { color: var(--ink-mid); }
 
-    /* ── Share cards ── */
-    .shares-list { display: flex; flex-direction: column; gap: 10px; }
+    /* ── Share grid ── */
+    .shares-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    /* Full-width row for expanded relive panel — sits between grid rows */
+    .relive-row {
+      grid-column: 1 / -1;
+    }
 
     .share-card {
-      border-radius: 14px; padding: 22px 24px;
+      border-radius: 14px;
+      padding: 18px 18px 14px;
       position: relative; overflow: hidden;
       transition: filter 0.15s;
+      display: flex; flex-direction: column;
+      aspect-ratio: 1;
+      cursor: default;
     }
     .share-card:hover { filter: brightness(0.97); }
 
@@ -118,58 +131,79 @@
     .sent-list .share-card:nth-child(3n+2) { background: url('faq-bg-pink.png')   center / cover no-repeat; color: #5c2d2d; }
     .sent-list .share-card:nth-child(3n+3) { background: url('faq-bg-olive.png')  center / cover no-repeat; color: #363614; }
 
-    /* Received tab colours (offset so it feels different) */
+    /* Received tab colours */
     .received-list .share-card:nth-child(3n+1) { background: url('faq-bg-pink.png')   center / cover no-repeat; color: #5c2d2d; }
     .received-list .share-card:nth-child(3n+2) { background: url('faq-bg-olive.png')  center / cover no-repeat; color: #363614; }
     .received-list .share-card:nth-child(3n+3) { background: url('faq-bg-yellow.png') center / cover no-repeat; color: #4a3800; }
 
     .share-card::after {
       content: '✦';
-      position: absolute; right: 20px; top: 16px;
-      font-size: 22px; opacity: 0.09; pointer-events: none;
+      position: absolute; right: 14px; top: 12px;
+      font-size: 16px; opacity: 0.09; pointer-events: none;
     }
 
     .share-label {
       font-family: 'Montserrat', sans-serif;
-      font-size: 9px; font-weight: 700; letter-spacing: 0.14em;
-      text-transform: uppercase; color: var(--rose); margin-bottom: 7px;
+      font-size: 8px; font-weight: 700; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--rose); margin-bottom: 6px;
     }
     .share-type-pill {
       display: inline-block;
       font-family: 'Montserrat', sans-serif;
-      font-size: 8px; font-weight: 700; letter-spacing: 0.12em;
-      text-transform: uppercase; padding: 2px 8px; border-radius: 10px;
+      font-size: 7.5px; font-weight: 700; letter-spacing: 0.10em;
+      text-transform: uppercase; padding: 2px 7px; border-radius: 8px;
       background: rgba(217,107,124,0.12); color: var(--rose);
-      margin-bottom: 10px;
+      margin-bottom: 7px;
     }
     .share-track {
       font-family: 'Lora', Georgia, serif;
-      font-size: 18px; font-weight: 700; line-height: 1.2; margin-bottom: 3px;
+      font-size: 15px; font-weight: 700; line-height: 1.25;
+      margin-bottom: 3px; flex: 1;
+      display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
     }
-    .share-artist { font-size: 12.5px; opacity: 0.60; margin-bottom: 10px; }
-    .share-notes-count {
-      font-family: 'Spectral', Georgia, serif;
-      font-style: italic; font-size: 13px; opacity: 0.65;
+    .share-artist {
+      font-size: 11px; opacity: 0.55; margin-bottom: 0;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     .share-footer {
       display: flex; align-items: center; justify-content: space-between;
-      margin-top: 14px; flex-wrap: wrap; gap: 8px;
+      margin-top: 10px; gap: 4px;
     }
     .share-date {
       font-family: 'Montserrat', sans-serif;
-      font-size: 9.5px; letter-spacing: 0.04em; opacity: 0.50;
+      font-size: 8px; letter-spacing: 0.03em; opacity: 0.45;
     }
-    .share-actions { display: flex; gap: 8px; }
+    .share-actions { display: flex; gap: 6px; flex-shrink: 0; }
     .btn-sm {
       font-family: 'Montserrat', sans-serif;
-      font-size: 9.5px; font-weight: 700; letter-spacing: 0.09em;
-      text-transform: uppercase; padding: 5px 13px; border-radius: 20px;
+      font-size: 8.5px; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; padding: 4px 11px; border-radius: 20px;
       background: rgba(217,107,124,0.12);
       border: 1.5px solid rgba(217,107,124,0.30);
       color: var(--rose); cursor: pointer;
-      transition: background 0.15s;
+      transition: background 0.15s; white-space: nowrap;
     }
     .btn-sm:hover { background: rgba(217,107,124,0.20); }
+
+    /* ── Pagination ── */
+    .pagination {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      margin-top: 4px;
+    }
+    .page-btn {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9px; font-weight: 700; letter-spacing: 0.10em;
+      text-transform: uppercase; padding: 6px 16px; border-radius: 20px;
+      background: rgba(217,107,124,0.10);
+      border: 1.5px solid rgba(217,107,124,0.25);
+      color: var(--rose); cursor: pointer; transition: background 0.15s;
+    }
+    .page-btn:hover:not(:disabled) { background: rgba(217,107,124,0.18); }
+    .page-btn:disabled { opacity: 0.30; cursor: default; }
+    .page-info {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9px; letter-spacing: 0.06em; color: var(--ink-lt); opacity: 0.7;
+    }
     /* ── Expanded notes view ── */
     .notes-expanded {
       margin-top: 16px;
@@ -368,6 +402,9 @@
   let hasArchivedCol = false;
   let hasReceivedTable = false;
   let activeTab = "sent";
+  let sentPage = 0;
+  let receivedPage = 0;
+  const PAGE_SIZE = 10;
 
   // Read tab from URL hash
   if (location.hash === "#received") activeTab = "received";
@@ -454,9 +491,20 @@
     page.querySelectorAll(".tab[data-tab]").forEach(btn => {
       btn.addEventListener("click", () => {
         activeTab = btn.dataset.tab;
+        sentPage = 0; receivedPage = 0;
         location.hash = activeTab === "received" ? "received" : "";
         render();
       });
+    });
+
+    // Pagination
+    page.querySelector("[data-prev]")?.addEventListener("click", () => {
+      if (activeTab === "sent") sentPage--; else receivedPage--;
+      render();
+    });
+    page.querySelector("[data-next]")?.addEventListener("click", () => {
+      if (activeTab === "sent") sentPage++; else receivedPage++;
+      render();
     });
 
     // Sign out
@@ -581,7 +629,7 @@
       }).join("");
 
       const wrap = document.createElement("div");
-      wrap.className = "notes-expanded";
+      wrap.className = "notes-expanded relive-row";
       wrap.id = `relive-${id}`;
       wrap.innerHTML = `
         ${notesHtml || `<div style="font-size:13px;opacity:0.5;">No notes found.</div>`}
@@ -589,10 +637,10 @@
           <button class="btn-sm-ghost" data-relive-close="${esc(id)}" style="opacity:0.45;font-size:9px;">Close</button>
         </div>`;
 
-      // Remove any paste UI first, then insert expanded notes
+      // Remove any existing panel, then insert after the card's row in the grid
       document.getElementById(`relive-${id}`)?.remove();
       const card = reliveBtn?.closest(".share-card");
-      if (card) card.appendChild(wrap);
+      if (card) card.after(wrap);
       if (reliveBtn) { reliveBtn.textContent = "Relive ✦"; reliveBtn.disabled = false; }
     } catch {
       if (reliveBtn) { reliveBtn.textContent = "Relive ✦"; reliveBtn.disabled = false; }
@@ -605,7 +653,7 @@
     if (document.getElementById(`relive-${id}`)) return;
 
     const wrap = document.createElement("div");
-    wrap.className = "paste-link-wrap";
+    wrap.className = "paste-link-wrap relive-row";
     wrap.id = `relive-${id}`;
     wrap.innerHTML = `
       <div class="paste-link-label">Paste your share link to read your notes</div>
@@ -616,7 +664,7 @@
       <div class="paste-link-error" id="paste-err-${esc(id)}">${prefillError}</div>
     `;
     const card = reliveBtn?.closest(".share-card");
-    if (card) card.appendChild(wrap);
+    if (card) card.after(wrap);
     document.getElementById(`paste-input-${id}`)?.focus();
   }
 
@@ -649,9 +697,12 @@
       </div>`;
     }
 
-    const cards = sentShares.map(share => {
-      // Prefer sender_content (plaintext, written at send time).
-      // Fall back to annotations for older shares that predate this column.
+    const total = sentShares.length;
+    const totalPages = Math.ceil(total / PAGE_SIZE);
+    sentPage = Math.max(0, Math.min(sentPage, totalPages - 1));
+    const pageShares = sentShares.slice(sentPage * PAGE_SIZE, (sentPage + 1) * PAGE_SIZE);
+
+    const cards = pageShares.map(share => {
       const anns = share.annotations || [];
       const noteCount = anns.length;
       const isPlaylist = share.share_type === "playlist";
@@ -660,29 +711,34 @@
       const trackTitle  = safeDisplay(rawTitle,  isPlaylist ? "Playlist share" : "Untitled note");
       const trackArtist = safeDisplay(rawArtist, "");
       const recipient   = safeDisplay(share.recipient_name, "someone special");
-      const noteLabel = noteCount === 1 ? "1 note inside" : `${noteCount} notes inside`;
-      const dateStr = new Date(share.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+      const noteLabel = noteCount === 1 ? "1 note" : `${noteCount} notes`;
+      const dateStr = new Date(share.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short" });
       const canRelive = !!share.sender_content;
 
       return `
-        <div class="share-card">
+        <div class="share-card" data-share-id="${esc(share.id)}">
           <div class="share-label">For ${recipient}</div>
-          ${isPlaylist ? `<div class="share-type-pill">Playlist · ${noteCount} song${noteCount !== 1 ? "s" : ""}</div>` : ""}
+          ${isPlaylist ? `<div class="share-type-pill">Playlist · ${noteCount}</div>` : ""}
           <div class="share-track">${trackTitle}</div>
           ${trackArtist ? `<div class="share-artist">${trackArtist}</div>` : ""}
           <div class="share-footer">
             <div class="share-date">${dateStr} · ${noteLabel}</div>
             <div class="share-actions">
-              ${canRelive
-                ? `<button class="btn-sm" data-relive="${esc(share.id)}">Relive ✦</button>`
-                : `<span style="font-size:10px;opacity:0.4;font-family:'Montserrat',sans-serif;">Resend to enable Relive</span>`}
+              ${canRelive ? `<button class="btn-sm" data-relive="${esc(share.id)}">Relive ✦</button>` : ""}
             </div>
           </div>
         </div>
       `;
     }).join("");
 
-    return `<div class="shares-list sent-list">${cards}</div>`;
+    const pagination = totalPages > 1 ? `
+      <div class="pagination">
+        <button class="page-btn" data-prev ${sentPage === 0 ? "disabled" : ""}>← Prev</button>
+        <span class="page-info">${sentPage + 1} of ${totalPages}</span>
+        <button class="page-btn" data-next ${sentPage >= totalPages - 1 ? "disabled" : ""}>Next →</button>
+      </div>` : "";
+
+    return `<div class="shares-grid shares-list sent-list">${cards}</div>${pagination}`;
   }
 
   function renderReceived() {
@@ -713,7 +769,12 @@
       </div>`;
     }
 
-    const cards = receivedItems.map(item => {
+    const total = receivedItems.length;
+    const totalPages = Math.ceil(total / PAGE_SIZE);
+    receivedPage = Math.max(0, Math.min(receivedPage, totalPages - 1));
+    const pageItems = receivedItems.slice(receivedPage * PAGE_SIZE, (receivedPage + 1) * PAGE_SIZE);
+
+    const cards = pageItems.map(item => {
       const share = item.shares;
       if (!share) return "";
       const anns = share.annotations || [];
@@ -722,24 +783,30 @@
       const trackTitle  = safeDisplay(anns[0]?.track_title,  isPlaylist ? "Playlist share" : "Untitled note");
       const trackArtist = safeDisplay(anns[0]?.track_artist, "");
       const senderName  = safeDisplay(share.sender_name, "someone");
-      const noteLabel = noteCount === 1 ? "1 note inside" : `${noteCount} notes inside`;
-      const dateStr = new Date(item.imported_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+      const noteLabel = noteCount === 1 ? "1 note" : `${noteCount} notes`;
+      const dateStr = new Date(item.imported_at).toLocaleDateString("en-IN", { day: "numeric", month: "short" });
 
       return `
         <div class="share-card">
           <div class="share-label">From ${senderName}</div>
-          ${isPlaylist ? `<div class="share-type-pill">Playlist · ${noteCount} song${noteCount !== 1 ? "s" : ""}</div>` : ""}
+          ${isPlaylist ? `<div class="share-type-pill">Playlist · ${noteCount}</div>` : ""}
           <div class="share-track">${trackTitle}</div>
           ${trackArtist ? `<div class="share-artist">${trackArtist}</div>` : ""}
-          ${noteCount > 0 ? `<div class="share-notes-count">${noteLabel}</div>` : ""}
           <div class="share-footer">
-            <div class="share-date">Received ${dateStr}</div>
+            <div class="share-date">${dateStr} · ${noteLabel}</div>
           </div>
         </div>
       `;
     }).join("");
 
-    return `<div class="shares-list received-list">${cards}</div>`;
+    const pagination = totalPages > 1 ? `
+      <div class="pagination">
+        <button class="page-btn" data-prev ${receivedPage === 0 ? "disabled" : ""}>← Prev</button>
+        <span class="page-info">${receivedPage + 1} of ${totalPages}</span>
+        <button class="page-btn" data-next ${receivedPage >= totalPages - 1 ? "disabled" : ""}>Next →</button>
+      </div>` : "";
+
+    return `<div class="shares-grid shares-list received-list">${cards}</div>${pagination}`;
   }
 </script>
 </body>
