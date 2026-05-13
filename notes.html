@@ -114,11 +114,6 @@
     @media (max-width: 400px)  { .shares-grid { grid-template-columns: 1fr; } }
     @media (max-width: 600px)  { .page { padding: 0 20px 60px; } }
 
-    /* Full-width row for expanded relive panel — sits between grid rows */
-    .relive-row {
-      grid-column: 1 / -1;
-    }
-
     .share-card {
       border-radius: 16px;
       padding: 20px 20px 16px;
@@ -349,14 +344,6 @@
     });
   }
 
-  // Extract enc_key from a pasted share URL (#k=...)
-  function keyFromUrl(url) {
-    try {
-      const hash = url.includes("#") ? url.split("#")[1] : "";
-      const params = new URLSearchParams(hash);
-      return params.get("k") || null;
-    } catch { return null; }
-  }
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   function esc(s) {
@@ -518,43 +505,10 @@
           return;
         }
 
-        // Relive button — open share.html as the recipient would see it
+        // Relive button — open the song/playlist on Spotify
         const reliveBtn = e.target.closest("[data-relive]");
         if (!reliveBtn) return;
-        const id = reliveBtn.dataset.relive;
-
-        reliveBtn.textContent = "Opening…";
-        reliveBtn.disabled = true;
-
-        const keyB64 = await getKeyFromExtension(id);
-        if (keyB64) {
-          const url = `https://aishwaryachulaki.github.io/songnotes/share.html?id=${id}&e=1#k=${keyB64}`;
-          window.open(url, "_blank");
-        } else {
-          showPasteUI(id, reliveBtn);
-        }
-
-        reliveBtn.textContent = "Relive ✦";
-        reliveBtn.disabled = false;
-      });
-
-      // Paste-link submit — just open the pasted URL
-      sentList.addEventListener("click", async (e) => {
-        const submitBtn = e.target.closest("[data-paste-submit]");
-        if (!submitBtn) return;
-        const id = submitBtn.dataset.pasteSubmit;
-        const input = document.getElementById(`paste-input-${id}`);
-        const errEl = document.getElementById(`paste-err-${id}`);
-        if (!input) return;
-
-        const url = input.value.trim();
-        const keyB64 = keyFromUrl(url);
-        if (!keyB64) {
-          errEl.textContent = "Couldn't find the key — paste the full link, including the part after #.";
-          return;
-        }
-        window.open(url, "_blank");
-        document.getElementById(`relive-${id}`)?.remove();
+        window.open(reliveBtn.dataset.spotify, "_blank");
       });
     }
   }
@@ -581,23 +535,18 @@
     }
   }
 
-  function showPasteUI(id, reliveBtn) {
-    if (document.getElementById(`relive-${id}`)) return;
-
-    const wrap = document.createElement("div");
-    wrap.className = "relive-row";
-    wrap.id = `relive-${id}`;
-    wrap.style.cssText = "display:flex;align-items:center;gap:8px;padding:10px 0;";
-    wrap.innerHTML = `
-      <input id="paste-input-${esc(id)}" type="text" placeholder="Paste your share link (https://…#k=…)"
-        style="flex:1;font-family:'Lora',Georgia,serif;font-size:12px;padding:8px 12px;border-radius:10px;
-               border:1.5px solid rgba(58,36,24,0.18);background:rgba(255,251,244,0.8);color:var(--ink);outline:none;" />
-      <button class="btn-sm" data-paste-submit="${esc(id)}">Open ✦</button>
-      <span id="paste-err-${esc(id)}" style="font-family:'Montserrat',sans-serif;font-size:10px;color:var(--rose);"></span>
-    `;
-    const card = reliveBtn?.closest(".share-card");
-    if (card) card.after(wrap);
-    document.getElementById(`paste-input-${id}`)?.focus();
+  // Build the Spotify URL for a share (track or playlist)
+  function spotifyUrl(share) {
+    const anns = share.annotations || [];
+    const rawId = anns[0]?.track_id || "";
+    if (!rawId) return "https://open.spotify.com";
+    // Normalize "spotify:track:ID" → bare ID
+    const id = rawId.includes(":") ? rawId.split(":").pop() : rawId;
+    if (share.share_type === "playlist" && share.playlist_id) {
+      const pid = share.playlist_id.includes(":") ? share.playlist_id.split(":").pop() : share.playlist_id;
+      return `https://open.spotify.com/playlist/${pid}`;
+    }
+    return `https://open.spotify.com/track/${id}`;
   }
 
   // AES-GCM output is base64: long, no spaces, only A-Za-z0-9+/= chars.
@@ -638,7 +587,8 @@
       const recipient   = safeDisplay(share.recipient_name, "someone special");
       const noteLabel = noteCount === 1 ? "1 note inside" : `${noteCount} notes inside`;
       const dateStr = new Date(share.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
-      const canRelive = !!share.sender_content;
+      const spotify = spotifyUrl(share);
+      const canRelive = spotify !== "https://open.spotify.com";
 
       return `
         <div class="share-card" data-share-id="${esc(share.id)}">
@@ -654,7 +604,7 @@
             </div>
             <div class="share-actions">
               <button class="btn-sm btn-sm-outline" data-copy="${esc(share.id)}">Link</button>
-              ${canRelive ? `<button class="btn-sm" data-relive="${esc(share.id)}">Relive ✦</button>` : ""}
+              ${canRelive ? `<button class="btn-sm" data-relive="${esc(share.id)}" data-spotify="${esc(spotify)}">Relive ✦</button>` : ""}
             </div>
           </div>
         </div>
