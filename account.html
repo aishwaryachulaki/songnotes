@@ -83,12 +83,11 @@
     /* ── Hero credits card ── */
     .hero-card {
       background: url('faq-bg-yellow.png') center / cover no-repeat;
-      border: 1.5px solid var(--border);
       border-radius: 18px; padding: 28px 32px;
       position: relative; overflow: hidden; min-height: 170px;
-      box-shadow: 0 4px 24px rgba(58,36,24,0.07);
+      color: #4a3800;
     }
-    .hero-content { max-width: 55%; position: relative; z-index: 1; }
+    .hero-content { position: relative; z-index: 1; }
     .hero-eyebrow {
       font-family: 'Montserrat', sans-serif;
       font-size: 9px; font-weight: 700; letter-spacing: 0.16em;
@@ -96,31 +95,16 @@
     }
     .hero-number {
       font-family: 'Lora', Georgia, serif;
-      font-size: 72px; font-weight: 700; color: var(--ink);
+      font-size: 72px; font-weight: 700;
       line-height: 1; margin-bottom: 12px;
     }
-    .hero-status {
-      font-size: 12.5px; color: var(--ink-mid); line-height: 1.55; margin-bottom: 8px;
-    }
+    .hero-status { font-size: 12.5px; line-height: 1.55; margin-bottom: 8px; opacity: 0.75; }
     .hero-cta {
       font-family: 'Spectral', Georgia, serif;
       font-size: 13px; color: var(--rose); font-style: italic;
-      text-decoration: none; cursor: pointer;
-      background: none; border: none; padding: 0; font: inherit;
-      font-family: 'Spectral', Georgia, serif;
-      font-style: italic;
+      background: none; border: none; padding: 0; cursor: pointer;
     }
     .hero-cta:hover { text-decoration: underline; }
-    .hero-flower {
-      position: absolute; right: 0; top: 0;
-      height: 100%; width: 45%;
-      background: url('credits-flower.png') right center / contain no-repeat;
-      pointer-events: none;
-    }
-    .sparkle {
-      position: absolute; color: var(--rose); opacity: 0.3;
-      pointer-events: none; user-select: none; font-style: normal;
-    }
 
     /* ── Tagline ── */
     .tagline { text-align: center; padding: 6px 0 2px; }
@@ -150,22 +134,16 @@
 
     /* ── Pricing grid ── */
     .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-    .bundle { background: url('faq-bg-yellow.png') center / cover no-repeat; }
-    .bundle:nth-child(1) { background: url('faq-bg-pink.png')   center / cover no-repeat; }
-    .bundle:nth-child(2) { background: url('faq-bg-yellow.png') center / cover no-repeat; }
-    .bundle:nth-child(3) { background: url('faq-bg-olive.png')  center / cover no-repeat; }
+    .bundle:nth-child(1) { background: url('faq-bg-pink.png')   center / cover no-repeat; color: #5c2d2d; }
+    .bundle:nth-child(2) { background: url('faq-bg-yellow.png') center / cover no-repeat; color: #4a3800; }
+    .bundle:nth-child(3) { background: url('faq-bg-olive.png')  center / cover no-repeat; color: #363614; }
     .bundle {
-      border: 1.5px solid var(--border);
       border-radius: 14px; padding: 20px 18px 18px;
       display: flex; flex-direction: column; gap: 8px;
       cursor: pointer; position: relative; overflow: hidden;
-      transition: border-color 0.15s, box-shadow 0.15s;
-      box-shadow: 0 2px 12px rgba(58,36,24,0.05);
+      transition: filter 0.15s;
     }
-    .bundle:hover {
-      border-color: rgba(217,107,124,0.45);
-      box-shadow: 0 0 0 3px rgba(217,107,124,0.09);
-    }
+    .bundle:hover { filter: brightness(0.96); }
     .bundle-sparkles {
       position: absolute; top: 10px; right: 10px;
       width: 36px; height: 36px;
@@ -180,29 +158,28 @@
     }
     .bundle-count {
       font-family: 'Lora', Georgia, serif;
-      font-size: 26px; font-weight: 700; color: var(--ink); line-height: 1.1;
+      font-size: 26px; font-weight: 700; line-height: 1.1;
     }
-    .bundle-rule { border: none; border-top: 1px solid rgba(217,107,124,0.18); }
+    .bundle-rule { border: none; border-top: 1px solid rgba(58,36,24,0.12); }
     .bundle-price {
       font-family: 'Lora', Georgia, serif;
       font-size: 22px; font-weight: 700; color: var(--rose);
     }
-    .bundle-desc { font-size: 11px; color: var(--ink-mid); line-height: 1.45; }
+    .bundle-desc { font-size: 11px; line-height: 1.45; opacity: 0.72; }
 
     /* ── Lifetime card ── */
     .lifetime-card {
       background: url('faq-bg-pink.png') center / cover no-repeat;
-      border: 1.5px solid rgba(217,107,124,0.18);
       border-radius: 14px; padding: 28px 32px;
       position: relative; overflow: hidden;
       cursor: pointer; transition: filter 0.15s;
-      box-shadow: 0 2px 16px rgba(58,36,24,0.06);
+      color: #5c2d2d;
     }
     .lifetime-card:hover { filter: brightness(0.97); }
-    .lifetime-content { max-width: 58%; position: relative; z-index: 1; }
+    .lifetime-content { position: relative; z-index: 1; }
     .lifetime-title {
       font-family: 'Lora', Georgia, serif;
-      font-size: 26px; font-weight: 700; color: var(--ink);
+      font-size: 26px; font-weight: 700;
       line-height: 1.2; margin-bottom: 4px;
     }
     .lifetime-sub {
@@ -210,21 +187,15 @@
       font-size: 16px; color: var(--rose); font-style: italic; margin-bottom: 16px;
     }
     .lifetime-rule {
-      border: none; border-top: 1px solid rgba(217,107,124,0.25);
-      margin-bottom: 16px; max-width: 80%;
+      border: none; border-top: 1px solid rgba(92,45,45,0.18);
+      margin-bottom: 16px;
     }
     .lifetime-price-row { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
     .lifetime-price {
       font-family: 'Lora', Georgia, serif;
-      font-size: 36px; font-weight: 700; color: var(--ink); line-height: 1;
+      font-size: 36px; font-weight: 700; line-height: 1;
     }
-    .lifetime-desc { font-size: 12px; color: var(--ink-mid); line-height: 1.65; }
-    .lifetime-flower {
-      position: absolute; right: 0; top: 0;
-      height: 100%; width: 44%;
-      background: url('lifetime-flower.png') right center / contain no-repeat;
-      pointer-events: none;
-    }
+    .lifetime-desc { font-size: 12px; line-height: 1.65; opacity: 0.72; }
 
     /* ── Trust line ── */
     .trust-line {
@@ -236,9 +207,8 @@
     /* ── Purchase history ── */
     .history-card {
       background: url('faq-bg-olive.png') center / cover no-repeat;
-      border: 1.5px solid var(--border);
       border-radius: 14px; padding: 20px 24px;
-      box-shadow: 0 2px 12px rgba(58,36,24,0.05);
+      color: #363614;
     }
     .purchase-row {
       display: flex; justify-content: space-between; align-items: center;
@@ -246,10 +216,10 @@
       font-size: 13px;
     }
     .purchase-row:last-child { border-bottom: none; }
-    .purchase-desc { font-weight: 600; color: var(--ink); }
+    .purchase-desc { font-weight: 600; }
     .purchase-date {
       font-family: 'Montserrat', sans-serif;
-      font-size: 10px; color: var(--ink-lt); margin-top: 3px; letter-spacing: 0.03em;
+      font-size: 10px; margin-top: 3px; letter-spacing: 0.03em; opacity: 0.65;
     }
     .purchase-amount {
       font-family: 'Lora', Georgia, serif;
@@ -412,9 +382,6 @@
           <div class="hero-status">${heroStatus}</div>
           ${heroCta}
         </div>
-        <div class="hero-flower"></div>
-        <i class="sparkle" style="top:20px;left:53%;font-size:15px">✦</i>
-        <i class="sparkle" style="bottom:24px;left:50%;font-size:9px">✦</i>
       </div>
 
       <div class="tagline">
@@ -436,9 +403,6 @@
             <div class="lifetime-desc">Write as much as you want.<br>No limits.</div>
           </div>
         </div>
-        <div class="lifetime-flower"></div>
-        <i class="sparkle" style="top:18px;left:55%;font-size:13px">✦</i>
-        <i class="sparkle" style="top:32px;left:62%;font-size:8px">✦</i>
       </div>
 
       <div class="trust-line">🔒 Secure payments · UPI, cards, netbanking</div>
