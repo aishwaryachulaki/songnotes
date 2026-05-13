@@ -384,7 +384,7 @@
     // annotations is kept as fallback for older plaintext shares.
     const sentRes = await sb
       .from("shares")
-      .select("*, sender_content, annotations(id, track_title, track_artist, note, timestamp)")
+      .select("*, sender_content, annotations(id, track_title, track_artist, track_id, note, timestamp)")
       .order("created_at", { ascending: false });
 
     sentShares = sentRes.data || [];
