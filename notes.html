@@ -181,6 +181,21 @@
     }
     .btn-sm-ghost:hover { opacity: 0.85; }
 
+    /* ── Deleted card state ── */
+    .share-card.deleted {
+      opacity: 0.50;
+      filter: grayscale(0.25);
+    }
+    .share-card.deleted:hover { opacity: 0.65; filter: none; }
+    .deleted-badge {
+      display: inline-block;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 8px; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; padding: 2px 8px; border-radius: 10px;
+      background: rgba(58,36,24,0.10); color: inherit;
+      margin-bottom: 10px; opacity: 0.6;
+    }
+
     /* ── Empty state ── */
     .empty-state {
       border-radius: 14px; padding: 52px 32px; text-align: center;
@@ -283,6 +298,7 @@
 
   // Read tab from URL hash
   if (location.hash === "#received") activeTab = "received";
+  else if (location.hash === "#sent") activeTab = "sent";
 
   (async () => {
     const { data: { session } } = await sb.auth.getSession();
@@ -384,16 +400,17 @@
           showToast("Open via the extension to copy the share link ✦");
           return;
         }
-        const archBtn = e.target.closest("[data-archive]");
-        if (archBtn && hasArchivedCol) {
-          const id = archBtn.dataset.archive;
+        const toggleBtn = e.target.closest("[data-toggle-delete]");
+        if (toggleBtn && hasArchivedCol) {
+          const id = toggleBtn.dataset.toggleDelete;
           const share = sentShares.find(s => s.id === id);
           if (!share) return;
-          archBtn.disabled = true;
-          const { error } = await sb.from("shares").update({ archived: !share.archived }).eq("id", id);
+          toggleBtn.disabled = true;
+          const nowDeleted = !share.archived;
+          const { error } = await sb.from("shares").update({ archived: nowDeleted }).eq("id", id);
           if (error) { showToast("Couldn't update — try again."); return; }
-          share.archived = !share.archived;
-          showToast(share.archived ? "Archived ✦" : "Moved back to active ✦");
+          share.archived = nowDeleted;
+          showToast(nowDeleted ? "Link deactivated — tap Reactivate to restore." : "Reactivated ✦ Link is live again.");
           render();
         }
       });
@@ -401,9 +418,7 @@
   }
 
   function renderSent() {
-    const visible = hasArchivedCol ? sentShares.filter(s => !s.archived) : sentShares;
-
-    if (visible.length === 0) {
+    if (sentShares.length === 0) {
       return `<div class="empty-state sent-empty">
         <div class="empty-icon">♪</div>
         <div class="empty-title">No notes sent yet</div>
@@ -411,7 +426,7 @@
       </div>`;
     }
 
-    const cards = visible.map(share => {
+    const cards = sentShares.map(share => {
       const anns = share.annotations || [];
       const noteCount = anns.length;
       const isPlaylist = share.share_type === "playlist";
@@ -419,19 +434,25 @@
       const trackArtist = anns[0]?.track_artist || "";
       const noteLabel = noteCount === 1 ? "1 note inside" : `${noteCount} notes inside`;
       const dateStr = new Date(share.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+      const isDeleted = hasArchivedCol && share.archived;
 
       return `
-        <div class="share-card">
+        <div class="share-card ${isDeleted ? "deleted" : ""}">
           <div class="share-label">For ${share.recipient_name ? esc(share.recipient_name) : "someone special"}</div>
-          ${isPlaylist ? `<div class="share-type-pill">Playlist · ${noteCount} song${noteCount !== 1 ? "s" : ""}</div>` : ""}
+          ${isDeleted ? `<div class="deleted-badge">Link deactivated</div>` : ""}
+          ${isPlaylist && !isDeleted ? `<div class="share-type-pill">Playlist · ${noteCount} song${noteCount !== 1 ? "s" : ""}</div>` : ""}
           <div class="share-track">${esc(trackTitle)}</div>
           ${trackArtist ? `<div class="share-artist">${esc(trackArtist)}</div>` : ""}
           ${noteCount > 0 ? `<div class="share-notes-count">${noteLabel}</div>` : ""}
           <div class="share-footer">
             <div class="share-date">${dateStr}</div>
             <div class="share-actions">
-              <button class="btn-sm" data-copy="${esc(share.id)}">Copy link</button>
-              ${hasArchivedCol ? `<button class="btn-sm-ghost" data-archive="${esc(share.id)}">Archive</button>` : ""}
+              ${!isDeleted ? `<button class="btn-sm" data-copy="${esc(share.id)}">Copy link</button>` : ""}
+              ${hasArchivedCol
+                ? isDeleted
+                  ? `<button class="btn-sm" data-toggle-delete="${esc(share.id)}">Reactivate</button>`
+                  : `<button class="btn-sm-ghost" data-toggle-delete="${esc(share.id)}">Delete</button>`
+                : ""}
             </div>
           </div>
         </div>
