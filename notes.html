@@ -23,12 +23,12 @@
       font-family: 'Lora', Georgia, serif;
       min-height: 100vh;
       color: var(--ink);
-      padding: 0 16px 80px;
     }
 
     .page {
-      max-width: 660px;
+      max-width: 1200px;
       margin: 0 auto;
+      padding: 0 40px 80px;
       display: flex;
       flex-direction: column;
       gap: 14px;
@@ -106,9 +106,12 @@
     /* ── Share grid ── */
     .shares-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 10px;
     }
+    @media (max-width: 900px) { .shares-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 600px) { .shares-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px) { .page { padding: 0 20px 60px; } }
 
     /* Full-width row for expanded relive panel — sits between grid rows */
     .relive-row {
