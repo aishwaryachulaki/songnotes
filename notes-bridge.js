@@ -5,8 +5,8 @@
     const shareId = e.detail?.shareId;
     if (!shareId) return;
 
-    chrome.storage.local.get("ks_store", (result) => {
-      const store = result.ks_store || {};
+    chrome.storage.local.get("ks_shares", (result) => {
+      const store = result.ks_shares || {};
       const shares = store.shares || {};
       const share = shares[shareId];
       const encKey = share?.enc_key || null;

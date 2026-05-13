@@ -387,7 +387,6 @@
   // Ask extension for a share's enc_key; resolves with key b64 or null
   function getKeyFromExtension(shareId) {
     return new Promise((resolve) => {
-      if (!extensionPresent) { resolve(null); return; }
       const handler = (e) => {
         if (e.detail?.shareId === shareId) {
           window.removeEventListener("keepsake:share_key_response", handler);
@@ -396,7 +395,11 @@
       };
       window.addEventListener("keepsake:share_key_response", handler);
       window.dispatchEvent(new CustomEvent("keepsake:get_share_key", { detail: { shareId } }));
-      setTimeout(() => { window.removeEventListener("keepsake:share_key_response", handler); resolve(null); }, 1500);
+      // Wait up to 2s — if extension is present it responds in <50ms
+      setTimeout(() => {
+        window.removeEventListener("keepsake:share_key_response", handler);
+        resolve(null);
+      }, 2000);
     });
   }
 
