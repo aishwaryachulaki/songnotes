@@ -8,6 +8,7 @@ button, .btn { font-family: 'Montserrat', sans-serif; }
   --blush:     #E36888;
   --tangerine: #F08C21;
   --cream:     #FFFBF4;
+  --card:      rgba(255, 244, 218, 0.82);
   --bg:        #F4D9A6;
   --ink:       #3a2418;
   --ink-mid:   #8a5a48;
@@ -31,7 +32,7 @@ body {
 
 /* ── Auth gate ── */
 .auth-gate {
-  background: var(--cream);
+  background: var(--card);
   border: 1.5px solid var(--border);
   border-radius: 14px;
   padding: 18px 16px;
@@ -89,7 +90,7 @@ body {
   width: 100%;
 }
 .credits-badge.empty {
-  background: rgba(58,36,24,0.04);
+  background: rgba(244,217,166,0.40);
   border-color: rgba(58,36,24,0.14);
   color: var(--ink-lt);
 }
@@ -137,7 +138,7 @@ body {
 
 /* ── Composer card (shared by name-block + composer) ── */
 .composer-card {
-  background: var(--cream);
+  background: var(--card);
   border: 1.5px solid var(--border);
   border-radius: 14px;
   padding: 14px 16px;
@@ -258,7 +259,7 @@ body {
   scrollbar-color: rgba(58,36,24,0.12) transparent;
 }
 .note {
-  background: var(--cream);
+  background: var(--card);
   border: 1.5px solid var(--border);
   border-radius: 10px;
   padding: 9px 26px 9px 10px;
@@ -290,7 +291,7 @@ body {
 
 /* ── Share card ── */
 .share-card {
-  background: var(--cream);
+  background: var(--card);
   border: 1.5px solid var(--border);
   border-radius: 14px; padding: 14px 16px;
   display: flex; flex-direction: column; gap: 10px;
@@ -312,7 +313,7 @@ body {
   display: flex; align-items: center; gap: 6px;
   border: 1.5px solid rgba(58,36,24,0.12);
   border-radius: 10px; padding: 7px 10px;
-  background: rgba(244,217,166,0.25);
+  background: rgba(244,217,166,0.40);
 }
 .playlist-icon { font-size: 13px; color: var(--ink-lt); flex-shrink: 0; }
 .playlist-input {
@@ -353,7 +354,7 @@ body {
 .previous-list { display: flex; flex-direction: column; gap: 7px; }
 .prev-item {
   display: flex; align-items: center; gap: 10px;
-  background: var(--cream);
+  background: var(--card);
   border: 1.5px solid var(--border);
   border-radius: 12px; padding: 9px 10px;
 }
