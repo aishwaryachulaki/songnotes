@@ -140,7 +140,7 @@ body {
 /* ── Composer card (shared by name-block + composer) ── */
 .composer-card {
   background: url('faq-bg-olive.png') center / cover no-repeat;
-  border: 1.5px solid var(--border);
+  border: none;
   border-radius: 14px;
   padding: 14px 16px;
   display: flex;
@@ -161,7 +161,7 @@ body {
   font-family: 'Montserrat', sans-serif;
   font-size: 8.5px; font-weight: 700;
   letter-spacing: 0.12em; text-transform: uppercase;
-  color: var(--ink-mid); line-height: 1.4;
+  color: var(--ink); line-height: 1.4;
 }
 .composer-header strong { color: var(--blush); font-weight: 700; text-transform: none; }
 .composer-header a { color: var(--tangerine); text-decoration: none; font-weight: 600; }
@@ -170,13 +170,13 @@ body {
 /* Underline-only input */
 .underline-input {
   width: 100%; background: transparent;
-  border: none; border-bottom: 1.5px solid rgba(58,36,24,0.15);
+  border: none; border-bottom: 1.5px solid rgba(58,36,24,0.30);
   border-radius: 0; padding: 6px 0;
   font: inherit; font-size: 14px; color: var(--ink); outline: none;
   transition: border-color 0.15s;
 }
 .underline-input:focus { border-bottom-color: var(--tangerine); }
-.underline-input::placeholder { color: var(--ink-lt); }
+.underline-input::placeholder { color: rgba(58,36,24,0.40); }
 
 /* Ruled paper textarea */
 .note-area { position: relative; }
@@ -184,7 +184,7 @@ body {
   width: 100%; background: transparent;
   background-image: repeating-linear-gradient(
     transparent 0px, transparent 23px,
-    rgba(58,36,24,0.10) 23px, rgba(58,36,24,0.10) 24px
+    rgba(58,36,24,0.14) 23px, rgba(58,36,24,0.14) 24px
   );
   border: none; border-radius: 0; padding: 2px 0 0;
   font: inherit; font-size: 13px;
@@ -193,21 +193,21 @@ body {
   height: 120px;
   overflow-y: auto;
 }
-.ruled-textarea::placeholder { color: var(--ink-lt); }
+.ruled-textarea::placeholder { color: rgba(58,36,24,0.40); }
 
 /* Timestamp row */
 .timestamp-row { display: flex; gap: 8px; align-items: center; }
 .ts-wrap {
   flex: 1; display: flex; align-items: center; gap: 6px;
-  border: 1.5px solid rgba(58,36,24,0.14); border-radius: 20px;
+  border: 1.5px solid rgba(58,36,24,0.30); border-radius: 20px;
   padding: 6px 12px;
 }
-.ts-icon { color: var(--ink-lt); flex-shrink: 0; }
+.ts-icon { color: var(--ink-mid); flex-shrink: 0; }
 .timestamp-input {
   flex: 1; background: transparent; border: none; outline: none;
   font: inherit; font-size: 12px; color: var(--ink); min-width: 0;
 }
-.timestamp-input::placeholder { color: var(--ink-lt); }
+.timestamp-input::placeholder { color: rgba(58,36,24,0.40); }
 
 .now-btn {
   border: 1.5px solid rgba(227,104,136,0.45); border-radius: 20px;
