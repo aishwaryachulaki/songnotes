@@ -297,6 +297,7 @@ async function pushShareMeta(share, accessToken) {
         playlist_url: share.playlist_url,
         sender_name: share.sender_name || senderName || "someone",
         recipient_name: share.recipient_name || null,
+        sender_content: share.sender_content || null,
       }),
     });
     return res.ok;
@@ -821,6 +822,15 @@ $("copyShare").addEventListener("click", async () => {
     recipient_name: activeShare.recipient_name
       ? await encryptField(activeShare.recipient_name, encKey)
       : null,
+    // Plaintext sender copy — readable only by the sender via RLS.
+    // Stored before encryption so the Notes page can display them.
+    sender_content: activeShare.notes.map(n => ({
+      note:         n.note,
+      timestamp:    n.timestamp ?? null,
+      track_title:  n.track_title  || null,
+      track_artist: n.track_artist || null,
+      track_id:     n.track_id     || null,
+    })),
   };
   // Encrypt each note's personal fields
   const notesToPush = await Promise.all(

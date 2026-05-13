@@ -311,10 +311,11 @@
   })();
 
   async function loadAll() {
-    // Load sent shares
+    // Load sent shares — sender_content is the plaintext copy written at send time.
+    // annotations is kept as fallback for older plaintext shares.
     const sentRes = await sb
       .from("shares")
-      .select("*, annotations(id, track_title, track_artist, note, timestamp)")
+      .select("*, sender_content, annotations(id, track_title, track_artist, note, timestamp)")
       .order("created_at", { ascending: false });
 
     sentShares = sentRes.data || [];
@@ -427,22 +428,26 @@
     }
 
     const cards = sentShares.map(share => {
-      const anns = share.annotations || [];
-      const noteCount = anns.length;
+      // Prefer sender_content (plaintext, written at send time).
+      // Fall back to annotations for older shares that predate this column.
+      const notes = (share.sender_content && share.sender_content.length > 0)
+        ? share.sender_content
+        : (share.annotations || []);
+      const noteCount = notes.length;
       const isPlaylist = share.share_type === "playlist";
-      const trackTitle = anns[0]?.track_title || (isPlaylist ? "Playlist share" : "Untitled note");
-      const trackArtist = anns[0]?.track_artist || "";
+      const trackTitle = notes[0]?.track_title || (isPlaylist ? "Playlist share" : "Untitled note");
+      const trackArtist = notes[0]?.track_artist || "";
       const noteLabel = noteCount === 1 ? "1 note inside" : `${noteCount} notes inside`;
       const dateStr = new Date(share.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
 
-      // Build expanded notes view — group by track for playlists
-      const notesHtml = anns.map(ann => {
-        const ts = formatTimestamp(ann.timestamp);
+      // Build expanded notes view
+      const notesHtml = notes.map(n => {
+        const ts = formatTimestamp(n.timestamp);
         return `
           <div class="note-entry">
-            ${isPlaylist && ann.track_title ? `<div class="note-song">${esc(ann.track_title)}${ann.track_artist ? ` — ${esc(ann.track_artist)}` : ""}</div>` : ""}
+            ${isPlaylist && n.track_title ? `<div class="note-song">${esc(n.track_title)}${n.track_artist ? ` — ${esc(n.track_artist)}` : ""}</div>` : ""}
             ${ts ? `<div class="note-timestamp">${ts}</div>` : ""}
-            <div class="note-text">${esc(ann.note || "")}</div>
+            <div class="note-text">${esc(n.note || "")}</div>
           </div>
         `;
       }).join("");
