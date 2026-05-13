@@ -17,7 +17,7 @@ button, .btn { font-family: 'Montserrat', sans-serif; }
 
 body {
   font-family: 'Lora', Georgia, serif;
-  background: var(--bg) url('faq-bg-yellow.png') center / cover no-repeat fixed;
+  background: var(--bg) url('background-extension.png') top / cover no-repeat;
   color: var(--ink);
   width: 340px;
 }
