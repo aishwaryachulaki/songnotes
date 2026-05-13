@@ -8,17 +8,16 @@ button, .btn { font-family: 'Montserrat', sans-serif; }
   --blush:     #E36888;
   --tangerine: #F08C21;
   --cream:     #FFFBF4;
-  --card:      rgba(255, 244, 218, 0.82);
   --bg:        #F4D9A6;
   --ink:       #3a2418;
   --ink-mid:   #8a5a48;
   --ink-lt:    #c4977a;
-  --border:    rgba(58,36,24,0.10);
+  --border:    rgba(58,36,24,0.12);
 }
 
 body {
   font-family: 'Lora', Georgia, serif;
-  background: var(--bg) url('background.png') center / cover no-repeat fixed;
+  background: var(--bg) url('faq-bg-yellow.png') center / cover no-repeat fixed;
   color: var(--ink);
   width: 340px;
 }
@@ -32,7 +31,7 @@ body {
 
 /* ── Auth gate ── */
 .auth-gate {
-  background: var(--card);
+  background: url('composer-bg.png') center / cover no-repeat;
   border: 1.5px solid var(--border);
   border-radius: 14px;
   padding: 18px 16px;
@@ -98,7 +97,7 @@ body {
 
 /* ── Now Playing card ── */
 .stamp-track {
-  background: var(--blush) url('now-playing-bg.png') center / cover no-repeat;
+  background: var(--blush) url('faq-bg-pink.png') center / cover no-repeat;
   border-radius: 16px;
   padding: 16px 18px 18px;
   position: relative;
@@ -138,7 +137,7 @@ body {
 
 /* ── Composer card (shared by name-block + composer) ── */
 .composer-card {
-  background: var(--card);
+  background: url('composer-bg.png') center / cover no-repeat;
   border: 1.5px solid var(--border);
   border-radius: 14px;
   padding: 14px 16px;
@@ -180,7 +179,7 @@ body {
 /* Ruled paper textarea */
 .note-area { position: relative; }
 .ruled-textarea {
-  width: 100%; background: transparent;
+  width: 100%; background: url('note-body-bg.png') bottom right / 55% no-repeat;
   background-image: repeating-linear-gradient(
     transparent 0px, transparent 23px,
     rgba(58,36,24,0.08) 23px, rgba(58,36,24,0.08) 24px
@@ -259,8 +258,8 @@ body {
   scrollbar-color: rgba(58,36,24,0.12) transparent;
 }
 .note {
-  background: var(--card);
-  border: 1.5px solid var(--border);
+  background: url('faq-bg-pink.png') center / cover no-repeat;
+  border: 1.5px solid rgba(58,36,24,0.10);
   border-radius: 10px;
   padding: 9px 26px 9px 10px;
   position: relative; font-size: 11.5px;
@@ -279,6 +278,7 @@ body {
   display: flex; align-items: center; justify-content: center;
   border-radius: 4px; line-height: 1;
 }
+.note:nth-child(even) { background: url('faq-bg-olive.png') center / cover no-repeat; }
 .note .del:hover { color: var(--blush); background: rgba(227,104,136,0.10); }
 .empty {
   font-family: 'Spectral', Georgia, serif;
@@ -291,8 +291,8 @@ body {
 
 /* ── Share card ── */
 .share-card {
-  background: var(--card);
-  border: 1.5px solid var(--border);
+  background: url('faq-bg-pink.png') center / cover no-repeat;
+  border: 1.5px solid rgba(58,36,24,0.10);
   border-radius: 14px; padding: 14px 16px;
   display: flex; flex-direction: column; gap: 10px;
   position: relative; overflow: hidden;
@@ -311,9 +311,9 @@ body {
 }
 .playlist-wrap {
   display: flex; align-items: center; gap: 6px;
-  border: 1.5px solid rgba(58,36,24,0.12);
+  border: 1.5px solid rgba(58,36,24,0.15);
   border-radius: 10px; padding: 7px 10px;
-  background: rgba(244,217,166,0.40);
+  background: rgba(58,36,24,0.07);
 }
 .playlist-icon { font-size: 13px; color: var(--ink-lt); flex-shrink: 0; }
 .playlist-input {
@@ -354,8 +354,8 @@ body {
 .previous-list { display: flex; flex-direction: column; gap: 7px; }
 .prev-item {
   display: flex; align-items: center; gap: 10px;
-  background: var(--card);
-  border: 1.5px solid var(--border);
+  background: url('faq-bg-olive.png') center / cover no-repeat;
+  border: 1.5px solid rgba(58,36,24,0.10);
   border-radius: 12px; padding: 9px 10px;
 }
 .prev-thumb {
