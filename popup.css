@@ -139,9 +139,7 @@ body {
 
 /* ── Composer card (shared by name-block + composer) ── */
 .composer-card {
-  background:
-    linear-gradient(rgba(252, 242, 220, 0.82), rgba(252, 242, 220, 0.82)),
-    url('faq-bg-yellow.png') center / cover no-repeat;
+  background: url('faq-bg-olive.png') center / cover no-repeat;
   border: 1.5px solid var(--border);
   border-radius: 14px;
   padding: 14px 16px;
@@ -181,21 +179,13 @@ body {
 .underline-input::placeholder { color: var(--ink-lt); }
 
 /* Ruled paper textarea */
-.note-area {
-  position: relative;
-  border-radius: 10px;
-  overflow: hidden;
-}
+.note-area { position: relative; }
 .ruled-textarea {
-  width: 100%;
-  background: url('faq-bg-olive.png') center / cover no-repeat;
-  background-image:
-    repeating-linear-gradient(
-      transparent 0px, transparent 23px,
-      rgba(58,36,24,0.10) 23px, rgba(58,36,24,0.10) 24px
-    ),
-    url('faq-bg-olive.png');
-  background-size: auto, cover;
+  width: 100%; background: transparent;
+  background-image: repeating-linear-gradient(
+    transparent 0px, transparent 23px,
+    rgba(58,36,24,0.10) 23px, rgba(58,36,24,0.10) 24px
+  );
   border: none; border-radius: 0; padding: 2px 0 0;
   font: inherit; font-size: 13px;
   line-height: 24px; color: var(--ink);
