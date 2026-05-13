@@ -549,7 +549,23 @@
         // Copy link
         const copyBtn = e.target.closest("[data-copy]");
         if (copyBtn) {
-          showToast("Open via the extension to copy the share link ✦");
+          const shareId = copyBtn.dataset.copy;
+          copyBtn.textContent = "…";
+          copyBtn.disabled = true;
+          const keyB64 = await getKeyFromExtension(shareId);
+          if (keyB64) {
+            const url = `https://aishwaryachulaki.github.io/songnotes/share.html?id=${shareId}&e=1#k=${keyB64}`;
+            try {
+              await navigator.clipboard.writeText(url);
+              showToast("Link copied ✦");
+            } catch {
+              showToast("Couldn't access clipboard — try from the extension.");
+            }
+          } else {
+            showToast("Extension not detected — open the extension to copy the link.");
+          }
+          copyBtn.textContent = "Link";
+          copyBtn.disabled = false;
           return;
         }
 
