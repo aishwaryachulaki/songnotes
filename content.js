@@ -241,9 +241,9 @@
       return true;
     }
     if (msg && msg.type === "KS_REFRESH") {
-      // Force re-evaluation on next tick by clearing the per-track cache
-      lastTrackId = null;
-      firedNotes = new Set();
+      // No state reset needed — tick() calls loadActiveShare() every 800ms so
+      // new notes are picked up automatically. Resetting lastTrackId/firedNotes
+      // here would cause all already-passed notes to re-fire as duplicate toasts.
       sendResponse({ ok: true });
       return true;
     }
