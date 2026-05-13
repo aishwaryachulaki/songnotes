@@ -363,14 +363,14 @@
   let receivedItems = [];
   let hasArchivedCol = false;
   let hasReceivedTable = false;
-  let activeTab = "sent";
+  let activeTab = "received";
   let sentPage = 0;
   let receivedPage = 0;
   const PAGE_SIZE = 10;
 
   // Read tab from URL hash
-  if (location.hash === "#received") activeTab = "received";
-  else if (location.hash === "#sent") activeTab = "sent";
+  if (location.hash === "#sent") activeTab = "sent";
+  else if (location.hash === "#received") activeTab = "received";
 
   (async () => {
     const { data: { session } } = await sb.auth.getSession();
@@ -400,7 +400,7 @@
     // Load received shares
     const recRes = await sb
       .from("received_shares")
-      .select(`id, imported_at, shares(id, share_type, sender_name, recipient_name, created_at, annotations(id, track_title, track_artist, note))`)
+      .select(`id, imported_at, shares(id, share_type, sender_name, recipient_name, created_at, annotations(id, track_title, track_artist, track_id, note))`)
       .order("imported_at", { ascending: false });
 
     if (!recRes.error) {
@@ -430,8 +430,8 @@
 
     const tabs = `
       <div class="tabs">
-        <button class="tab ${activeTab === "sent" ? "active" : ""}" data-tab="sent">Sent</button>
         <button class="tab ${activeTab === "received" ? "active" : ""}" data-tab="received">Received</button>
+        <button class="tab ${activeTab === "sent" ? "active" : ""}" data-tab="sent">Sent</button>
       </div>
     `;
 
@@ -454,7 +454,7 @@
       btn.addEventListener("click", () => {
         activeTab = btn.dataset.tab;
         sentPage = 0; receivedPage = 0;
-        location.hash = activeTab === "received" ? "received" : "";
+        location.hash = activeTab === "sent" ? "sent" : "";
         render();
       });
     });
@@ -477,6 +477,16 @@
 
     // Silently decrypt any encrypted recipient labels using extension keys
     if (activeTab === "sent") tryDecryptLabels();
+
+    // Received list — relive button
+    const receivedList = page.querySelector(".received-list");
+    if (receivedList) {
+      receivedList.addEventListener("click", (e) => {
+        const reliveBtn = e.target.closest("[data-relive]");
+        if (!reliveBtn) return;
+        window.open(reliveBtn.dataset.spotify, "_blank");
+      });
+    }
 
     // Sent list — relive / paste-link / decrypt
     const sentList = page.querySelector(".sent-list");
@@ -665,12 +675,13 @@
       const senderName  = safeDisplay(share.sender_name, "someone");
       const noteLabel = noteCount === 1 ? "1 note inside" : `${noteCount} notes inside`;
       const dateStr = new Date(item.imported_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+      const spotify = spotifyUrl(share);
+      const canRelive = spotify !== "https://open.spotify.com";
 
       return `
         <div class="share-card">
           <div class="share-label">From ${senderName}</div>
           <div class="share-body">
-            ${isPlaylist ? `<div class="share-type-pill">Playlist · ${noteCount}</div>` : ""}
             <div class="share-track">${trackTitle}</div>
             ${trackArtist ? `<div class="share-artist">${trackArtist}</div>` : ""}
           </div>
@@ -678,6 +689,9 @@
             <div class="share-meta">
               <div class="share-date">${dateStr}</div>
               <div class="share-note-count">${noteLabel}</div>
+            </div>
+            <div class="share-actions">
+              ${canRelive ? `<button class="btn-sm" data-relive="${esc(share.id)}" data-spotify="${esc(spotify)}">Relive ✦</button>` : ""}
             </div>
           </div>
         </div>
