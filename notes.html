@@ -106,12 +106,13 @@
     /* ── Share grid ── */
     .shares-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(5, 1fr);
       gap: 10px;
     }
-    @media (max-width: 900px) { .shares-grid { grid-template-columns: repeat(3, 1fr); } }
-    @media (max-width: 600px) { .shares-grid { grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 600px) { .page { padding: 0 20px 60px; } }
+    @media (max-width: 1100px) { .shares-grid { grid-template-columns: repeat(4, 1fr); } }
+    @media (max-width: 800px)  { .shares-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 520px)  { .shares-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px)  { .page { padding: 0 20px 60px; } }
 
     /* Full-width row for expanded relive panel — sits between grid rows */
     .relive-row {
@@ -124,7 +125,6 @@
       position: relative; overflow: hidden;
       transition: filter 0.15s;
       display: flex; flex-direction: column;
-      aspect-ratio: 1;
       cursor: default;
     }
     .share-card:hover { filter: brightness(0.97); }
@@ -161,8 +161,8 @@
     .share-track {
       font-family: 'Lora', Georgia, serif;
       font-size: 15px; font-weight: 700; line-height: 1.25;
-      margin-bottom: 3px; flex: 1;
-      display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+      margin-bottom: 3px;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
     }
     .share-artist {
       font-size: 11px; opacity: 0.55; margin-bottom: 0;
@@ -714,8 +714,8 @@
       const trackTitle  = safeDisplay(rawTitle,  isPlaylist ? "Playlist share" : "Untitled note");
       const trackArtist = safeDisplay(rawArtist, "");
       const recipient   = safeDisplay(share.recipient_name, "someone special");
-      const noteLabel = noteCount === 1 ? "1 note" : `${noteCount} notes`;
-      const dateStr = new Date(share.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+      const noteLabel = noteCount === 1 ? "1 note inside" : `${noteCount} notes inside`;
+      const dateStr = new Date(share.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
       const canRelive = !!share.sender_content;
 
       return `
@@ -786,8 +786,8 @@
       const trackTitle  = safeDisplay(anns[0]?.track_title,  isPlaylist ? "Playlist share" : "Untitled note");
       const trackArtist = safeDisplay(anns[0]?.track_artist, "");
       const senderName  = safeDisplay(share.sender_name, "someone");
-      const noteLabel = noteCount === 1 ? "1 note" : `${noteCount} notes`;
-      const dateStr = new Date(item.imported_at).toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+      const noteLabel = noteCount === 1 ? "1 note inside" : `${noteCount} notes inside`;
+      const dateStr = new Date(item.imported_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
 
       return `
         <div class="share-card">
