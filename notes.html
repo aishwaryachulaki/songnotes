@@ -586,6 +586,14 @@
     document.getElementById(`paste-input-${id}`)?.focus();
   }
 
+  // AES-GCM output is base64, 60+ chars. Real names/titles won't match this.
+  function looksEncrypted(s) {
+    return s && s.length > 44 && /^[A-Za-z0-9+/]+=*$/.test(s.trim());
+  }
+  function safeDisplay(s, fallback) {
+    return (s && !looksEncrypted(s)) ? esc(s) : fallback;
+  }
+
   function formatTimestamp(seconds) {
     if (seconds == null || isNaN(seconds)) return "";
     const m = Math.floor(seconds / 60);
@@ -608,18 +616,21 @@
       const anns = share.annotations || [];
       const noteCount = anns.length;
       const isPlaylist = share.share_type === "playlist";
-      const trackTitle = anns[0]?.track_title || (isPlaylist ? "Playlist share" : "Untitled note");
-      const trackArtist = anns[0]?.track_artist || "";
+      const rawTitle  = anns[0]?.track_title || "";
+      const rawArtist = anns[0]?.track_artist || "";
+      const trackTitle  = safeDisplay(rawTitle,  isPlaylist ? "Playlist share" : "Untitled note");
+      const trackArtist = safeDisplay(rawArtist, "");
+      const recipient   = safeDisplay(share.recipient_name, "someone special");
       const noteLabel = noteCount === 1 ? "1 note inside" : `${noteCount} notes inside`;
       const dateStr = new Date(share.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
       const canRelive = !!share.sender_content;
 
       return `
         <div class="share-card">
-          <div class="share-label">For ${share.recipient_name ? esc(share.recipient_name) : "someone special"}</div>
+          <div class="share-label">For ${recipient}</div>
           ${isPlaylist ? `<div class="share-type-pill">Playlist · ${noteCount} song${noteCount !== 1 ? "s" : ""}</div>` : ""}
-          <div class="share-track">${esc(trackTitle)}</div>
-          ${trackArtist ? `<div class="share-artist">${esc(trackArtist)}</div>` : ""}
+          <div class="share-track">${trackTitle}</div>
+          ${trackArtist ? `<div class="share-artist">${trackArtist}</div>` : ""}
           <div class="share-footer">
             <div class="share-date">${dateStr} · ${noteLabel}</div>
             <div class="share-actions">
@@ -669,17 +680,18 @@
       const anns = share.annotations || [];
       const noteCount = anns.length;
       const isPlaylist = share.share_type === "playlist";
-      const trackTitle = anns[0]?.track_title || (isPlaylist ? "Playlist share" : "Untitled note");
-      const trackArtist = anns[0]?.track_artist || "";
+      const trackTitle  = safeDisplay(anns[0]?.track_title,  isPlaylist ? "Playlist share" : "Untitled note");
+      const trackArtist = safeDisplay(anns[0]?.track_artist, "");
+      const senderName  = safeDisplay(share.sender_name, "someone");
       const noteLabel = noteCount === 1 ? "1 note inside" : `${noteCount} notes inside`;
       const dateStr = new Date(item.imported_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
 
       return `
         <div class="share-card">
-          <div class="share-label">From ${share.sender_name ? esc(share.sender_name) : "someone"}</div>
+          <div class="share-label">From ${senderName}</div>
           ${isPlaylist ? `<div class="share-type-pill">Playlist · ${noteCount} song${noteCount !== 1 ? "s" : ""}</div>` : ""}
-          <div class="share-track">${esc(trackTitle)}</div>
-          ${trackArtist ? `<div class="share-artist">${esc(trackArtist)}</div>` : ""}
+          <div class="share-track">${trackTitle}</div>
+          ${trackArtist ? `<div class="share-artist">${trackArtist}</div>` : ""}
           ${noteCount > 0 ? `<div class="share-notes-count">${noteLabel}</div>` : ""}
           <div class="share-footer">
             <div class="share-date">Received ${dateStr}</div>

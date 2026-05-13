@@ -171,19 +171,14 @@ async function decryptField(b64, key) {
 async function encryptNoteFields(note, key) {
   return {
     ...note,
-    note:         await encryptField(note.note, key),
-    track_title:  await encryptField(note.track_title, key),
-    track_artist: await encryptField(note.track_artist, key),
-    sender_name:  await encryptField(note.sender_name, key),
+    // Only the note text is personal — track/artist/sender are metadata.
+    note: await encryptField(note.note, key),
   };
 }
 async function decryptNoteFields(note, key) {
   return {
     ...note,
-    note:         await decryptField(note.note, key),
-    track_title:  await decryptField(note.track_title, key),
-    track_artist: await decryptField(note.track_artist, key),
-    sender_name:  await decryptField(note.sender_name, key),
+    note: await decryptField(note.note, key),
   };
 }
 
@@ -815,13 +810,11 @@ $("copyShare").addEventListener("click", async () => {
   activeShare.enc_key = keyB64;
   store.shares[newId] = activeShare;
 
-  // Encrypt share meta — only personal strings, structural fields stay plaintext
+  // Only note text is encrypted — names and song metadata stay plaintext.
   const shareToPush = {
     ...activeShare,
-    sender_name:    await encryptField(activeShare.sender_name || senderName, encKey),
-    recipient_name: activeShare.recipient_name
-      ? await encryptField(activeShare.recipient_name, encKey)
-      : null,
+    sender_name:    activeShare.sender_name || senderName,
+    recipient_name: activeShare.recipient_name || null,
     // Sender copy — encrypted with the same enc_key as the share.
     // Decrypted client-side on notes.html via the extension or a pasted share link.
     // Server only ever sees the encrypted blob.
