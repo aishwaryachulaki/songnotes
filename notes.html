@@ -465,6 +465,9 @@
       window.location.href = "auth.html";
     });
 
+    // Silently decrypt any encrypted recipient labels using extension keys
+    if (activeTab === "sent") tryDecryptLabels();
+
     // Sent list — relive / paste-link / decrypt
     const sentList = page.querySelector(".sent-list");
     if (sentList) {
@@ -528,12 +531,43 @@
     }
   }
 
+  // After rendering, quietly decrypt any encrypted recipient names via the extension
+  async function tryDecryptLabels() {
+    const toDecrypt = sentShares.filter(s => looksEncrypted(s.recipient_name));
+    for (const share of toDecrypt) {
+      const keyB64 = await getKeyFromExtension(share.id);
+      if (!keyB64) continue;
+      try {
+        const cryptoKey = await importEncKey(keyB64);
+        const name = await decryptField(share.recipient_name, cryptoKey);
+        if (!name) continue;
+        // Update the label on the rendered card
+        const card = document.querySelector(`[data-relive="${share.id}"]`)?.closest(".share-card");
+        if (card) {
+          const label = card.querySelector(".share-label");
+          if (label) label.textContent = `For ${name}`;
+        }
+        // Cache it so Relive can also show it
+        share._decryptedRecipient = name;
+      } catch { /* leave as fallback */ }
+    }
+  }
+
   async function expandWithKey(id, share, keyB64, reliveBtn) {
     try {
       const cryptoKey = await importEncKey(keyB64);
       const json = await decryptField(share.sender_content, cryptoKey);
       if (!json) throw new Error("decrypt failed");
-      const notes = JSON.parse(json);
+      const parsed = JSON.parse(json);
+      // Support both old format (array) and new format ({recipient_name, notes})
+      const notes = Array.isArray(parsed) ? parsed : (parsed.notes || []);
+      // Update the recipient label if we now have the plaintext name
+      const recipientName = parsed.recipient_name || share._decryptedRecipient;
+      if (recipientName) {
+        const card = reliveBtn?.closest(".share-card");
+        const label = card?.querySelector(".share-label");
+        if (label) label.textContent = `For ${recipientName}`;
+      }
       const isPlaylist = share.share_type === "playlist";
 
       const notesHtml = notes.map(n => {

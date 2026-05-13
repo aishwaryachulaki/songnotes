@@ -818,13 +818,16 @@ $("copyShare").addEventListener("click", async () => {
     // Sender copy — encrypted with the same enc_key as the share.
     // Decrypted client-side on notes.html via the extension or a pasted share link.
     // Server only ever sees the encrypted blob.
-    sender_content: await encryptField(JSON.stringify(activeShare.notes.map(n => ({
-      note:         n.note,
-      timestamp:    n.timestamp ?? null,
-      track_title:  n.track_title  || null,
-      track_artist: n.track_artist || null,
-      track_id:     n.track_id     || null,
-    }))), encKey),
+    sender_content: await encryptField(JSON.stringify({
+      recipient_name: activeShare.recipient_name || null,
+      notes: activeShare.notes.map(n => ({
+        note:         n.note,
+        timestamp:    n.timestamp ?? null,
+        track_title:  n.track_title  || null,
+        track_artist: n.track_artist || null,
+        track_id:     n.track_id     || null,
+      })),
+    }), encKey),
   };
   // Encrypt each note's personal fields
   const notesToPush = await Promise.all(
