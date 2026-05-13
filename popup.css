@@ -97,9 +97,7 @@ body {
 
 /* ── Now Playing card ── */
 .stamp-track {
-  background:
-    linear-gradient(rgba(209,88,110,0.45), rgba(209,88,110,0.45)),
-    url('faq-bg-pink.png') center / cover no-repeat;
+  background: url('faq-bg-pink.png') center / cover no-repeat;
   border-radius: 16px;
   padding: 16px 18px 18px;
   position: relative;
@@ -108,32 +106,32 @@ body {
 .stamp-eyebrow {
   font-family: 'Montserrat', sans-serif;
   font-size: 8px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.18em; color: rgba(255,251,244,0.52);
+  letter-spacing: 0.18em; color: var(--ink-mid);
   margin-bottom: 8px;
 }
 .track-title {
-  font-size: 18px; font-weight: 700; color: #fff;
+  font-size: 18px; font-weight: 700; color: var(--ink);
   line-height: 1.25; padding-right: 66px; /* clear postmark */
 }
-.track-artist { font-size: 11.5px; color: rgba(255,251,244,0.58); margin-top: 4px; }
+.track-artist { font-size: 11.5px; color: var(--ink-mid); margin-top: 4px; }
 
 /* Postmark badge */
 .postmark {
   position: absolute; top: 14px; right: 16px;
   width: 56px; height: 56px;
-  border: 1.5px solid rgba(255,251,244,0.28);
+  border: 1.5px solid rgba(58,36,24,0.22);
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
 }
 .postmark-inner { display: flex; flex-direction: column; align-items: center; gap: 2px; }
 .postmark-top {
   font-size: 5.5px; font-weight: 800; letter-spacing: 0.12em;
-  color: rgba(255,251,244,0.58); text-transform: uppercase;
+  color: var(--ink-mid); text-transform: uppercase;
 }
 .postmark-wave { width: 34px; }
 .postmark-year {
   font-size: 7px; font-weight: 700; letter-spacing: 0.06em;
-  color: rgba(255,251,244,0.58);
+  color: var(--ink-mid);
 }
 
 
