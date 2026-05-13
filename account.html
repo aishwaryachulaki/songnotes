@@ -68,6 +68,7 @@
       text-decoration: none; opacity: 0.65; transition: opacity 0.15s;
     }
     .nav-link:hover { opacity: 1; }
+    .nav-link.active { opacity: 1; color: var(--rose); }
     .btn-signout {
       font-family: 'Montserrat', sans-serif;
       font-size: 10px; font-weight: 700;
@@ -369,8 +370,8 @@
       <div class="nav">
         <a class="nav-logo" href="index.html">keepsake.<span class="logo-spark">✦</span></a>
         <div class="nav-right">
-          <a class="nav-link" href="faq.html">FAQ</a>
-          <span class="nav-email">${escHtml(currentUser.email)}</span>
+          <a class="nav-link" href="notes.html">Notes</a>
+          <a class="nav-link active" href="account.html">Account</a>
           <button class="btn-signout" id="signoutBtn">Sign out</button>
         </div>
       </div>

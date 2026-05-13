@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Keepsake — Sent Notes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@1,400&family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@500;600;700&display=swap" />
+  <style>
+    :root {
+      --rose:      #D96B7C;
+      --tangerine: #F08C21;
+      --cream:     #FFFBF4;
+      --bg:        #F4D9A6;
+      --ink:       #3A2E2A;
+      --ink-mid:   #6B5A52;
+      --ink-lt:    #A08878;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg) url('background.png') center / cover no-repeat fixed;
+      font-family: 'Lora', Georgia, serif;
+      min-height: 100vh;
+      color: var(--ink);
+      padding: 0 16px 80px;
+    }
+
+    .page {
+      max-width: 660px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* ── Nav ── */
+    .nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 22px 0 10px;
+    }
+    .nav-logo {
+      font-family: 'Spectral', Georgia, serif;
+      font-style: italic; font-weight: 400; font-size: 26px;
+      color: #C04E6A; text-decoration: none; letter-spacing: -0.01em;
+      display: flex; align-items: center; gap: 5px;
+      text-shadow: 0 1px 12px rgba(140,50,60,0.13);
+    }
+    .nav-logo .logo-spark {
+      font-style: normal; font-family: sans-serif;
+      font-size: 11px; color: var(--tangerine); font-weight: 400;
+      vertical-align: super; line-height: 0;
+    }
+    .nav-right { display: flex; align-items: center; gap: 14px; }
+    .nav-link {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px; font-weight: 600; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--ink-mid);
+      text-decoration: none; opacity: 0.65; transition: opacity 0.15s;
+    }
+    .nav-link:hover { opacity: 1; }
+    .nav-link.active { opacity: 1; color: var(--rose); }
+    .btn-signout {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 6px 16px; border-radius: 20px;
+      background: rgba(217,107,124,0.10);
+      border: 1.5px solid rgba(217,107,124,0.30);
+      color: var(--rose); cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-signout:hover { background: rgba(217,107,124,0.18); }
+
+    /* ── Section header ── */
+    .section-header { display: flex; align-items: center; gap: 10px; }
+    .section-header span {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 8.5px; font-weight: 700; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--rose); white-space: nowrap;
+      opacity: 0.75;
+    }
+    .section-header::after {
+      content: ''; flex: 1; height: 1px;
+      background: rgba(217,107,124,0.22);
+    }
+
+    /* ── Tabs ── */
+    .tabs {
+      display: flex;
+      border-bottom: 1.5px solid rgba(58,36,24,0.10);
+    }
+    .tab {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px; font-weight: 700; letter-spacing: 0.10em;
+      text-transform: uppercase; padding: 8px 16px 10px;
+      border: none; background: none; cursor: pointer;
+      color: var(--ink-lt);
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1.5px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .tab.active { color: var(--rose); border-bottom-color: var(--rose); }
+    .tab:hover:not(.active) { color: var(--ink-mid); }
+
+    /* ── Share cards ── */
+    .shares-list { display: flex; flex-direction: column; gap: 10px; }
+
+    .share-card {
+      border-radius: 14px; padding: 22px 24px;
+      position: relative; overflow: hidden;
+      transition: filter 0.15s;
+    }
+    .share-card:hover { filter: brightness(0.97); }
+    .share-card:nth-child(3n+1) { background: url('faq-bg-yellow.png') center / cover no-repeat; color: #4a3800; }
+    .share-card:nth-child(3n+2) { background: url('faq-bg-pink.png')   center / cover no-repeat; color: #5c2d2d; }
+    .share-card:nth-child(3n+3) { background: url('faq-bg-olive.png')  center / cover no-repeat; color: #363614; }
+
+    .share-card::after {
+      content: '✦';
+      position: absolute; right: 20px; top: 16px;
+      font-size: 22px; opacity: 0.10; pointer-events: none;
+    }
+
+    .share-recipient {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9px; font-weight: 700; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--rose); margin-bottom: 7px;
+    }
+    .share-track {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 18px; font-weight: 700; line-height: 1.2; margin-bottom: 3px;
+    }
+    .share-artist {
+      font-size: 12.5px; opacity: 0.60; margin-bottom: 12px;
+    }
+    .share-notes-count {
+      font-family: 'Spectral', Georgia, serif;
+      font-style: italic; font-size: 13px; opacity: 0.65;
+    }
+    .share-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 14px; flex-wrap: wrap; gap: 8px;
+    }
+    .share-date {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9.5px; letter-spacing: 0.04em; opacity: 0.50;
+    }
+    .share-actions { display: flex; gap: 8px; }
+    .btn-share {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9.5px; font-weight: 700; letter-spacing: 0.09em;
+      text-transform: uppercase; padding: 5px 13px; border-radius: 20px;
+      background: rgba(217,107,124,0.12);
+      border: 1.5px solid rgba(217,107,124,0.30);
+      color: var(--rose); cursor: pointer;
+      transition: background 0.15s; text-decoration: none;
+      display: inline-flex; align-items: center;
+    }
+    .btn-share:hover { background: rgba(217,107,124,0.20); }
+    .btn-archive {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9.5px; font-weight: 600; letter-spacing: 0.09em;
+      text-transform: uppercase; padding: 5px 13px; border-radius: 20px;
+      background: transparent;
+      border: 1.5px solid rgba(58,36,24,0.18);
+      color: inherit; cursor: pointer; opacity: 0.50;
+      transition: opacity 0.15s;
+    }
+    .btn-archive:hover { opacity: 0.85; }
+
+    /* ── Multi-note cards (playlist) ── */
+    .share-type-pill {
+      display: inline-block;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 8px; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; padding: 2px 8px; border-radius: 10px;
+      background: rgba(217,107,124,0.12); color: var(--rose);
+      margin-bottom: 10px;
+    }
+
+    /* ── Empty state ── */
+    .empty-state {
+      background: url('faq-bg-yellow.png') center / cover no-repeat;
+      border-radius: 14px; padding: 52px 32px; text-align: center;
+      color: #4a3800;
+    }
+    .empty-icon { font-size: 30px; opacity: 0.30; margin-bottom: 16px; }
+    .empty-title {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 20px; font-weight: 700; margin-bottom: 8px;
+    }
+    .empty-sub {
+      font-family: 'Spectral', Georgia, serif;
+      font-style: italic; font-size: 14px; color: var(--rose); opacity: 0.85;
+    }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+      background: var(--ink); color: var(--cream);
+      font-family: 'Montserrat', sans-serif; font-size: 11px; letter-spacing: 0.04em;
+      padding: 9px 20px; border-radius: 20px;
+      opacity: 0; transition: opacity 0.2s; pointer-events: none;
+      white-space: nowrap; z-index: 999;
+    }
+    .toast.show { opacity: 1; }
+
+    /* ── State ── */
+    .state {
+      text-align: center; padding: 80px 20px;
+      color: var(--ink-mid); font-size: 14px; line-height: 1.6;
+    }
+    .state strong {
+      font-family: 'Lora', Georgia, serif;
+      display: block; font-size: 20px; color: var(--ink); margin-bottom: 8px;
+    }
+
+    /* ── Footer ── */
+    .footer-links {
+      text-align: center;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px; color: var(--ink-lt); letter-spacing: 0.04em;
+      opacity: 0.7;
+    }
+    .footer-links a { color: var(--ink-lt); text-decoration: none; }
+    .footer-links a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+<div class="page" id="page">
+  <div class="state"><strong>Loading…</strong></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+  const SUPABASE_URL = "https://kkasgbkgwjxiutdalbbm.supabase.co";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtrYXNnYmtnd2p4aXV0ZGFsYmJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyNjU3OTQsImV4cCI6MjA5Mjg0MTc5NH0.z1JLMTzz3X_swbWHdt2z4UDKyUwjEfNYys5kdDMq3R4";
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  function escHtml(s) {
+    return String(s).replace(/[&<>"']/g, c =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 2400);
+  }
+
+  let currentUser = null;
+  let allShares = [];
+  let activeTab = "active"; // "active" | "archived"
+  let hasArchivedCol = false;
+
+  (async () => {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { window.location.href = "auth.html"; return; }
+    currentUser = session.user;
+    await loadShares();
+  })();
+
+  async function loadShares() {
+    // Try to fetch with archived column; if it fails, schema hasn't been updated yet
+    let res = await sb
+      .from("shares")
+      .select("*, annotations(id, track_title, track_artist, note, timestamp)")
+      .order("created_at", { ascending: false });
+
+    // Check if archived column exists by inspecting returned data
+    if (!res.error && res.data && res.data.length > 0) {
+      hasArchivedCol = "archived" in res.data[0];
+    } else if (!res.error) {
+      // Empty result — check schema via a direct probe
+      const probe = await sb.from("shares").select("archived").limit(1);
+      hasArchivedCol = !probe.error;
+    }
+
+    allShares = res.data || [];
+    renderPage();
+  }
+
+  function renderPage() {
+    const filtered = hasArchivedCol
+      ? allShares.filter(s => activeTab === "active" ? !s.archived : s.archived)
+      : allShares;
+
+    const nav = `
+      <div class="nav">
+        <a class="nav-logo" href="index.html">keepsake.<span class="logo-spark">✦</span></a>
+        <div class="nav-right">
+          <a class="nav-link active" href="sent.html">Sent</a>
+          <a class="nav-link" href="received.html">Received</a>
+          <a class="nav-link" href="account.html">Account</a>
+          <button class="btn-signout" id="signoutBtn">Sign out</button>
+        </div>
+      </div>
+    `;
+
+    const tabs = hasArchivedCol ? `
+      <div class="tabs">
+        <button class="tab ${activeTab === "active" ? "active" : ""}" data-tab="active">Active</button>
+        <button class="tab ${activeTab === "archived" ? "active" : ""}" data-tab="archived">Archived</button>
+      </div>
+    ` : "";
+
+    let content;
+    if (filtered.length === 0) {
+      content = activeTab === "archived"
+        ? `<div class="empty-state">
+             <div class="empty-icon">📦</div>
+             <div class="empty-title">Nothing archived yet</div>
+             <div class="empty-sub">Notes you archive will rest here.</div>
+           </div>`
+        : `<div class="empty-state">
+             <div class="empty-icon">♪</div>
+             <div class="empty-title">No notes sent yet</div>
+             <div class="empty-sub">Your shared moments will appear here.</div>
+           </div>`;
+    } else {
+      content = `<div class="shares-list" id="sharesList">${filtered.map(renderCard).join("")}</div>`;
+    }
+
+    document.getElementById("page").innerHTML = `
+      ${nav}
+      <div class="section-header"><span>Notes you've sent</span></div>
+      ${tabs}
+      ${content}
+      <div class="footer-links">
+        <a href="privacy.html" target="_blank">Privacy Policy</a>
+        &nbsp;·&nbsp;
+        <a href="index.html">Home</a>
+      </div>
+    `;
+
+    // Events
+    document.getElementById("signoutBtn").addEventListener("click", async () => {
+      await sb.auth.signOut();
+      window.location.href = "auth.html";
+    });
+
+    if (hasArchivedCol) {
+      document.querySelectorAll(".tab[data-tab]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          activeTab = btn.dataset.tab;
+          renderPage();
+        });
+      });
+    }
+
+    const list = document.getElementById("sharesList");
+    if (list) {
+      list.addEventListener("click", async (e) => {
+        // Copy link
+        const copyBtn = e.target.closest("[data-copy]");
+        if (copyBtn) {
+          const shareId = copyBtn.dataset.copy;
+          // The share link includes the encryption key in the fragment —
+          // we only have the ID here; the full link is only in the extension.
+          // Show a helpful message instead.
+          showToast("Open via the extension to copy the link ✦");
+          return;
+        }
+
+        // Archive / unarchive
+        const archBtn = e.target.closest("[data-archive]");
+        if (archBtn && hasArchivedCol) {
+          const shareId = archBtn.dataset.archive;
+          const share = allShares.find(s => s.id === shareId);
+          if (!share) return;
+          archBtn.disabled = true;
+          const { error } = await sb.from("shares")
+            .update({ archived: !share.archived })
+            .eq("id", shareId);
+          if (error) {
+            showToast("Couldn't update — try again.");
+          } else {
+            share.archived = !share.archived;
+            showToast(share.archived ? "Archived ✦" : "Moved back to active ✦");
+            renderPage();
+          }
+        }
+      });
+    }
+  }
+
+  function renderCard(share) {
+    const anns = share.annotations || [];
+    const noteCount = anns.length;
+    const isPlaylist = share.share_type === "playlist";
+
+    // Primary display info
+    let trackTitle = "";
+    let trackArtist = "";
+    if (anns.length > 0) {
+      trackTitle = anns[0].track_title || "";
+      trackArtist = anns[0].track_artist || "";
+    }
+
+    const typePill = isPlaylist
+      ? `<div class="share-type-pill">Playlist · ${noteCount} song${noteCount !== 1 ? "s" : ""}</div>`
+      : "";
+
+    const displayTitle = trackTitle
+      ? escHtml(trackTitle)
+      : isPlaylist
+        ? "Playlist share"
+        : "Untitled note";
+
+    const displayArtist = trackArtist
+      ? escHtml(trackArtist)
+      : "";
+
+    const noteLabel = noteCount === 1 ? "1 note inside" : `${noteCount} notes inside`;
+
+    const dateStr = new Date(share.created_at).toLocaleDateString("en-IN", {
+      day: "numeric", month: "short", year: "numeric"
+    });
+
+    const archiveLabel = (hasArchivedCol && share.archived) ? "Unarchive" : "Archive";
+
+    return `
+      <div class="share-card">
+        <div class="share-recipient">For ${share.recipient_name ? escHtml(share.recipient_name) : "someone special"}</div>
+        ${typePill}
+        <div class="share-track">${displayTitle}</div>
+        ${displayArtist ? `<div class="share-artist">${displayArtist}</div>` : ""}
+        ${noteCount > 0 ? `<div class="share-notes-count">${noteLabel}</div>` : ""}
+        <div class="share-footer">
+          <div class="share-date">${dateStr}</div>
+          <div class="share-actions">
+            <button class="btn-share" data-copy="${escHtml(share.id)}">Copy link</button>
+            ${hasArchivedCol ? `<button class="btn-archive" data-archive="${escHtml(share.id)}">${archiveLabel}</button>` : ""}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+</script>
+</body>
+</html>

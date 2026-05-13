@@ -1,0 +1,501 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Keepsake — My Notes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@1,400&family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@500;600;700&display=swap" />
+  <style>
+    :root {
+      --rose:      #D96B7C;
+      --tangerine: #F08C21;
+      --cream:     #FFFBF4;
+      --bg:        #F4D9A6;
+      --ink:       #3A2E2A;
+      --ink-mid:   #6B5A52;
+      --ink-lt:    #A08878;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg) url('background.png') center / cover no-repeat fixed;
+      font-family: 'Lora', Georgia, serif;
+      min-height: 100vh;
+      color: var(--ink);
+      padding: 0 16px 80px;
+    }
+
+    .page {
+      max-width: 660px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* ── Nav ── */
+    .nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 22px 0 10px;
+    }
+    .nav-logo {
+      font-family: 'Spectral', Georgia, serif;
+      font-style: italic; font-weight: 400; font-size: 26px;
+      color: #C04E6A; text-decoration: none; letter-spacing: -0.01em;
+      display: flex; align-items: center; gap: 5px;
+      text-shadow: 0 1px 12px rgba(140,50,60,0.13);
+    }
+    .nav-logo .logo-spark {
+      font-style: normal; font-family: sans-serif;
+      font-size: 11px; color: var(--tangerine); font-weight: 400;
+      vertical-align: super; line-height: 0;
+    }
+    .nav-right { display: flex; align-items: center; gap: 14px; }
+    .nav-link {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px; font-weight: 600; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--ink-mid);
+      text-decoration: none; opacity: 0.65; transition: opacity 0.15s;
+    }
+    .nav-link:hover { opacity: 1; }
+    .nav-link.active { opacity: 1; color: var(--rose); }
+    .btn-signout {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 6px 16px; border-radius: 20px;
+      background: rgba(217,107,124,0.10);
+      border: 1.5px solid rgba(217,107,124,0.30);
+      color: var(--rose); cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-signout:hover { background: rgba(217,107,124,0.18); }
+
+    /* ── Section header ── */
+    .section-header { display: flex; align-items: center; gap: 10px; }
+    .section-header span {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 8.5px; font-weight: 700; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--rose); white-space: nowrap;
+      opacity: 0.75;
+    }
+    .section-header::after {
+      content: ''; flex: 1; height: 1px;
+      background: rgba(217,107,124,0.22);
+    }
+
+    /* ── Tabs ── */
+    .tabs {
+      display: flex;
+      border-bottom: 1.5px solid rgba(58,36,24,0.10);
+    }
+    .tab {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px; font-weight: 700; letter-spacing: 0.10em;
+      text-transform: uppercase; padding: 8px 20px 10px;
+      border: none; background: none; cursor: pointer;
+      color: var(--ink-lt);
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1.5px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .tab.active { color: var(--rose); border-bottom-color: var(--rose); }
+    .tab:hover:not(.active) { color: var(--ink-mid); }
+
+    /* ── Share cards ── */
+    .shares-list { display: flex; flex-direction: column; gap: 10px; }
+
+    .share-card {
+      border-radius: 14px; padding: 22px 24px;
+      position: relative; overflow: hidden;
+      transition: filter 0.15s;
+    }
+    .share-card:hover { filter: brightness(0.97); }
+
+    /* Sent tab colours */
+    .sent-list .share-card:nth-child(3n+1) { background: url('faq-bg-yellow.png') center / cover no-repeat; color: #4a3800; }
+    .sent-list .share-card:nth-child(3n+2) { background: url('faq-bg-pink.png')   center / cover no-repeat; color: #5c2d2d; }
+    .sent-list .share-card:nth-child(3n+3) { background: url('faq-bg-olive.png')  center / cover no-repeat; color: #363614; }
+
+    /* Received tab colours (offset so it feels different) */
+    .received-list .share-card:nth-child(3n+1) { background: url('faq-bg-pink.png')   center / cover no-repeat; color: #5c2d2d; }
+    .received-list .share-card:nth-child(3n+2) { background: url('faq-bg-olive.png')  center / cover no-repeat; color: #363614; }
+    .received-list .share-card:nth-child(3n+3) { background: url('faq-bg-yellow.png') center / cover no-repeat; color: #4a3800; }
+
+    .share-card::after {
+      content: '✦';
+      position: absolute; right: 20px; top: 16px;
+      font-size: 22px; opacity: 0.09; pointer-events: none;
+    }
+
+    .share-label {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9px; font-weight: 700; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--rose); margin-bottom: 7px;
+    }
+    .share-type-pill {
+      display: inline-block;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 8px; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; padding: 2px 8px; border-radius: 10px;
+      background: rgba(217,107,124,0.12); color: var(--rose);
+      margin-bottom: 10px;
+    }
+    .share-track {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 18px; font-weight: 700; line-height: 1.2; margin-bottom: 3px;
+    }
+    .share-artist { font-size: 12.5px; opacity: 0.60; margin-bottom: 10px; }
+    .share-notes-count {
+      font-family: 'Spectral', Georgia, serif;
+      font-style: italic; font-size: 13px; opacity: 0.65;
+    }
+    .share-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 14px; flex-wrap: wrap; gap: 8px;
+    }
+    .share-date {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9.5px; letter-spacing: 0.04em; opacity: 0.50;
+    }
+    .share-actions { display: flex; gap: 8px; }
+    .btn-sm {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9.5px; font-weight: 700; letter-spacing: 0.09em;
+      text-transform: uppercase; padding: 5px 13px; border-radius: 20px;
+      background: rgba(217,107,124,0.12);
+      border: 1.5px solid rgba(217,107,124,0.30);
+      color: var(--rose); cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-sm:hover { background: rgba(217,107,124,0.20); }
+    .btn-sm-ghost {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9.5px; font-weight: 600; letter-spacing: 0.09em;
+      text-transform: uppercase; padding: 5px 13px; border-radius: 20px;
+      background: transparent;
+      border: 1.5px solid rgba(58,36,24,0.18);
+      color: inherit; cursor: pointer; opacity: 0.50;
+      transition: opacity 0.15s;
+    }
+    .btn-sm-ghost:hover { opacity: 0.85; }
+
+    /* ── Empty state ── */
+    .empty-state {
+      border-radius: 14px; padding: 52px 32px; text-align: center;
+    }
+    .empty-state.sent-empty     { background: url('faq-bg-yellow.png') center / cover no-repeat; color: #4a3800; }
+    .empty-state.received-empty { background: url('faq-bg-pink.png')   center / cover no-repeat; color: #5c2d2d; }
+    .empty-icon { font-size: 28px; opacity: 0.28; margin-bottom: 16px; }
+    .empty-title { font-family: 'Lora', Georgia, serif; font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+    .empty-sub {
+      font-family: 'Spectral', Georgia, serif;
+      font-style: italic; font-size: 14px; color: var(--rose); opacity: 0.85; line-height: 1.55;
+    }
+
+    /* ── Notice (received not set up yet) ── */
+    .notice-card {
+      border-radius: 14px; padding: 26px 26px 24px;
+      position: relative; overflow: hidden;
+    }
+    .notice-card:nth-child(1) { background: url('faq-bg-pink.png') center / cover no-repeat; color: #5c2d2d; }
+    .notice-card:nth-child(2) { background: url('faq-bg-olive.png') center / cover no-repeat; color: #363614; margin-top: 0; }
+    .notice-card::after {
+      content: '✦'; position: absolute; right: 22px; top: 18px;
+      font-size: 26px; opacity: 0.09; pointer-events: none;
+    }
+    .notice-eyebrow {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9px; font-weight: 700; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--rose); margin-bottom: 10px;
+    }
+    .notice-title { font-family: 'Lora', Georgia, serif; font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+    .notice-body { font-size: 13.5px; line-height: 1.65; opacity: 0.72; margin-bottom: 12px; }
+    .notice-sub {
+      font-family: 'Spectral', Georgia, serif;
+      font-style: italic; font-size: 13px; color: var(--rose); opacity: 0.85;
+    }
+    .notice-steps { font-size: 13.5px; line-height: 1.85; opacity: 0.72; }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+      background: var(--ink); color: var(--cream);
+      font-family: 'Montserrat', sans-serif; font-size: 11px; letter-spacing: 0.04em;
+      padding: 9px 20px; border-radius: 20px;
+      opacity: 0; transition: opacity 0.2s; pointer-events: none;
+      white-space: nowrap; z-index: 999;
+    }
+    .toast.show { opacity: 1; }
+
+    /* ── Loading / error ── */
+    .state {
+      text-align: center; padding: 80px 20px;
+      color: var(--ink-mid); font-size: 14px; line-height: 1.6;
+    }
+    .state strong {
+      font-family: 'Lora', Georgia, serif;
+      display: block; font-size: 20px; color: var(--ink); margin-bottom: 8px;
+    }
+
+    /* ── Footer ── */
+    .footer-links {
+      text-align: center;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px; color: var(--ink-lt); letter-spacing: 0.04em;
+      opacity: 0.7;
+    }
+    .footer-links a { color: var(--ink-lt); text-decoration: none; }
+    .footer-links a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+<div class="page" id="page">
+  <div class="state"><strong>Loading…</strong></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+  const SUPABASE_URL = "https://kkasgbkgwjxiutdalbbm.supabase.co";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtrYXNnYmtnd2p4aXV0ZGFsYmJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyNjU3OTQsImV4cCI6MjA5Mjg0MTc5NH0.z1JLMTzz3X_swbWHdt2z4UDKyUwjEfNYys5kdDMq3R4";
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, c =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 2400);
+  }
+
+  let currentUser = null;
+  let sentShares = [];
+  let receivedItems = [];
+  let hasArchivedCol = false;
+  let hasReceivedTable = false;
+  let activeTab = "sent";
+
+  // Read tab from URL hash
+  if (location.hash === "#received") activeTab = "received";
+
+  (async () => {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { window.location.href = "auth.html"; return; }
+    currentUser = session.user;
+    await loadAll();
+  })();
+
+  async function loadAll() {
+    // Load sent shares
+    const sentRes = await sb
+      .from("shares")
+      .select("*, annotations(id, track_title, track_artist, note, timestamp)")
+      .order("created_at", { ascending: false });
+
+    sentShares = sentRes.data || [];
+
+    // Check if archived column exists
+    if (sentShares.length > 0) {
+      hasArchivedCol = "archived" in sentShares[0];
+    } else {
+      const probe = await sb.from("shares").select("archived").limit(1);
+      hasArchivedCol = !probe.error;
+    }
+
+    // Load received shares
+    const recRes = await sb
+      .from("received_shares")
+      .select(`id, imported_at, shares(id, share_type, sender_name, recipient_name, created_at, annotations(id, track_title, track_artist, note))`)
+      .order("imported_at", { ascending: false });
+
+    if (!recRes.error) {
+      hasReceivedTable = true;
+      receivedItems = recRes.data || [];
+    } else {
+      hasReceivedTable = recRes.error.code !== "42P01"; // table missing vs other error
+      receivedItems = [];
+    }
+
+    render();
+  }
+
+  function render() {
+    const page = document.getElementById("page");
+
+    const nav = `
+      <div class="nav">
+        <a class="nav-logo" href="index.html">keepsake.<span class="logo-spark">✦</span></a>
+        <div class="nav-right">
+          <a class="nav-link active" href="notes.html">Notes</a>
+          <a class="nav-link" href="account.html">Account</a>
+          <button class="btn-signout" id="signoutBtn">Sign out</button>
+        </div>
+      </div>
+    `;
+
+    const tabs = `
+      <div class="tabs">
+        <button class="tab ${activeTab === "sent" ? "active" : ""}" data-tab="sent">Sent</button>
+        <button class="tab ${activeTab === "received" ? "active" : ""}" data-tab="received">Received</button>
+      </div>
+    `;
+
+    const content = activeTab === "sent" ? renderSent() : renderReceived();
+
+    page.innerHTML = `
+      ${nav}
+      <div class="section-header"><span>Your notes</span></div>
+      ${tabs}
+      ${content}
+      <div class="footer-links">
+        <a href="privacy.html" target="_blank">Privacy Policy</a>
+        &nbsp;·&nbsp;
+        <a href="index.html">Home</a>
+      </div>
+    `;
+
+    // Tab switching
+    page.querySelectorAll(".tab[data-tab]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        activeTab = btn.dataset.tab;
+        location.hash = activeTab === "received" ? "received" : "";
+        render();
+      });
+    });
+
+    // Sign out
+    document.getElementById("signoutBtn").addEventListener("click", async () => {
+      await sb.auth.signOut();
+      window.location.href = "auth.html";
+    });
+
+    // Sent list events
+    const sentList = page.querySelector(".sent-list");
+    if (sentList) {
+      sentList.addEventListener("click", async (e) => {
+        const copyBtn = e.target.closest("[data-copy]");
+        if (copyBtn) {
+          showToast("Open via the extension to copy the share link ✦");
+          return;
+        }
+        const archBtn = e.target.closest("[data-archive]");
+        if (archBtn && hasArchivedCol) {
+          const id = archBtn.dataset.archive;
+          const share = sentShares.find(s => s.id === id);
+          if (!share) return;
+          archBtn.disabled = true;
+          const { error } = await sb.from("shares").update({ archived: !share.archived }).eq("id", id);
+          if (error) { showToast("Couldn't update — try again."); return; }
+          share.archived = !share.archived;
+          showToast(share.archived ? "Archived ✦" : "Moved back to active ✦");
+          render();
+        }
+      });
+    }
+  }
+
+  function renderSent() {
+    const visible = hasArchivedCol ? sentShares.filter(s => !s.archived) : sentShares;
+
+    if (visible.length === 0) {
+      return `<div class="empty-state sent-empty">
+        <div class="empty-icon">♪</div>
+        <div class="empty-title">No notes sent yet</div>
+        <div class="empty-sub">Your shared moments will appear here as soon as you send one.</div>
+      </div>`;
+    }
+
+    const cards = visible.map(share => {
+      const anns = share.annotations || [];
+      const noteCount = anns.length;
+      const isPlaylist = share.share_type === "playlist";
+      const trackTitle = anns[0]?.track_title || (isPlaylist ? "Playlist share" : "Untitled note");
+      const trackArtist = anns[0]?.track_artist || "";
+      const noteLabel = noteCount === 1 ? "1 note inside" : `${noteCount} notes inside`;
+      const dateStr = new Date(share.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+
+      return `
+        <div class="share-card">
+          <div class="share-label">For ${share.recipient_name ? esc(share.recipient_name) : "someone special"}</div>
+          ${isPlaylist ? `<div class="share-type-pill">Playlist · ${noteCount} song${noteCount !== 1 ? "s" : ""}</div>` : ""}
+          <div class="share-track">${esc(trackTitle)}</div>
+          ${trackArtist ? `<div class="share-artist">${esc(trackArtist)}</div>` : ""}
+          ${noteCount > 0 ? `<div class="share-notes-count">${noteLabel}</div>` : ""}
+          <div class="share-footer">
+            <div class="share-date">${dateStr}</div>
+            <div class="share-actions">
+              <button class="btn-sm" data-copy="${esc(share.id)}">Copy link</button>
+              ${hasArchivedCol ? `<button class="btn-sm-ghost" data-archive="${esc(share.id)}">Archive</button>` : ""}
+            </div>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    return `<div class="shares-list sent-list">${cards}</div>`;
+  }
+
+  function renderReceived() {
+    if (!hasReceivedTable) {
+      return `
+        <div class="notice-card">
+          <div class="notice-eyebrow">Coming soon</div>
+          <div class="notice-title">Your received notes will live here</div>
+          <div class="notice-body">When someone sends you a Keepsake link and you import it in the extension while signed in, it'll be saved here — always accessible, even after the link is gone.</div>
+          <div class="notice-sub">Needs a one-time setup in Supabase to activate.</div>
+        </div>
+        <div class="notice-card" style="background: url('faq-bg-olive.png') center/cover no-repeat; color: #363614;">
+          <div class="notice-eyebrow">How it'll work</div>
+          <div class="notice-steps">
+            1. Someone sends you a Keepsake link<br>
+            2. You open it in the extension while signed in<br>
+            3. It saves here automatically — all your received notes in one place
+          </div>
+        </div>
+      `;
+    }
+
+    if (receivedItems.length === 0) {
+      return `<div class="empty-state received-empty">
+        <div class="empty-icon">✉</div>
+        <div class="empty-title">Nothing received yet</div>
+        <div class="empty-sub">Import a share link in the extension while signed in and it'll appear here.</div>
+      </div>`;
+    }
+
+    const cards = receivedItems.map(item => {
+      const share = item.shares;
+      if (!share) return "";
+      const anns = share.annotations || [];
+      const noteCount = anns.length;
+      const isPlaylist = share.share_type === "playlist";
+      const trackTitle = anns[0]?.track_title || (isPlaylist ? "Playlist share" : "Untitled note");
+      const trackArtist = anns[0]?.track_artist || "";
+      const noteLabel = noteCount === 1 ? "1 note inside" : `${noteCount} notes inside`;
+      const dateStr = new Date(item.imported_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+
+      return `
+        <div class="share-card">
+          <div class="share-label">From ${share.sender_name ? esc(share.sender_name) : "someone"}</div>
+          ${isPlaylist ? `<div class="share-type-pill">Playlist · ${noteCount} song${noteCount !== 1 ? "s" : ""}</div>` : ""}
+          <div class="share-track">${esc(trackTitle)}</div>
+          ${trackArtist ? `<div class="share-artist">${esc(trackArtist)}</div>` : ""}
+          ${noteCount > 0 ? `<div class="share-notes-count">${noteLabel}</div>` : ""}
+          <div class="share-footer">
+            <div class="share-date">Received ${dateStr}</div>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    return `<div class="shares-list received-list">${cards}</div>`;
+  }
+</script>
+</body>
+</html>
