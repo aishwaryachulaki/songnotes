@@ -239,6 +239,12 @@
   const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtrYXNnYmtnd2p4aXV0ZGFsYmJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyNjU3OTQsImV4cCI6MjA5Mjg0MTc5NH0.z1JLMTzz3X_swbWHdt2z4UDKyUwjEfNYys5kdDMq3R4";
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+  // AES-GCM ciphertext is long base64 with no spaces — real names are short and human-readable.
+  // Used to avoid displaying raw ciphertext when the extension key isn't present.
+  function looksEncrypted(s) {
+    return typeof s === "string" && s.length > 30 && !/\s/.test(s) &&
+      /[+\/=]/.test(s) && /^[A-Za-z0-9+\/=]+$/.test(s);
+  }
   function escHtml(s) {
     return String(s).replace(/[&<>"']/g, c =>
       ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
@@ -424,7 +430,7 @@
 
     return `
       <div class="share-card">
-        <div class="share-recipient">For ${share.recipient_name ? escHtml(share.recipient_name) : "someone special"}</div>
+        <div class="share-recipient">For ${share.recipient_name && !looksEncrypted(share.recipient_name) ? escHtml(share.recipient_name) : "someone special"}</div>
         ${typePill}
         <div class="share-track">${displayTitle}</div>
         ${displayArtist ? `<div class="share-artist">${displayArtist}</div>` : ""}

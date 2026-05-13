@@ -120,6 +120,12 @@ function formatTs(sec) {
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 }
+// AES-GCM ciphertext is long base64 with no spaces — real names are short and readable.
+// Used to avoid storing/displaying raw ciphertext when a decryption key isn't available.
+function looksEncrypted(s) {
+  return typeof s === "string" && s.length > 30 && !/\s/.test(s) &&
+    /[+\/=]/.test(s) && /^[A-Za-z0-9+\/=]+$/.test(s);
+}
 // Returns only structurally valid notes — guards share/import paths.
 function sanitizeNotes(notes) {
   return (notes || []).filter((n) => n && n.id && n.note && n.track_id);
@@ -989,7 +995,11 @@ $("importBtn").addEventListener("click", async () => {
     playlist_id: decryptedMeta?.playlist_id || decryptedRemote.find((r) => r.playlist_id)?.playlist_id || null,
     playlist_url: decryptedMeta?.playlist_url || null,
     sender_name: decryptedMeta?.sender_name || decryptedRemote[0]?.sender_name || "someone",
-    recipient_name: decryptedMeta?.recipient_name || null,
+    // If no key was provided, recipient_name may arrive as a ciphertext blob —
+    // null it out rather than storing/displaying garbage in the UI.
+    recipient_name: decryptedMeta?.recipient_name && !looksEncrypted(decryptedMeta.recipient_name)
+      ? decryptedMeta.recipient_name
+      : null,
     enc_key: importKeyB64 || null, // stored so reactivation can decrypt from Supabase
     imported: true,
     created_at: Date.now(),
