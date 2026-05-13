@@ -586,9 +586,14 @@
     document.getElementById(`paste-input-${id}`)?.focus();
   }
 
-  // AES-GCM output is base64, 60+ chars. Real names/titles won't match this.
+  // AES-GCM output is base64: long, no spaces, only A-Za-z0-9+/= chars.
+  // Real names and song titles are short or contain spaces.
   function looksEncrypted(s) {
-    return s && s.length > 44 && /^[A-Za-z0-9+/]+=*$/.test(s.trim());
+    return typeof s === "string" &&
+      s.length > 30 &&
+      !/\s/.test(s) &&
+      /[+\/=]/.test(s) &&
+      /^[A-Za-z0-9+\/=]+$/.test(s);
   }
   function safeDisplay(s, fallback) {
     return (s && !looksEncrypted(s)) ? esc(s) : fallback;
