@@ -230,34 +230,6 @@
       font-family: 'Montserrat', sans-serif;
       font-size: 9px; letter-spacing: 0.06em; color: var(--ink-lt); opacity: 0.7;
     }
-    /* ── Expanded notes view ── */
-    .notes-expanded {
-      margin-top: 16px;
-      border-top: 1px solid rgba(58,36,24,0.12);
-      padding-top: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .note-entry {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-    }
-    .note-timestamp {
-      font-family: 'Montserrat', sans-serif;
-      font-size: 8.5px; font-weight: 700; letter-spacing: 0.12em;
-      text-transform: uppercase; opacity: 0.45;
-    }
-    .note-song {
-      font-family: 'Lora', Georgia, serif;
-      font-size: 12px; font-weight: 600; opacity: 0.70;
-    }
-    .note-text {
-      font-family: 'Lora', Georgia, serif;
-      font-size: 14px; line-height: 1.65;
-      font-style: italic;
-    }
 
     /* ── Empty state ── */
     .empty-state {
@@ -317,32 +289,6 @@
       display: block; font-size: 20px; color: var(--ink); margin-bottom: 8px;
     }
 
-    /* ── Paste-link fallback ── */
-    .paste-link-wrap {
-      margin-top: 14px;
-      border-top: 1px solid rgba(58,36,24,0.12);
-      padding-top: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .paste-link-label {
-      font-family: 'Spectral', Georgia, serif;
-      font-style: italic; font-size: 13px; opacity: 0.65;
-    }
-    .paste-link-row { display: flex; gap: 8px; }
-    .paste-link-input {
-      flex: 1; font-family: 'Lora', Georgia, serif;
-      font-size: 12px; padding: 7px 12px; border-radius: 10px;
-      border: 1.5px solid rgba(58,36,24,0.18);
-      background: rgba(255,251,244,0.7); color: var(--ink);
-      outline: none;
-    }
-    .paste-link-input:focus { border-color: rgba(217,107,124,0.40); }
-    .paste-link-error {
-      font-family: 'Montserrat', sans-serif;
-      font-size: 10px; color: var(--rose); opacity: 0.8;
-    }
 
     /* ── Footer ── */
     .footer-links {
@@ -572,61 +518,43 @@
           return;
         }
 
-        // Close button
-        const closeBtn = e.target.closest("[data-relive-close]");
-        if (closeBtn) {
-          const id = closeBtn.dataset.reliveClose;
-          document.getElementById(`relive-${id}`)?.remove();
-          const btn = document.querySelector(`[data-relive="${id}"]`);
-          if (btn) btn.textContent = "Relive ✦";
-          return;
-        }
-
-        // Relive button — try extension first, fall back to paste UI
+        // Relive button — open share.html as the recipient would see it
         const reliveBtn = e.target.closest("[data-relive]");
         if (!reliveBtn) return;
         const id = reliveBtn.dataset.relive;
-        const share = sentShares.find(s => s.id === id);
-        if (!share || !share.sender_content) return;
-
-        // Already open → close
-        if (document.getElementById(`relive-${id}`)) {
-          document.getElementById(`relive-${id}`)?.remove();
-          reliveBtn.textContent = "Relive ✦";
-          return;
-        }
 
         reliveBtn.textContent = "Opening…";
         reliveBtn.disabled = true;
 
         const keyB64 = await getKeyFromExtension(id);
         if (keyB64) {
-          await expandWithKey(id, share, keyB64, reliveBtn);
+          const url = `https://aishwaryachulaki.github.io/songnotes/share.html?id=${id}&e=1#k=${keyB64}`;
+          window.open(url, "_blank");
         } else {
-          // Extension not present or key not found — show paste UI
-          showPasteUI(id, share, reliveBtn);
+          showPasteUI(id, reliveBtn);
         }
+
+        reliveBtn.textContent = "Relive ✦";
+        reliveBtn.disabled = false;
       });
 
-      // Paste-link submit
+      // Paste-link submit — just open the pasted URL
       sentList.addEventListener("click", async (e) => {
         const submitBtn = e.target.closest("[data-paste-submit]");
         if (!submitBtn) return;
         const id = submitBtn.dataset.pasteSubmit;
-        const share = sentShares.find(s => s.id === id);
         const input = document.getElementById(`paste-input-${id}`);
         const errEl = document.getElementById(`paste-err-${id}`);
-        const reliveBtn = document.querySelector(`[data-relive="${id}"]`);
-        if (!input || !share) return;
+        if (!input) return;
 
-        const keyB64 = keyFromUrl(input.value.trim());
+        const url = input.value.trim();
+        const keyB64 = keyFromUrl(url);
         if (!keyB64) {
-          errEl.textContent = "Couldn't find the key — make sure you paste the full link, including the part after #.";
+          errEl.textContent = "Couldn't find the key — paste the full link, including the part after #.";
           return;
         }
-        errEl.textContent = "";
-        submitBtn.disabled = true;
-        await expandWithKey(id, share, keyB64, reliveBtn);
+        window.open(url, "_blank");
+        document.getElementById(`relive-${id}`)?.remove();
       });
     }
   }
@@ -653,67 +581,19 @@
     }
   }
 
-  async function expandWithKey(id, share, keyB64, reliveBtn) {
-    try {
-      const cryptoKey = await importEncKey(keyB64);
-      const json = await decryptField(share.sender_content, cryptoKey);
-      if (!json) throw new Error("decrypt failed");
-      const parsed = JSON.parse(json);
-      // Support both old format (array) and new format ({recipient_name, notes})
-      const notes = Array.isArray(parsed) ? parsed : (parsed.notes || []);
-      // Update the recipient label if we now have the plaintext name
-      const recipientName = parsed.recipient_name || share._decryptedRecipient;
-      if (recipientName) {
-        const card = reliveBtn?.closest(".share-card");
-        const label = card?.querySelector(".share-label");
-        if (label) label.textContent = `For ${recipientName}`;
-      }
-      const isPlaylist = share.share_type === "playlist";
-
-      const notesHtml = notes.map(n => {
-        const ts = formatTimestamp(n.timestamp);
-        return `
-          <div class="note-entry">
-            ${isPlaylist && n.track_title ? `<div class="note-song">${esc(n.track_title)}${n.track_artist ? ` — ${esc(n.track_artist)}` : ""}</div>` : ""}
-            ${ts ? `<div class="note-timestamp">${ts}</div>` : ""}
-            <div class="note-text">${esc(n.note || "")}</div>
-          </div>`;
-      }).join("");
-
-      const wrap = document.createElement("div");
-      wrap.className = "notes-expanded relive-row";
-      wrap.id = `relive-${id}`;
-      wrap.innerHTML = `
-        ${notesHtml || `<div style="font-size:13px;opacity:0.5;">No notes found.</div>`}
-        <div style="margin-top:4px;">
-          <button class="btn-sm-ghost" data-relive-close="${esc(id)}" style="opacity:0.45;font-size:9px;">Close</button>
-        </div>`;
-
-      // Remove any existing panel, then insert after the card's row in the grid
-      document.getElementById(`relive-${id}`)?.remove();
-      const card = reliveBtn?.closest(".share-card");
-      if (card) card.after(wrap);
-      if (reliveBtn) { reliveBtn.textContent = "Relive ✦"; reliveBtn.disabled = false; }
-    } catch {
-      if (reliveBtn) { reliveBtn.textContent = "Relive ✦"; reliveBtn.disabled = false; }
-      showPasteUI(id, share, reliveBtn, "Couldn't decrypt — try pasting the share link.");
-    }
-  }
-
-  function showPasteUI(id, share, reliveBtn, prefillError = "") {
-    if (reliveBtn) { reliveBtn.textContent = "Relive ✦"; reliveBtn.disabled = false; }
+  function showPasteUI(id, reliveBtn) {
     if (document.getElementById(`relive-${id}`)) return;
 
     const wrap = document.createElement("div");
-    wrap.className = "paste-link-wrap relive-row";
+    wrap.className = "relive-row";
     wrap.id = `relive-${id}`;
+    wrap.style.cssText = "display:flex;align-items:center;gap:8px;padding:10px 0;";
     wrap.innerHTML = `
-      <div class="paste-link-label">Paste your share link to read your notes</div>
-      <div class="paste-link-row">
-        <input class="paste-link-input" id="paste-input-${esc(id)}" type="text" placeholder="https://…#k=…" />
-        <button class="btn-sm" data-paste-submit="${esc(id)}">Decrypt</button>
-      </div>
-      <div class="paste-link-error" id="paste-err-${esc(id)}">${prefillError}</div>
+      <input id="paste-input-${esc(id)}" type="text" placeholder="Paste your share link (https://…#k=…)"
+        style="flex:1;font-family:'Lora',Georgia,serif;font-size:12px;padding:8px 12px;border-radius:10px;
+               border:1.5px solid rgba(58,36,24,0.18);background:rgba(255,251,244,0.8);color:var(--ink);outline:none;" />
+      <button class="btn-sm" data-paste-submit="${esc(id)}">Open ✦</button>
+      <span id="paste-err-${esc(id)}" style="font-family:'Montserrat',sans-serif;font-size:10px;color:var(--rose);"></span>
     `;
     const card = reliveBtn?.closest(".share-card");
     if (card) card.after(wrap);
@@ -731,13 +611,6 @@
   }
   function safeDisplay(s, fallback) {
     return (s && !looksEncrypted(s)) ? esc(s) : fallback;
-  }
-
-  function formatTimestamp(seconds) {
-    if (seconds == null || isNaN(seconds)) return "";
-    const m = Math.floor(seconds / 60);
-    const s = Math.floor(seconds % 60);
-    return `${m}:${s.toString().padStart(2, "0")}`;
   }
 
   function renderSent() {
