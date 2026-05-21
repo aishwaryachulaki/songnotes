@@ -1030,6 +1030,24 @@ $("importBtn").addEventListener("click", async () => {
   renderSummary();
   renderPrevious();
   notifyContentRefresh();
+
+  // Record this import server-side so it appears in the Received tab on
+  // notes.html for this user, persisted across devices and reinstalls.
+  // Fire-and-forget — local import already succeeded above.
+  // resolution=ignore-duplicates handles re-imports of the same share gracefully.
+  getSession().then(session => {
+    if (!session) return;
+    fetch(`${SUPABASE_URL}/rest/v1/received_shares`, {
+      method: "POST",
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${session.access_token}`,
+        "Content-Type": "application/json",
+        Prefer: "resolution=ignore-duplicates,return=minimal",
+      },
+      body: JSON.stringify({ user_id: session.user.id, share_id: v }),
+    }).catch(console.warn);
+  });
 });
 
 init().then(startLiveTracking);
