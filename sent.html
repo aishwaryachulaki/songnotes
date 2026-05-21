@@ -207,13 +207,20 @@
     .toast.show { opacity: 1; }
 
     /* ── State ── */
+    @keyframes ks-breathe {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.35; }
+    }
     .state {
       text-align: center; padding: 80px 20px;
       color: var(--ink-mid); font-size: 14px; line-height: 1.6;
     }
     .state strong {
-      font-family: 'Lora', Georgia, serif;
-      display: block; font-size: 20px; color: var(--ink); margin-bottom: 8px;
+      font-family: 'Spectral', Georgia, serif;
+      font-style: italic; font-weight: 400;
+      display: block; font-size: 32px; color: var(--rose);
+      margin-bottom: 8px;
+      animation: ks-breathe 2s ease-in-out infinite;
     }
 
     /* ── Footer ── */
@@ -229,7 +236,7 @@
 </head>
 <body>
 <div class="page" id="page">
-  <div class="state"><strong>Loading…</strong></div>
+  <div class="state"><strong>loading…</strong></div>
 </div>
 <div class="toast" id="toast"></div>
 
