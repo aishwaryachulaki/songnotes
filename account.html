@@ -141,67 +141,67 @@
     .bundle:nth-child(2) { background: url('faq-bg-yellow.png') top / cover no-repeat; color: #4a3800; }
     .bundle:nth-child(3) { background: url('faq-bg-olive.png')  center / cover no-repeat; color: #363614; }
     .bundle {
-      border-radius: 16px; padding: 22px 20px;
-      aspect-ratio: 1;
-      display: flex; flex-direction: column; justify-content: space-between;
+      border-radius: 14px; padding: 16px 14px 14px;
+      display: flex; flex-direction: column; gap: 6px;
       cursor: pointer; position: relative; overflow: hidden;
       transition: filter 0.15s;
     }
     .bundle:hover { filter: brightness(0.96); }
     .bundle-sparkles {
-      position: absolute; top: 12px; right: 12px;
-      width: 32px; height: 32px;
+      position: absolute; top: 10px; right: 10px;
+      width: 28px; height: 28px;
       background: url('credits-sparkles.png') center / contain no-repeat;
-      pointer-events: none; opacity: 0.85;
+      pointer-events: none; opacity: 0.75;
     }
-    .bundle-top { display: flex; flex-direction: column; gap: 4px; }
+    .bundle-top { display: flex; flex-direction: column; gap: 2px; }
     .bundle-name {
       font-family: 'Montserrat', sans-serif;
-      font-size: 9px; font-weight: 700;
-      letter-spacing: 0.1em; text-transform: uppercase;
+      font-size: 8.5px; font-weight: 600;
+      letter-spacing: 0.09em; text-transform: uppercase;
       color: var(--rose);
     }
     .bundle-count {
       font-family: 'Lora', Georgia, serif;
-      font-size: 32px; font-weight: 700; line-height: 1;
+      font-size: 20px; font-weight: 400; line-height: 1.1;
     }
-    .bundle-bottom { display: flex; flex-direction: column; gap: 4px; }
-    .bundle-rule { border: none; border-top: 1px solid rgba(58,36,24,0.12); margin-bottom: 2px; }
+    .bundle-bottom { display: flex; flex-direction: column; gap: 3px; margin-top: 4px; }
+    .bundle-rule { border: none; border-top: 1px solid rgba(58,36,24,0.10); margin-bottom: 1px; }
     .bundle-price {
       font-family: 'Lora', Georgia, serif;
-      font-size: 24px; font-weight: 700; color: var(--rose);
+      font-size: 17px; font-weight: 500; color: var(--rose);
     }
-    .bundle-desc { font-size: 10.5px; line-height: 1.4; opacity: 0.68; }
+    .bundle-desc { font-size: 10px; line-height: 1.4; opacity: 0.65; }
 
     /* ── Lifetime card ── */
     .lifetime-card {
       background: url('faq-bg-pink.png') top / cover no-repeat;
-      border-radius: 14px; padding: 28px 32px;
+      border-radius: 14px; padding: 20px 24px;
       position: relative; overflow: hidden;
       cursor: pointer; transition: filter 0.15s;
       color: #5c2d2d;
+      display: flex; align-items: center; justify-content: space-between; gap: 20px;
     }
     .lifetime-card:hover { filter: brightness(0.97); }
-    .lifetime-content { position: relative; z-index: 1; }
+    .lifetime-content { position: relative; z-index: 1; flex: 1; }
     .lifetime-title {
       font-family: 'Lora', Georgia, serif;
-      font-size: 26px; font-weight: 700;
-      line-height: 1.2; margin-bottom: 4px;
+      font-size: 17px; font-weight: 400;
+      line-height: 1.2; margin-bottom: 2px;
     }
     .lifetime-sub {
       font-family: 'Spectral', Georgia, serif;
-      font-size: 16px; color: var(--rose); font-style: italic; margin-bottom: 16px;
+      font-size: 13px; color: var(--rose); font-style: italic;
     }
-    .lifetime-rule {
-      border: none; border-top: 1px solid rgba(92,45,45,0.18);
-      margin-bottom: 16px;
+    .lifetime-rule { display: none; }
+    .lifetime-price-row {
+      display: flex; flex-direction: column; align-items: flex-end;
+      flex-shrink: 0; gap: 2px;
     }
-    .lifetime-price-row { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
     .lifetime-price {
       font-family: 'Lora', Georgia, serif;
-      font-size: 36px; font-weight: 700; line-height: 1;
+      font-size: 24px; font-weight: 500; line-height: 1; color: var(--rose);
     }
-    .lifetime-desc { font-size: 12px; line-height: 1.65; opacity: 0.72; }
+    .lifetime-desc { font-size: 10px; line-height: 1.4; opacity: 0.65; text-align: right; }
 
     /* ── Trust line ── */
     .trust-line {
@@ -414,11 +414,10 @@
         <div class="lifetime-content">
           <div class="lifetime-title">Keep every note</div>
           <div class="lifetime-sub">Unlimited, forever</div>
-          <hr class="lifetime-rule" />
-          <div class="lifetime-price-row">
-            <div class="lifetime-price">₹999</div>
-            <div class="lifetime-desc">Write as much as you want.<br>No limits.</div>
-          </div>
+        </div>
+        <div class="lifetime-price-row">
+          <div class="lifetime-price">₹999</div>
+          <div class="lifetime-desc">Write as much as you want. No limits.</div>
         </div>
       </div>
 
