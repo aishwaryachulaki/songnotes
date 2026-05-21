@@ -23,15 +23,19 @@
       font-family: 'Lora', Georgia, serif;
       min-height: 100vh;
       color: var(--ink);
+      display: flex;
+      flex-direction: column;
     }
 
     .page {
       max-width: 1200px;
+      width: 100%;
       margin: 0 auto;
-      padding: 0 40px 80px;
+      padding: 0 40px 48px;
       display: flex;
       flex-direction: column;
       gap: 14px;
+      flex: 1;
     }
 
     /* ── Nav ── */
@@ -299,6 +303,8 @@
 
     /* ── Footer ── */
     .footer-links {
+      margin-top: auto;
+      padding-top: 32px;
       text-align: center;
       font-family: 'Montserrat', sans-serif;
       font-size: 10px; color: var(--ink-lt); letter-spacing: 0.04em;
@@ -377,7 +383,7 @@
   let activeTab = "received";
   let sentPage = 0;
   let receivedPage = 0;
-  const PAGE_SIZE = 10;
+  const PAGE_SIZE = 16;
 
   // Read tab from URL hash
   if (location.hash === "#sent") activeTab = "sent";
