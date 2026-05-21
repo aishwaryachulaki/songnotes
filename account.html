@@ -141,34 +141,37 @@
     .bundle:nth-child(2) { background: url('faq-bg-yellow.png') top / cover no-repeat; color: #4a3800; }
     .bundle:nth-child(3) { background: url('faq-bg-olive.png')  center / cover no-repeat; color: #363614; }
     .bundle {
-      border-radius: 14px; padding: 20px 18px 18px;
-      display: flex; flex-direction: column; gap: 8px;
+      border-radius: 16px; padding: 22px 20px;
+      aspect-ratio: 1;
+      display: flex; flex-direction: column; justify-content: space-between;
       cursor: pointer; position: relative; overflow: hidden;
       transition: filter 0.15s;
     }
     .bundle:hover { filter: brightness(0.96); }
     .bundle-sparkles {
-      position: absolute; top: 10px; right: 10px;
-      width: 36px; height: 36px;
+      position: absolute; top: 12px; right: 12px;
+      width: 32px; height: 32px;
       background: url('credits-sparkles.png') center / contain no-repeat;
       pointer-events: none; opacity: 0.85;
     }
+    .bundle-top { display: flex; flex-direction: column; gap: 4px; }
     .bundle-name {
       font-family: 'Montserrat', sans-serif;
-      font-size: 10px; font-weight: 700;
-      letter-spacing: 0.08em; text-transform: uppercase;
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
       color: var(--rose);
     }
     .bundle-count {
       font-family: 'Lora', Georgia, serif;
-      font-size: 26px; font-weight: 700; line-height: 1.1;
+      font-size: 32px; font-weight: 700; line-height: 1;
     }
-    .bundle-rule { border: none; border-top: 1px solid rgba(58,36,24,0.12); }
+    .bundle-bottom { display: flex; flex-direction: column; gap: 4px; }
+    .bundle-rule { border: none; border-top: 1px solid rgba(58,36,24,0.12); margin-bottom: 2px; }
     .bundle-price {
       font-family: 'Lora', Georgia, serif;
-      font-size: 22px; font-weight: 700; color: var(--rose);
+      font-size: 24px; font-weight: 700; color: var(--rose);
     }
-    .bundle-desc { font-size: 11px; line-height: 1.45; opacity: 0.72; }
+    .bundle-desc { font-size: 10.5px; line-height: 1.4; opacity: 0.68; }
 
     /* ── Lifetime card ── */
     .lifetime-card {
@@ -349,11 +352,15 @@
     const bundleCards = BUNDLES.map((b, i) => `
       <div class="bundle" data-bundle="${i}">
         <div class="bundle-sparkles"></div>
-        <div class="bundle-name">${b.name}</div>
-        <div class="bundle-count">${b.letters} notes</div>
-        <hr class="bundle-rule" />
-        <div class="bundle-price">${b.label}</div>
-        <div class="bundle-desc">${b.desc}</div>
+        <div class="bundle-top">
+          <div class="bundle-name">${b.name}</div>
+          <div class="bundle-count">${b.letters} notes</div>
+        </div>
+        <div class="bundle-bottom">
+          <hr class="bundle-rule" />
+          <div class="bundle-price">${b.label}</div>
+          <div class="bundle-desc">${b.desc}</div>
+        </div>
       </div>
     `).join("");
 
