@@ -97,7 +97,7 @@ body {
 
 /* ── Now Playing card ── */
 .stamp-track {
-  background: url('faq-bg-pink.png') center / cover no-repeat;
+  background: url('faq-bg-pink.png') top / cover no-repeat;
   border-radius: 16px;
   padding: 16px 18px 18px;
   position: relative;
@@ -258,7 +258,7 @@ body {
   scrollbar-color: rgba(58,36,24,0.12) transparent;
 }
 .note {
-  background: url('faq-bg-pink.png') center / cover no-repeat;
+  background: url('faq-bg-pink.png') top / cover no-repeat;
   border: none;
   border-radius: 10px;
   padding: 9px 26px 9px 10px;
@@ -291,7 +291,7 @@ body {
 
 /* ── Share card ── */
 .share-card {
-  background: url('faq-bg-pink.png') center / cover no-repeat;
+  background: url('faq-bg-pink.png') top / cover no-repeat;
   border: none;
   border-radius: 14px; padding: 14px 16px;
   display: flex; flex-direction: column; gap: 10px;
