@@ -15,10 +15,10 @@ button, .btn { font-family: 'Montserrat', sans-serif; }
   --border:    rgba(58,36,24,0.12);
 
   /* Ink-density tiers — rgba so paper texture reads through */
-  --ink-2: rgba(58,36,24,0.72);  /* body text, input values, card titles */
-  --ink-3: rgba(58,36,24,0.50);  /* labels, eyebrows, nav, artist, metadata */
-  --ink-4: rgba(58,36,24,0.34);  /* helper text, sub-labels, supporting info */
-  --ink-5: rgba(58,36,24,0.20);  /* placeholders, decorative, ghost */
+  --ink-2: rgba(58,36,24,0.82);  /* body text, input values, card titles */
+  --ink-3: rgba(58,36,24,0.62);  /* labels, eyebrows, nav, artist, metadata */
+  --ink-4: rgba(58,36,24,0.44);  /* helper text, sub-labels, supporting info */
+  --ink-5: rgba(58,36,24,0.28);  /* placeholders, decorative, ghost */
 }
 
 body {
@@ -35,7 +35,7 @@ body::before {
   position: fixed; inset: 0; pointer-events: none; z-index: 0;
   background: radial-gradient(
     ellipse 100% 55% at 50% 0%,
-    rgba(255,251,244,0.28) 0%,
+    rgba(255,251,244,0.10) 0%,
     transparent 70%
   );
 }
@@ -181,7 +181,7 @@ body::before {
 .composer-card::before {
   content: '';
   position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
-  background: radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.18) 0%, transparent 65%);
+  background: radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.08) 0%, transparent 65%);
   z-index: 0;
 }
 .composer-card > * { position: relative; z-index: 1; }
