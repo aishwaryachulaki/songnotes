@@ -138,9 +138,9 @@
 
     /* ── Pricing grid ── */
     .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-    .bundle:nth-child(1) { background: #f0c0c8 url('faq-bg-pink.png') top / cover no-repeat; color: #5c2d2d; box-shadow: inset 0 0 0 1px rgba(240,192,200,0.6); }
-    .bundle:nth-child(2) { background: #f0dfa0 url('faq-bg-yellow.png') top / cover no-repeat; color: #4a3800; box-shadow: inset 0 0 0 1px rgba(240,223,160,0.6); }
-    .bundle:nth-child(3) { background: #d4d898 url('faq-bg-olive.png')  center / cover no-repeat; color: #363614; box-shadow: inset 0 0 0 1px rgba(212,216,152,0.6); }
+    .bundle:nth-child(1),
+    .bundle:nth-child(2),
+    .bundle:nth-child(3) { background: #f0e8dc url('lifetime-background.png') top / cover no-repeat; color: #3a2418; box-shadow: inset 0 0 0 1px rgba(240,232,220,0.6); }
     .bundle {
       border-radius: 14px; padding: 20px 18px 18px;
       display: flex; flex-direction: column; gap: 8px;
@@ -175,8 +175,9 @@
 
     /* ── Lifetime card ── */
     .lifetime-card {
-      background: #f0c0c8 url('lifetime-background.png') top / cover no-repeat;
+      background: #f0c0c8 url('faq-bg-pink.png') top / cover no-repeat;
       border: 1.5px solid rgba(217,107,124,0.45);
+      box-shadow: inset 0 0 0 1px rgba(240,192,200,0.6);
       border-radius: 14px; padding: 20px 24px;
       position: relative; overflow: hidden;
       cursor: pointer; transition: filter 0.15s;
