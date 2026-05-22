@@ -714,14 +714,20 @@
       .stamp-grid { grid-template-columns: 1fr 1fr; }
     }
 
-    @media (max-width: 700px) {
+    @media (max-width: 960px) {
       .page-top {
         grid-template-columns: 1fr;
         gap: 20px;
         padding-bottom: 32px;
       }
+      /* Hide the illustration on narrower viewports — envelope hero is enough */
+      .illus-col { display: none; }
+      .env-wrap { width: 100%; margin-left: 0; max-width: 600px; margin: 0 auto; }
+      .env-overlay { top: 12%; left: 10%; right: 10%; bottom: 12%; }
+    }
+
+    @media (max-width: 700px) {
       .illus-frame { min-height: 320px; }
-      /* Safe zone stays strict on mobile */
       .env-overlay { top: 13%; left: 11%; right: 11%; bottom: 13%; }
     }
 
