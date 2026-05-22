@@ -624,3 +624,16 @@ body::before {
   background: var(--tangerine); color: #fff; border-color: var(--tangerine);
 }
 .btn.primary:hover { opacity: 0.88; }
+
+
+/* ── Stretch all card textures to fill their container wall-to-wall ── */
+/* Prevents the pale top-edge of the landscape images from showing at card tops */
+.auth-gate,
+.stamp-track,
+.composer-card,
+.note,
+.share-card,
+.share-panel,
+.prev-item {
+  background-size: 100% 100%;
+}
