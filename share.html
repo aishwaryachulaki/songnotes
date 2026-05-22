@@ -138,48 +138,41 @@
     /* ── Action buttons ── */
     .hero-actions {
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
       align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
       gap: 10px;
       margin-top: 24px;
-      min-height: 52px;
+      min-height: 44px;
     }
-    /* shared pill style */
+    /* shared pale-pink pill — matches site's sp-attach / prev-activate style */
     .hero-btn {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      border: none;
+      gap: 7px;
+      background: rgba(227, 104, 136, 0.10);
+      border: 1.5px solid rgba(227, 104, 136, 0.35);
+      color: var(--rose);
       border-radius: 50px;
-      padding: 13px 28px;
+      padding: 12px 24px;
       font-family: 'Montserrat', sans-serif;
       font-size: 11px;
       font-weight: 700;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.10em;
       text-transform: uppercase;
       text-decoration: none;
       cursor: pointer;
-      transition: opacity 0.15s, transform 0.12s;
+      transition: background 0.15s, color 0.15s, transform 0.12s;
+      white-space: nowrap;
     }
-    .hero-btn:hover { opacity: 0.88; transform: translateY(-1px); }
-    .hero-btn:disabled { opacity: 0.4; cursor: default; transform: none; }
-
-    .btn-spotify {
-      background: var(--olive);
-      color: var(--cream);
-      box-shadow: 0 4px 16px rgba(59,58,39,0.22);
-    }
-    .btn-import {
-      background: var(--tangerine);
+    .hero-btn:hover {
+      background: var(--blush);
       color: #fff;
-      box-shadow: 0 4px 16px rgba(240,140,33,0.25);
+      border-color: var(--blush);
+      transform: translateY(-1px);
     }
-    .btn-install {
-      background: transparent;
-      color: var(--ink-mid);
-      border: 1.5px solid rgba(58,36,24,0.25);
-      box-shadow: none;
-    }
+    .hero-btn:disabled { opacity: 0.4; cursor: default; transform: none; }
 
     /* ── Envelope — shows top ~55%, cropped at bottom edge ── */
     .hero-envelope {
@@ -352,8 +345,9 @@
       <div class="hero-count">${totalNotes} note${totalNotes === 1 ? "" : "s"} inside</div>
       ${recipient ? `<div class="hero-recipient">for <strong>${escHtml(recipient)}</strong></div>` : ""}
       <div class="hero-actions" id="heroActions">
+        <!-- import btn injected here by extension detection -->
         ${spLink ? `
-          <a class="hero-btn btn-spotify" href="${escHtml(spLink)}" target="_blank" rel="noopener">
+          <a class="hero-btn" id="spotifyBtn" href="${escHtml(spLink)}" target="_blank" rel="noopener">
             ♪ ${spotifyLabel(meta, notes)}
           </a>` : ""}
       </div>
@@ -369,10 +363,10 @@
       const actions = document.getElementById("heroActions");
       if (!actions) return;
       const btn = document.createElement("button");
-      btn.className = "hero-btn btn-import";
+      btn.className = "hero-btn";
       btn.id = "importBtn";
       btn.textContent = "♫ Import into Keepsake";
-      actions.appendChild(btn);
+      actions.insertBefore(btn, actions.firstChild);
       btn.addEventListener("click", () => {
         window.__KS_PAYLOAD = { share_id: shareId, share: meta || {}, notes };
         window.dispatchEvent(new CustomEvent("keepsake:import", { detail: window.__KS_PAYLOAD }));
@@ -391,7 +385,7 @@
       const actions = document.getElementById("heroActions");
       if (!actions) return;
       const a = document.createElement("a");
-      a.className = "hero-btn btn-install";
+      a.className = "hero-btn";
       a.href = EXTENSION_CWS_URL;
       a.target = "_blank";
       a.rel = "noopener";
