@@ -405,27 +405,33 @@
   function renderCard(share) {
     const anns = share.annotations || [];
     const noteCount = anns.length;
-    const isPlaylist = share.share_type === "playlist";
-    const isMulti    = share.share_type === "multi";
+    // Count unique songs — compute first so it can inform type detection.
+    const uniqueTracks = new Set(anns.map(a => a.track_title).filter(Boolean)).size || anns.length;
 
-    // Primary display info — for single-track shares, show the track; for
-    // multi/playlist shares, show a summary so the first song doesn't mislead.
+    // Detect playlist/multi. Fall back to annotation count for old shares where
+    // the DB columns were never populated (PostgREST silently ignores unknown cols).
+    const isPlaylist = share.share_type === "playlist"
+      || !!(share.playlist_url || share.playlist_id)
+      || !!share.playlist_name
+      || uniqueTracks > 1;
+    const isMulti = false; // playlist covers all multi-track cases
+
+    // Primary display info — for single-track shares, show the track.
     let trackTitle = "";
     let trackArtist = "";
-    if (anns.length > 0 && !isPlaylist && !isMulti) {
+    if (anns.length > 0 && !isPlaylist) {
       trackTitle  = anns[0].track_title  || "";
       trackArtist = anns[0].track_artist || "";
     }
-
-    // Count unique songs across all annotations
-    const uniqueTracks = new Set(anns.map(a => a.track_title).filter(Boolean)).size || anns.length;
 
     const typePill = (isPlaylist || isMulti)
       ? `<div class="share-type-pill">${isPlaylist ? "Playlist" : "Multi-song"} · ${uniqueTracks} song${uniqueTracks !== 1 ? "s" : ""}</div>`
       : "";
 
     let displayTitle;
-    if (isPlaylist || isMulti) {
+    if (isPlaylist) {
+      displayTitle = "A Playlist Share";
+    } else if (isMulti) {
       displayTitle = `${uniqueTracks} song${uniqueTracks !== 1 ? "s" : ""}, ${noteCount} note${noteCount !== 1 ? "s" : ""}`;
     } else {
       displayTitle = trackTitle ? escHtml(trackTitle) : "Untitled note";

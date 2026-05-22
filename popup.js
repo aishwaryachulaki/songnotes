@@ -231,6 +231,7 @@ function ensureActive(store, sender) {
       type: "single",
       playlist_id: null,
       playlist_url: null,
+      playlist_name: null,
       sender_name: sender || "someone",
       recipient_name: null,
       notes: [],
@@ -254,7 +255,7 @@ let shareOrigin = CONFIGURED_ORIGIN || "";
 let activeShare = null; // reference into store.shares[active]
 
 async function getActiveTab() {
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
   return tab;
 }
 async function fetchTrack() {
@@ -292,6 +293,7 @@ async function pushShareMeta(share, accessToken) {
         share_type: share.type,
         playlist_id: share.playlist_id,
         playlist_url: share.playlist_url,
+        playlist_name: share.playlist_name || null,
         sender_name: share.sender_name || senderName || "someone",
         recipient_name: share.recipient_name || null,
         sender_content: share.sender_content || null,
@@ -587,7 +589,15 @@ async function init() {
   activeShare = ensureActive(store, senderName);
   await saveStore(store).catch(console.error);
 
-  const state = await fetchTrack();
+  let state = await fetchTrack();
+  // If fetchTrack() couldn't detect the song (tab query unreliable from side
+  // panel context), fall back to the track background.js last cached from
+  // a KS_TRACK_CHANGED broadcast. This covers the case where the song was
+  // already playing before the panel was opened.
+  if ((!state || !state.trackId) && !state?.notOnSpotify) {
+    const cached = await chrome.runtime.sendMessage({ type: "KS_GET_CACHED_TRACK" }).catch(() => null);
+    if (cached && cached.trackId) state = { ...cached, playerVisible: true };
+  }
   if (state && state.trackId) {
     currentTrack = state;
     $("trackTitle").textContent = state.title || "Unknown track";
@@ -730,6 +740,19 @@ $("playlistUrl").addEventListener("change", async () => {
   activeShare.playlist_url = v || null;
   activeShare.playlist_id = parsePlaylistId(v);
   activeShare.type = deriveType(activeShare);
+  // Capture the playlist name from the Spotify tab title while the user is on
+  // the playlist page. Spotify sets the tab title to the playlist name.
+  if (v && parsePlaylistId(v)) {
+    try {
+      const res = await fetch(`https://open.spotify.com/oembed?url=${encodeURIComponent(v)}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.title) activeShare.playlist_name = data.title;
+      }
+    } catch { /* network error — proceed without name */ }
+  } else {
+    activeShare.playlist_name = null;
+  }
   const { store } = await loadStore();
   store.shares[activeShare.id] = activeShare;
   await saveStore(store).catch(console.error);
@@ -784,6 +807,23 @@ $("copyShare").addEventListener("click", async () => {
   activeShare.playlist_url = v || null;
   activeShare.playlist_id = parsePlaylistId(v);
   activeShare.type = deriveType(activeShare);
+  // Ensure playlist_name is set at share time — the change-event oEmbed fetch
+  // may not have completed before the user clicked Share (race condition).
+  if (activeShare.playlist_id && !activeShare.playlist_name) {
+    try {
+      const oembed = await fetch(`https://open.spotify.com/oembed?url=${encodeURIComponent(v)}`);
+      if (oembed.ok) {
+        const d = await oembed.json();
+        activeShare.playlist_name = d.title || "A Playlist Share";
+      } else {
+        activeShare.playlist_name = "A Playlist Share";
+      }
+    } catch {
+      activeShare.playlist_name = "A Playlist Share";
+    }
+  } else if (!activeShare.playlist_id) {
+    activeShare.playlist_name = null;
+  }
   activeShare.notes = sanitizeNotes(activeShare.notes);
   const seen = new Set();
   activeShare.notes = activeShare.notes.filter((n) => {
@@ -815,11 +855,7 @@ $("copyShare").addEventListener("click", async () => {
   const shareToPush = {
     ...activeShare,
     sender_name:    activeShare.sender_name || senderName,
-    // Encrypt recipient_name so the server never sees who the letter is for.
-    // The import flow already decrypts this field, so no changes needed there.
-    recipient_name: activeShare.recipient_name
-      ? await encryptField(activeShare.recipient_name, encKey)
-      : null,
+    recipient_name: activeShare.recipient_name || null,
     // Sender copy — encrypted with the same enc_key as the share.
     // Decrypted client-side on notes.html via the extension or a pasted share link.
     // Server only ever sees the encrypted blob.

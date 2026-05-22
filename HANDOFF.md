@@ -24,6 +24,8 @@ Get the Keepsake Chrome extension ready for public launch and Chrome Web Store s
 2. **Razorpay server-side signature verification** — payments work but the Razorpay signature is not verified server-side. Fine for testing, not for real money. Implement as a Supabase Edge Function before going live. (Flagged in memory: `keepsake_payments.md`)
 3. **account.html hero assets** — `credits-flower.png` and `credits-sparkles.png` for the credits hero card are still pending.
 
+4. **Playlist share title on sent.html** — playlist shares still show the first song title instead of "A Playlist Share". Root cause is unclear after multiple attempts: `share_type`, `playlist_url`, `playlist_id`, and `playlist_name` are all null in Supabase for these shares, so `isPlaylist` detection always fails. `playlist_name` column exists (added via SQL) and the push includes it, but it arrives as null — possibly because `playlist_url`/`playlist_id` columns don't exist in the DB so PostgREST silently drops them, and the oEmbed fetch either races with the share action or isn't triggering. The `uniqueTracks > 1` annotation-count fallback in `renderCard` is also in place but not helping. Needs fresh debugging — recommend checking the Supabase `shares` table schema and verifying what actually gets stored on a new share push.
+
 ### Low priority / pre-submission only
 - Delete dev files before Chrome Web Store submission: `faq-demo.html`, `PRD.md`, `reference.jpg`, `faq-reference.png`, `ChatGPT Image May 5, 2026, 11_16_27 AM.png`
 - Check `stamp-olive.jpg` vs `stamp-olive.png` — one is a duplicate, delete whichever isn't referenced
