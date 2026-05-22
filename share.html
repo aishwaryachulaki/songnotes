@@ -145,33 +145,32 @@
       margin-top: 24px;
       min-height: 44px;
     }
-    /* shared pale-pink pill */
+    /* shared pale-pink pill — same values as .prev-activate in popup.css */
     .hero-btn {
       display: inline-flex;
       align-items: center;
       gap: 7px;
-      background: rgba(242, 216, 143, 0.18); /* near-transparent warm cream */
-      border: 1.5px solid rgba(227, 104, 136, 0.50);
+      background: rgba(227, 104, 136, 0.07);
+      border: 1.5px solid rgba(227, 104, 136, 0.40);
       color: var(--blush);
       border-radius: 50px;
       padding: 13px 28px;
       font-family: 'Montserrat', sans-serif;
       font-size: 11px;
       font-weight: 700;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.10em;
       text-transform: uppercase;
       text-decoration: none;
       cursor: pointer;
-      transition: background 0.15s, color 0.15s, transform 0.12s;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
       white-space: nowrap;
     }
     .hero-btn:hover {
       background: var(--blush);
       color: #fff;
       border-color: var(--blush);
-      transform: translateY(-1px);
     }
-    .hero-btn:disabled { opacity: 0.4; cursor: default; transform: none; }
+    .hero-btn:disabled { opacity: 0.4; cursor: default; }
 
     /* ── Envelope — shows top ~55%, cropped at bottom edge ── */
     .hero-envelope {
