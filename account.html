@@ -324,21 +324,17 @@
       sb.from("user_credits").select("*").eq("user_id", currentUser.id).single(),
       sb.from("purchases").select("*").eq("user_id", currentUser.id).order("created_at", { ascending: false }).limit(20),
     ]);
-    creditsData = cRes.data || { paid_credits: 0, lifetime: false, monthly_free_used_at: null };
+    creditsData = cRes.data || { paid_credits: 0, lifetime: false, free_credits_used: 0 };
     render(creditsData, pRes.data || []);
   }
 
-  function freeAvailable(c) {
-    if (!c.monthly_free_used_at) return true;
-    const used = new Date(c.monthly_free_used_at);
-    const now = new Date();
-    return used.getFullYear() < now.getFullYear() ||
-      (used.getFullYear() === now.getFullYear() && used.getMonth() < now.getMonth());
+  function freeCreditsRemaining(c) {
+    return Math.max(0, 3 - (c.free_credits_used || 0));
   }
 
   function render(c, purchases) {
-    const free = freeAvailable(c);
-    const total = c.lifetime ? null : c.paid_credits + (free ? 1 : 0);
+    const freeRemaining = freeCreditsRemaining(c);
+    const total = c.lifetime ? null : c.paid_credits + freeRemaining;
 
     let heroNumber, heroStatus, heroCta;
     if (c.lifetime) {
@@ -347,10 +343,10 @@
       heroCta = "";
     } else {
       heroNumber = total;
-      heroStatus = free
-        ? `${c.paid_credits} purchased · 1 free available this month`
-        : "You've used your free note this month.";
-      heroCta = `<button class="hero-cta" onclick="document.querySelector('.pricing-grid').scrollIntoView({behavior:'smooth'})">Write something again?</button>`;
+      heroStatus = freeRemaining > 0
+        ? `${c.paid_credits} purchased · ${freeRemaining} free remaining`
+        : "You've used all your free notes.";
+      heroCta = total === 0 ? `<button class="hero-cta" onclick="document.querySelector('.pricing-grid').scrollIntoView({behavior:'smooth'})">Top up your notes →</button>` : "";
     }
 
     const bundleCards = BUNDLES.map((b, i) => `

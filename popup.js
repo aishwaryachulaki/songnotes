@@ -62,22 +62,18 @@ async function fetchCredits(accessToken, userId) {
   );
   if (!res.ok) return null;
   const rows = await res.json();
-  return rows[0] || { paid_credits: 0, lifetime: false, monthly_free_used_at: null };
+  return rows[0] || { paid_credits: 0, lifetime: false, free_credits_used: 0 };
 }
 
-function creditsFreeAvailable(c) {
-  if (!c || !c.monthly_free_used_at) return true;
-  const used = new Date(c.monthly_free_used_at);
-  const now = new Date();
-  return used.getFullYear() < now.getFullYear() ||
-    (used.getFullYear() === now.getFullYear() && used.getMonth() < now.getMonth());
+function freeCreditsRemaining(c) {
+  if (!c) return 0;
+  return Math.max(0, 3 - (c.free_credits_used || 0));
 }
 
 function creditsLabel(c) {
   if (!c) return "0 letters";
   if (c.lifetime) return "∞ Lifetime";
-  const free = creditsFreeAvailable(c) ? 1 : 0;
-  const total = c.paid_credits + free;
+  const total = c.paid_credits + freeCreditsRemaining(c);
   return `${total} letter${total !== 1 ? "s" : ""}`;
 }
 
