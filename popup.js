@@ -624,7 +624,7 @@ async function init() {
     const c = await fetchCredits(session.access_token, session.user.id);
     const badge = $("creditsBadge");
     badge.textContent = creditsLabel(c);
-    if (c && !c.lifetime && c.paid_credits === 0 && !creditsFreeAvailable(c)) badge.classList.add("empty");
+    if (c && !c.lifetime && c.paid_credits === 0 && freeCreditsRemaining(c) === 0) badge.classList.add("empty");
   } else {
     $("authGate").classList.remove("hidden");
     $("authBar").classList.add("hidden");
@@ -770,7 +770,7 @@ $("copyShare").addEventListener("click", async () => {
   const hasCredit = credits && (
     credits.lifetime ||
     credits.paid_credits > 0 ||
-    creditsFreeAvailable(credits)
+    freeCreditsRemaining(credits) > 0
   );
   if (!hasCredit) {
     $("shareInfo").innerHTML = `No letters left. <a href="#" id="buyLink" style="color:var(--tangerine);font-weight:600">Buy more →</a>`;
