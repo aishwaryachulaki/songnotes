@@ -614,6 +614,13 @@ body::before {
 .import-block .status { color: var(--ink-3); font-size: 11px; margin-top: 4px; display: block; font-family: 'Spectral', Georgia, serif; font-style: italic; }
 
 
+/* ── Uniform button height across all pill buttons ── */
+.btn, .save-btn, .share-btn, .now-btn, .new-share-btn,
+.sp-share-btn, .sp-attach-btn, .copy-link-btn,
+.prev-activate, .prev-copy {
+  min-height: 38px;
+}
+
 /* ── Generic button (name save + import) ── */
 .btn {
   background: rgba(227,104,136,0.07);
