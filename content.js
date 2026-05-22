@@ -218,6 +218,15 @@
       lastTrackId = info.trackId;
       lastPosition = -1;
       firedNotes = new Set();
+      // Push track change directly to the side panel — more reliable than
+      // the panel polling via sendMessage, which can be blocked by the
+      // side panel's document.hidden state or currentWindow resolution.
+      chrome.runtime.sendMessage({
+        type: "KS_TRACK_CHANGED",
+        trackId: info.trackId,
+        title:   info.title,
+        artist:  info.artist,
+      }).catch(() => {}); // panel may not be open — that's fine
       // Fire "song start" notes (timestamp == null) for matching tracks
       share.notes
         .filter((n) => n.track_id === info.trackId && n.timestamp == null)

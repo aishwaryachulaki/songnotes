@@ -1046,7 +1046,27 @@ $("importBtn").addEventListener("click", async () => {
   });
 });
 
-init().then(startLiveTracking);
+// Run init and startLiveTracking independently so a mid-init error
+// can't prevent the live tracking interval from starting.
+init().catch(console.error);
+startLiveTracking();
+
+// Also listen for push notifications from the content script's tick() loop.
+// This is the primary track-change signal — it fires the moment content.js
+// detects a new song, without waiting for a poll cycle.
+chrome.runtime.onMessage.addListener((msg) => {
+  if (msg && msg.type === "KS_TRACK_CHANGED") {
+    const changed = !currentTrack ||
+      currentTrack.trackId !== msg.trackId ||
+      currentTrack.title   !== msg.title;
+    if (!changed) return;
+    currentTrack = { trackId: msg.trackId, title: msg.title, artist: msg.artist };
+    $("trackTitle").textContent = msg.title  || "Unknown track";
+    $("trackArtist").textContent = msg.artist || "";
+    renderNotes();
+    renderSummary();
+  }
+});
 
 // ---- Live track polling ----
 // The side panel stays open indefinitely, so we poll for track changes
