@@ -120,9 +120,7 @@ body::before {
   box-shadow:
     0 2px 4px rgba(58,36,24,0.08),
     0 6px 18px rgba(58,36,24,0.09),
-    0 12px 32px rgba(58,36,24,0.05),
-    inset 0 1px 0 rgba(255,255,255,0.60),
-    inset 0 -1px 0 rgba(58,36,24,0.07);
+    0 12px 32px rgba(58,36,24,0.05);
 }
 .stamp-eyebrow {
   font-family: 'Montserrat', sans-serif;
@@ -170,9 +168,7 @@ body::before {
   box-shadow:
     0 2px 4px rgba(58,36,24,0.08),
     0 6px 18px rgba(58,36,24,0.09),
-    0 12px 32px rgba(58,36,24,0.05),
-    inset 0 1px 0 rgba(255,255,255,0.60),
-    inset 0 -1px 0 rgba(58,36,24,0.07);
+    0 12px 32px rgba(58,36,24,0.05);
 }
 
 /* Atmospheric top-light overlay on olive — pushes content forward */
@@ -308,8 +304,7 @@ body::before {
   color: var(--ink); line-height: 1.55; word-break: break-word;
   box-shadow:
     0 1px 3px rgba(58,36,24,0.09),
-    0 3px 8px rgba(58,36,24,0.06),
-    inset 0 1px 0 rgba(255,255,255,0.50);
+    0 3px 8px rgba(58,36,24,0.06);
 }
 .note .meta {
   font-family: 'Montserrat', sans-serif;
@@ -345,9 +340,7 @@ body::before {
   box-shadow:
     0 2px 4px rgba(58,36,24,0.08),
     0 6px 18px rgba(58,36,24,0.09),
-    0 12px 32px rgba(58,36,24,0.05),
-    inset 0 1px 0 rgba(255,255,255,0.60),
-    inset 0 -1px 0 rgba(58,36,24,0.07);
+    0 12px 32px rgba(58,36,24,0.05);
 }
 .share-card::after {
   content: '✦';
@@ -412,9 +405,7 @@ body::before {
   box-shadow:
     0 2px 4px rgba(58,36,24,0.08),
     0 6px 18px rgba(58,36,24,0.09),
-    0 12px 32px rgba(58,36,24,0.05),
-    inset 0 1px 0 rgba(255,255,255,0.60),
-    inset 0 -1px 0 rgba(58,36,24,0.07);
+    0 12px 32px rgba(58,36,24,0.05);
 }
 
 .sp-header {
@@ -538,8 +529,7 @@ body::before {
   border-radius: 12px; padding: 9px 10px;
   box-shadow:
     0 1px 3px rgba(58,36,24,0.09),
-    0 4px 10px rgba(58,36,24,0.07),
-    inset 0 1px 0 rgba(255,255,255,0.45);
+    0 4px 10px rgba(58,36,24,0.07);
 }
 .prev-thumb {
   width: 48px; height: 48px; border-radius: 0;
