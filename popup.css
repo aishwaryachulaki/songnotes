@@ -506,7 +506,7 @@ body::before {
 .sp-hint-sub { font-size: 10px; color: var(--ink-4); margin-top: 2px; line-height: 1.4; font-style: italic; }
 
 .sp-footer {
-  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
 }
 .copy-link-btn {
   width: 100%; background: rgba(227,104,136,0.07); border: 1.5px solid rgba(227,104,136,0.40);
@@ -530,6 +530,7 @@ body::before {
   font-family: 'Montserrat', sans-serif;
   font-size: 9px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase;
   cursor: pointer; transition: background 0.15s, border-color 0.15s; white-space: nowrap;
+  width: 100%;
 }
 .sp-share-btn:hover { background: rgba(227,104,136,0.18); border-color: rgba(227,104,136,0.65); }
 .sp-share-btn:disabled { opacity: 0.4; cursor: default; }
