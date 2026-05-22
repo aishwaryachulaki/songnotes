@@ -200,7 +200,7 @@ body::before {
   color: var(--ink-3); line-height: 1.4;
 }
 .composer-header strong { color: var(--blush); font-weight: 700; text-transform: none; }
-.composer-header a { color: var(--tangerine); text-decoration: none; font-weight: 600; }
+.composer-header a { color: var(--blush); text-decoration: none; font-weight: 600; }
 .composer-header a:hover { text-decoration: underline; }
 
 /* Underline-only input */
@@ -212,7 +212,7 @@ body::before {
   transition: border-color 0.15s, background 0.15s;
 }
 .underline-input:focus {
-  border-bottom-color: var(--tangerine);
+  border-bottom-color: var(--blush);
   background: rgba(255,255,255,0.18);
   border-radius: 4px 4px 0 0;
 }
@@ -314,7 +314,7 @@ body::before {
 }
 .note .meta {
   font-family: 'Montserrat', sans-serif;
-  font-size: 8px; font-weight: 600; color: var(--tangerine);
+  font-size: 8px; font-weight: 600; color: var(--blush);
   letter-spacing: 0.08em; margin-bottom: 4px; text-transform: uppercase;
 }
 .note .del {
@@ -388,7 +388,7 @@ body::before {
   font-size: 11px; color: var(--ink-3);
   word-break: break-all; line-height: 1.5;
 }
-.share-info a { color: var(--tangerine); font-weight: 600; }
+.share-info a { color: var(--blush); font-weight: 600; }
 
 .new-share-btn {
   background: rgba(227,104,136,0.07); border: 1.5px solid rgba(227,104,136,0.40);
@@ -604,7 +604,7 @@ body::before {
   padding: 7px 10px; font: inherit; font-size: 12px;
 }
 .import-block input[type="text"]::placeholder { color: var(--ink-5); }
-.import-block input[type="text"]:focus { outline: none; border-color: var(--tangerine); }
+.import-block input[type="text"]:focus { outline: none; border-color: var(--blush); }
 .import-block .status { color: var(--ink-3); font-size: 11px; margin-top: 4px; display: block; font-family: 'Spectral', Georgia, serif; font-style: italic; }
 
 
