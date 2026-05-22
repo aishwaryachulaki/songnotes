@@ -4,8 +4,10 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Keepsake — A letter for you</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@1,400&family=Lora:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@500;600;700&display=swap" />
   <style>
-    /* ── Palette (matches extension) ── */
+    /* ── Palette ── */
     :root {
       --butter:    #F2D88F;
       --blush:     #E36888;
@@ -15,74 +17,179 @@
       --ink:       #3a2418;
       --ink-mid:   #8a5a48;
       --ink-lt:    #c4977a;
+      --rose:      #c0544e;
+      --olive:     #3b3a27;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      background: var(--butter) url('background.png') center / cover no-repeat fixed;
+      background: var(--cream);
       color: var(--ink);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
       min-height: 100vh;
-      padding: 40px 16px 72px;
     }
 
-    /* ── Layout ── */
-    .page { max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
-
-    /* ── Header card ── */
-    .header-card {
-      background: url('faq-bg-pink.png') top / cover no-repeat;
-      border-radius: 14px;
-      padding: 20px 22px;
+    /* ── Hero ── */
+    .hero {
+      min-height: 100vh;
+      background: var(--cream) url('background.png') center / cover no-repeat fixed;
+      display: flex;
+      flex-direction: column;
       position: relative;
       overflow: hidden;
     }
-    .header-card::before {
-      content: '♪';
-      position: absolute;
-      right: 18px;
-      top: 14px;
-      font-size: 64px;
-      color: rgba(92,45,45,0.10);
-      line-height: 1;
-      pointer-events: none;
+
+    /* ── Nav ── */
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 640px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 22px 24px;
     }
-    .eyebrow {
+    .nav-logo {
+      font-family: 'Spectral', Georgia, serif;
+      font-style: italic;
+      font-size: 21px;
+      color: var(--rose);
+      text-decoration: none;
+    }
+    .nav-logo .logo-spark { font-style: normal; color: var(--tangerine); }
+    .nav-links { display: flex; align-items: center; gap: 20px; }
+    .nav-link {
+      font-family: 'Montserrat', sans-serif;
       font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
-      letter-spacing: 0.14em;
-      color: rgba(92,45,45,0.55);
-      margin-bottom: 8px;
+      color: var(--ink);
+      text-decoration: none;
+      opacity: 0.5;
+      transition: opacity 0.15s;
     }
-    .sender-name {
-      font-size: 30px;
-      font-weight: 800;
-      color: #5c2d2d;
+    .nav-link:hover { opacity: 1; }
+    .nav-link--pill {
+      border: 1.5px solid rgba(58,36,24,0.3);
+      border-radius: 50px;
+      padding: 5px 12px;
+      opacity: 0.5;
+    }
+    .nav-link--pill:hover { opacity: 1; }
+
+    /* ── Hero content ── */
+    .hero-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px 24px 0;
+      position: relative;
+      z-index: 1;
+    }
+    .hero-eyebrow {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-mid);
+      opacity: 0.6;
+      margin-bottom: 18px;
+    }
+    .hero-title {
+      font-family: 'Lora', Georgia, serif;
+      font-size: clamp(32px, 6vw, 54px);
+      font-weight: 700;
+      color: var(--ink);
       line-height: 1.15;
+      max-width: 520px;
+      margin-bottom: 14px;
     }
-    .recipient-line {
+    .hero-artist {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 16px;
+      color: var(--rose);
+      margin-bottom: 18px;
+    }
+    .hero-artist strong { font-weight: 700; }
+    .hero-divider {
       font-size: 13px;
-      color: rgba(92,45,45,0.72);
-      margin-top: 4px;
+      color: var(--tangerine);
+      opacity: 0.6;
+      margin-bottom: 14px;
     }
-    .recipient-line strong { color: #5c2d2d; font-weight: 700; }
-    .sender-sub {
+    .hero-count {
+      font-family: 'Lora', Georgia, serif;
+      font-style: italic;
+      font-size: 14px;
+      color: var(--ink-mid);
+      margin-bottom: 6px;
+    }
+    .hero-recipient {
       font-size: 13px;
-      color: rgba(92,45,45,0.72);
-      margin-top: 6px;
+      color: var(--ink-mid);
+      opacity: 0.75;
+      margin-bottom: 28px;
     }
-    .denomination {
-      margin-top: 18px;
-      font-size: 9px;
+    .hero-recipient strong { color: var(--ink); font-weight: 700; }
+    .hero-cta {
+      display: inline-block;
+      background: var(--olive);
+      color: var(--cream);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
-      letter-spacing: 0.15em;
-      color: rgba(92,45,45,0.35);
-      text-align: right;
+      text-decoration: none;
+      border: none;
+      border-radius: 50px;
+      padding: 14px 32px;
+      cursor: pointer;
+      margin-top: 10px;
+      margin-bottom: 40px;
+      transition: opacity 0.15s, transform 0.12s;
+      box-shadow: 0 4px 16px rgba(59,58,39,0.25);
+    }
+    .hero-cta:hover { opacity: 0.88; transform: translateY(-1px); }
+
+    /* ── Envelope image ── */
+    .hero-envelope {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      flex-shrink: 0;
+      margin-top: auto;
+    }
+    .envelope-img {
+      width: min(360px, 75vw);
+      display: block;
+      /* Slightly crop the bottom so it bleeds into the next section */
+      margin-bottom: -24px;
+      filter: drop-shadow(0 -4px 18px rgba(58,36,24,0.10));
+    }
+
+    /* ── Notes section ── */
+    .notes-section {
+      background: var(--butter) url('background.png') center / cover no-repeat fixed;
+      padding: 52px 16px 72px;
+    }
+    .notes-inner {
+      max-width: 560px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
     }
 
     /* ── Section divider ── */
     .song-label {
+      font-family: 'Montserrat', sans-serif;
       font-size: 9px;
       text-transform: uppercase;
       letter-spacing: 0.13em;
@@ -131,6 +238,7 @@
       text-transform: uppercase;
       letter-spacing: 0.06em;
       margin-bottom: 8px;
+      font-family: 'Montserrat', sans-serif;
     }
     .note-redacted {
       display: flex;
@@ -143,9 +251,7 @@
       background: rgba(58,36,24,0.1);
       border-radius: 4px;
     }
-    .note-redacted span:last-child {
-      width: 60%;
-    }
+    .note-redacted span:last-child { width: 60%; }
 
     /* ── Spotify button ── */
     .spotify-area {
@@ -182,13 +288,13 @@
       opacity: 0.75;
     }
 
-    /* ── Import into extension (installed) ── */
+    /* ── Import into extension ── */
     .import-area {
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 10px;
-      min-height: 52px; /* prevents layout jump during detection */
+      min-height: 52px;
     }
     .btn-import {
       background: var(--tangerine);
@@ -214,7 +320,7 @@
       margin: 0;
     }
 
-    /* ── Install nudge (not installed) ── */
+    /* ── Install nudge ── */
     .install-nudge {
       background: var(--cream);
       border-radius: 14px;
@@ -227,6 +333,7 @@
       width: 100%;
     }
     .install-nudge-eyebrow {
+      font-family: 'Montserrat', sans-serif;
       font-size: 10px;
       text-transform: uppercase;
       letter-spacing: 0.13em;
@@ -258,26 +365,7 @@
     }
     .btn-install:hover { opacity: 0.9; transform: translateY(-1px); }
 
-    /* ── Nav ── */
-    nav {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 18px 24px; max-width: 560px; margin: 0 auto;
-    }
-    .nav-logo {
-      font-family: Georgia, serif;
-      font-style: italic; font-size: 20px;
-      color: var(--ink); text-decoration: none; opacity: 0.75;
-      display: flex; align-items: center; gap: 4px;
-    }
-    .nav-logo span { font-style: normal; font-size: 11px; color: var(--tangerine); }
-    .nav-get {
-      font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
-      text-transform: uppercase; color: var(--blush);
-      text-decoration: none; opacity: 0.8; transition: opacity 0.15s;
-    }
-    .nav-get:hover { opacity: 1; }
-
-    /* ── States ── */
+    /* ── Loading / error states ── */
     .state {
       text-align: center;
       padding: 60px 20px;
@@ -306,28 +394,40 @@
       text-align: center;
       font-weight: 600;
     }
+
+    /* Loading state lives in hero */
+    .hero--loading {
+      align-items: center;
+      justify-content: center;
+    }
   </style>
 </head>
 <body>
-<nav>
-  <a class="nav-logo" href="index.html">keepsake.<span>✦</span></a>
-  <a class="nav-get" href="auth.html">Get Keepsake →</a>
-</nav>
-<div class="page" id="page">
-  <div class="state" id="loading">
-    <strong>Opening your letter…</strong>
-    Fetching notes from the cloud
+
+<div class="hero" id="heroSection">
+  <nav class="nav">
+    <a class="nav-logo" href="index.html">keepsake.<span class="logo-spark">✦</span></a>
+    <div class="nav-links">
+      <a href="notes.html" class="nav-link">Notes</a>
+      <a href="account.html" class="nav-link">Account</a>
+      <a href="auth.html" class="nav-link nav-link--pill">Sign out</a>
+    </div>
+  </nav>
+  <div id="heroContent">
+    <div class="state loading"><span class="loading-dot">✦</span> opening your letter…</div>
   </div>
+</div>
+<div class="notes-section" id="notesSection" style="display:none">
+  <div class="notes-inner" id="notesInner"></div>
 </div>
 
 <script>
-  // ── Config (keep in sync with config.js) ──────────────────
+  // ── Config ──────────────────────────────────────────────────
   const SUPABASE_URL = "https://kkasgbkgwjxiutdalbbm.supabase.co";
   const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtrYXNnYmtnd2p4aXV0ZGFsYmJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyNjU3OTQsImV4cCI6MjA5Mjg0MTc5NH0.z1JLMTzz3X_swbWHdt2z4UDKyUwjEfNYys5kdDMq3R4";
-  // ── Chrome Web Store link — update this one line when published ──
-  const EXTENSION_CWS_URL = null; // e.g. "https://chromewebstore.google.com/detail/keepsake/EXTENSION_ID"
+  const EXTENSION_CWS_URL = null;
 
-  // ── Helpers ───────────────────────────────────────────────
+  // ── Helpers ──────────────────────────────────────────────────
   function getShareId() {
     const params = new URLSearchParams(window.location.search);
     if (params.get("id")) return params.get("id");
@@ -347,8 +447,6 @@
       ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   }
 
-  // Fetches JSON with a hard timeout. Throws on network failure or timeout
-  // so callers can show a proper error instead of hanging forever.
   async function fetchJson(url, timeoutMs = 9000) {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -363,15 +461,11 @@
     } catch (err) {
       clearTimeout(timer);
       if (err.name === "AbortError") throw new Error("timeout");
-      throw err; // re-throw network errors so the outer catch can handle them
+      throw err;
     }
   }
 
-  // ── End-to-end decryption ────────────────────────────────────
-  // The encryption key lives only in the URL fragment (#k=...).
-  // Fragments are never sent to any server — only the browser and
-  // JavaScript running locally can read them.
-
+  // ── Decryption ───────────────────────────────────────────────
   async function importEncKey(b64) {
     const raw = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
     return crypto.subtle.importKey("raw", raw, { name: "AES-GCM" }, false, ["decrypt"]);
@@ -390,7 +484,7 @@
       );
       return new TextDecoder().decode(dec);
     } catch {
-      return b64; // old plaintext share — return value as-is
+      return b64;
     }
   }
   async function decryptNoteFields(note, key) {
@@ -403,27 +497,21 @@
     };
   }
 
-  // ── Spotify link logic ─────────────────────────────────────
+  // ── Spotify link logic ───────────────────────────────────────
   function isLocalTrack(trackId) {
-    // Local files have IDs like "local:Coffee::BTS" — no real Spotify URL exists
     return !trackId || trackId.startsWith("local:");
   }
-
   function spotifyLink(meta, notes) {
-    // Playlist link takes priority (sender explicitly set it)
     if (meta?.playlist_url) return meta.playlist_url;
     if (meta?.playlist_id) return `https://open.spotify.com/playlist/${meta.playlist_id}`;
-    // Single song
     const firstNote = notes[0];
     const trackId = firstNote?.track_id;
     if (isLocalTrack(trackId)) {
-      // Local file — fall back to search by title + artist
       const q = [firstNote?.track_title, firstNote?.track_artist].filter(Boolean).join(" ");
       return q ? `https://open.spotify.com/search/${encodeURIComponent(q)}` : null;
     }
     return `https://open.spotify.com/track/${trackId}`;
   }
-
   function spotifyLabel(meta, notes) {
     if (meta?.playlist_url || meta?.playlist_id) return "Open playlist in Spotify";
     const trackId = notes[0]?.track_id;
@@ -431,12 +519,16 @@
     return "Open song in Spotify";
   }
 
-  // ── Render ────────────────────────────────────────────────
+  // ── Show error in hero ───────────────────────────────────────
+  function showHeroError(html) {
+    document.getElementById("heroContent").innerHTML = `<div class="state">${html}</div>`;
+  }
+
+  // ── Render ───────────────────────────────────────────────────
   function render(shareId, meta, notes) {
-    const page = document.getElementById("page");
     const sender = meta?.sender_name || notes[0]?.sender_name || "someone";
 
-    // Group notes by track
+    // Group + sort notes by track
     const byTrack = {};
     notes.forEach(n => {
       const key = n.track_id;
@@ -449,44 +541,70 @@
 
     const trackCount = Object.keys(byTrack).length;
     const recipient = meta?.recipient_name || null;
+    const totalNotes = notes.length;
 
-    let html = `
-      <div class="header-card">
-        <div class="eyebrow">✉ a letter from</div>
-        <div class="sender-name">${escHtml(sender)}</div>
-        ${recipient ? `<div class="recipient-line">for <strong>${escHtml(recipient)}</strong></div>` : ""}
-        <div class="sender-sub">chose ${notes.length} moment${notes.length === 1 ? "" : "s"} across ${trackCount} song${trackCount === 1 ? "" : "s"} just for you</div>
-        <div class="denomination">Keepsake</div>
+    // Hero title / subtitle
+    const isPlaylist = trackCount > 1 || !!(meta?.playlist_name);
+    const heroTitle = isPlaylist
+      ? (meta?.playlist_name || "A Playlist Share")
+      : (notes[0]?.track_title || "A song");
+    const heroArtist = isPlaylist ? sender : (notes[0]?.track_artist || "");
+
+    // ── Hero content ──
+    const heroEl = document.getElementById("heroContent");
+    heroEl.innerHTML = `
+      <div class="hero-content">
+        <div class="hero-eyebrow">You've received</div>
+        <h1 class="hero-title">${escHtml(heroTitle)}</h1>
+        ${heroArtist ? `<div class="hero-artist">by <strong>${escHtml(heroArtist)}</strong></div>` : ""}
+        <div class="hero-divider">✦</div>
+        <div class="hero-count">${totalNotes} note${totalNotes === 1 ? "" : "s"} inside</div>
+        ${recipient ? `<div class="hero-recipient">for <strong>${escHtml(recipient)}</strong></div>` : ""}
+        <a href="#notesSection" class="hero-cta" id="readNotesBtn">READ NOTES ✦</a>
+      </div>
+      <div class="hero-envelope">
+        <img src="share-envelope.png" alt="" class="envelope-img" />
       </div>
     `;
 
+    // Smooth scroll for READ NOTES button
+    document.getElementById("readNotesBtn").addEventListener("click", e => {
+      e.preventDefault();
+      document.getElementById("notesSection").scrollIntoView({ behavior: "smooth" });
+    });
+
+    // ── Notes section ──
+    const notesSection = document.getElementById("notesSection");
+    const notesInner = document.getElementById("notesInner");
+    notesSection.style.display = "";
+
+    let notesHtml = "";
     Object.values(byTrack).forEach(group => {
-      html += `<div class="song-group">`;
-      html += `<div class="song-label">Song</div>`;
-      html += `<div class="song-title-block">
-        <strong>${escHtml(group.title || "Unknown track")}</strong>
-        <span>${escHtml(group.artist || "")}</span>
-      </div>`;
-      html += `<div class="notes-grid">`;
+      notesHtml += `<div class="song-group">`;
+      if (trackCount > 1) {
+        notesHtml += `<div class="song-label">Song</div>
+          <div class="song-title-block">
+            <strong>${escHtml(group.title || "Unknown track")}</strong>
+            <span>${escHtml(group.artist || "")}</span>
+          </div>`;
+      }
+      notesHtml += `<div class="notes-grid">`;
       group.notes.forEach(n => {
-        html += `
+        notesHtml += `
           <div class="note-card">
             <div class="note-ts">${escHtml(formatTs(n.timestamp))}</div>
             <div class="note-redacted">
-              <span></span>
-              <span></span>
-              <span></span>
+              <span></span><span></span><span></span>
             </div>
-          </div>
-        `;
+          </div>`;
       });
-      html += `</div></div>`;
+      notesHtml += `</div></div>`;
     });
 
-    // Spotify open button
+    // Spotify button
     const spLink = spotifyLink(meta, notes);
     if (spLink) {
-      html += `
+      notesHtml += `
         <div class="spotify-area">
           <a class="btn-spotify" href="${escHtml(spLink)}" target="_blank" rel="noopener">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -494,32 +612,24 @@
             </svg>
             ${spotifyLabel(meta, notes)}
           </a>
-        </div>
-      `;
+        </div>`;
     }
 
-    // Spotify attribution — required by Spotify Developer Policy Section II.4
-    html += `<p class="spotify-note">Music data from <a href="https://spotify.com" target="_blank" rel="noopener" style="color:inherit">Spotify</a></p>`;
+    notesHtml += `<p class="spotify-note">Music data from <a href="https://spotify.com" target="_blank" rel="noopener" style="color:inherit">Spotify</a></p>`;
+    notesHtml += `<div id="importArea" class="import-area"></div>`;
 
-    // Import section — filled in after extension detection below
-    html += `<div id="importArea" class="import-area"></div>`;
+    notesInner.innerHTML = notesHtml;
 
-    page.innerHTML = html;
-
-    // Set payload so share-bridge.js can pick it up when it loads
+    // Set payload for share-bridge.js
     window.__KS_PAYLOAD = { share_id: shareId, share: meta || {}, notes };
 
-    // ── Extension detection ───────────────────────────────────
-    // share-bridge.js sets data-keepsake-installed and fires "keepsake:ready"
-    // at document_idle. We give it up to 1 s to appear; if it doesn't, the
-    // extension isn't installed.
+    // ── Extension detection ──
     let detected = false;
 
     function onExtensionReady() {
       if (detected) return;
       detected = true;
       renderImportInstalled(shareId, meta, notes);
-      // Bridge may have already picked up __KS_PAYLOAD; fire once more to be safe
       window.dispatchEvent(new CustomEvent("keepsake:import", { detail: window.__KS_PAYLOAD }));
     }
 
@@ -530,7 +640,6 @@
     }
 
     window.addEventListener("keepsake:ready", onExtensionReady, { once: true });
-    // Fallback: check the attribute directly (bridge may have already run)
     if (document.documentElement.getAttribute("data-keepsake-installed") === "1") {
       onExtensionReady();
     } else {
@@ -538,7 +647,7 @@
     }
   }
 
-  // ── Import UI: extension installed ───────────────────────
+  // ── Import UI: extension installed ──────────────────────────
   function renderImportInstalled(shareId, meta, notes) {
     const area = document.getElementById("importArea");
     if (!area) return;
@@ -558,7 +667,7 @@
     });
   }
 
-  // ── Import UI: extension not installed ───────────────────
+  // ── Import UI: extension not installed ──────────────────────
   function renderImportNotInstalled() {
     const area = document.getElementById("importArea");
     if (!area) return;
@@ -579,30 +688,21 @@
     `;
   }
 
-  // ── Main ──────────────────────────────────────────────────
+  // ── Main ────────────────────────────────────────────────────
   (async () => {
     const shareId = getShareId();
-    const page = document.getElementById("page");
 
     if (!shareId) {
-      page.innerHTML = `<div class="state"><strong>No letter here</strong>You need a share link to open a letter.</div>`;
+      showHeroError(`<strong>No letter here</strong>You need a share link to open a letter.`);
       return;
     }
 
-    // Show immediately — recipient sees something the moment the page loads,
-    // not a blank screen while waiting for Supabase.
-    page.innerHTML = `<div class="state loading"><span class="loading-dot">✦</span> opening your letter…</div>`;
-
-    // Extract encryption key from URL fragment — never sent to any server.
     const fragment = new URLSearchParams(window.location.hash.slice(1));
     const keyB64 = fragment.get("k");
 
-    // e=1 is added by the sender to mark this as an encrypted link.
-    // If it's present but the key is missing from the fragment, the most
-    // likely cause is a messaging app or email client stripping the #… part.
     const isEncrypted = new URLSearchParams(window.location.search).get("e") === "1";
     if (isEncrypted && !keyB64) {
-      page.innerHTML = `<div class="state"><strong>Part of your link got cut off</strong>Ask the sender to resend it, or try opening it in a different browser.</div>`;
+      showHeroError(`<strong>Part of your link got cut off</strong>Ask the sender to resend it, or try opening it in a different browser.`);
       return;
     }
 
@@ -611,7 +711,7 @@
       try {
         encKey = await importEncKey(keyB64);
       } catch {
-        page.innerHTML = `<div class="state"><strong>Invalid link</strong>This share link appears to be corrupted or incomplete.</div>`;
+        showHeroError(`<strong>Invalid link</strong>This share link appears to be corrupted or incomplete.`);
         return;
       }
     }
@@ -625,11 +725,10 @@
       ]);
 
       if (!rawNotes.length && !rawMeta) {
-        page.innerHTML = `<div class="state"><strong>Letter not found</strong>This link may be invalid or the notes were removed.</div>`;
+        showHeroError(`<strong>Letter not found</strong>This link may be invalid or the notes were removed.`);
         return;
       }
 
-      // Decrypt locally — ciphertext never leaves this device in plaintext form
       const notes = encKey
         ? await Promise.all(rawNotes.map(n => decryptNoteFields(n, encKey)))
         : rawNotes;
@@ -648,14 +747,13 @@
 
     } catch (err) {
       const isTimeout = err.message === "timeout";
-      page.innerHTML = `
-        <div class="state">
-          <strong>${isTimeout ? "Still loading…" : "Couldn't load your letter"}</strong>
-          ${isTimeout
-            ? "This is taking longer than usual. Check your connection and try again."
-            : "Something went wrong. Check your connection and try again."}
-          <a href="" style="display:block;margin-top:14px;color:var(--blush);font-weight:600;font-size:13px;">Try again</a>
-        </div>`;
+      showHeroError(`
+        <strong>${isTimeout ? "Still loading…" : "Couldn't load your letter"}</strong>
+        ${isTimeout
+          ? "This is taking longer than usual. Check your connection and try again."
+          : "Something went wrong. Check your connection and try again."}
+        <a href="" style="display:block;margin-top:14px;color:var(--blush);font-weight:600;font-size:13px;">Try again</a>
+      `);
     }
   })();
 </script>
