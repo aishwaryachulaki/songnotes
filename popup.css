@@ -246,27 +246,27 @@ body::before {
 .timestamp-input::placeholder { color: rgba(58,36,24,0.40); }
 
 .now-btn {
-  border: 1.5px solid rgba(227,104,136,0.45); border-radius: 20px;
-  background: transparent; color: var(--blush);
+  background: rgba(227,104,136,0.07); border: 1.5px solid rgba(227,104,136,0.40);
+  border-radius: 50px; color: var(--blush);
   font-family: 'Montserrat', sans-serif;
-  font-size: 10px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase;
   padding: 6px 14px; cursor: pointer; white-space: nowrap;
-  transition: background 0.15s, color 0.15s;
+  transition: background 0.15s, border-color 0.15s;
 }
-.now-btn:hover { background: var(--blush); color: #fff; border-color: var(--blush); }
+.now-btn:hover { background: rgba(227,104,136,0.18); border-color: rgba(227,104,136,0.65); }
 
 /* Save row */
 .save-row { display: flex; align-items: center; gap: 8px; }
 .save-btn {
-  flex: 1; background: var(--tangerine); color: #fff;
-  border: none; border-radius: 10px;
+  flex: 1; background: rgba(227,104,136,0.07); color: var(--blush);
+  border: 1.5px solid rgba(227,104,136,0.40); border-radius: 50px;
   padding: 10px 16px;
   font-family: 'Montserrat', sans-serif;
-  font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
-  cursor: pointer; transition: opacity 0.15s;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase;
+  cursor: pointer; transition: background 0.15s, border-color 0.15s;
 }
-.save-btn:hover { opacity: 0.88; }
-.save-btn:disabled { opacity: 0.5; cursor: default; }
+.save-btn:hover { background: rgba(227,104,136,0.18); border-color: rgba(227,104,136,0.65); }
+.save-btn:disabled { opacity: 0.4; cursor: default; }
 .status { font-size: 11px; color: var(--ink-mid); }
 
 
@@ -369,14 +369,14 @@ body::before {
 .playlist-input::placeholder { color: var(--ink-lt); }
 
 .share-btn {
-  width: 100%; background: var(--tangerine); color: #fff;
-  border: none; border-radius: 10px; padding: 11px;
+  width: 100%; background: rgba(227,104,136,0.07); color: var(--blush);
+  border: 1.5px solid rgba(227,104,136,0.40); border-radius: 50px; padding: 11px;
   font-family: 'Montserrat', sans-serif;
-  font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
-  cursor: pointer; transition: opacity 0.15s;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase;
+  cursor: pointer; transition: background 0.15s, border-color 0.15s;
 }
-.share-btn:hover { opacity: 0.88; }
-.share-btn:disabled { opacity: 0.5; cursor: default; }
+.share-btn:hover { background: rgba(227,104,136,0.18); border-color: rgba(227,104,136,0.65); }
+.share-btn:disabled { opacity: 0.4; cursor: default; }
 
 .share-info {
   font-size: 11px; color: var(--ink-mid);
@@ -385,15 +385,15 @@ body::before {
 .share-info a { color: var(--tangerine); font-weight: 600; }
 
 .new-share-btn {
-  background: transparent; border: none;
-  color: var(--blush);
+  background: rgba(227,104,136,0.07); border: 1.5px solid rgba(227,104,136,0.40);
+  border-radius: 50px; color: var(--blush);
   font-family: 'Montserrat', sans-serif;
-  font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
-  cursor: pointer; padding: 0;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase;
+  cursor: pointer; padding: 7px 0;
   text-align: center; width: 100%;
-  opacity: 0.65; transition: opacity 0.15s;
+  transition: background 0.15s, border-color 0.15s;
 }
-.new-share-btn:hover { opacity: 1; }
+.new-share-btn:hover { background: rgba(227,104,136,0.18); border-color: rgba(227,104,136,0.65); }
 
 
 /* ── Share Panel ── */
@@ -473,13 +473,14 @@ body::before {
 .sp-url-input:focus { border-color: var(--blush); }
 .sp-url-input::placeholder { color: rgba(92,45,45,0.35); }
 .sp-attach-btn {
-  background: transparent; border: 1.5px solid var(--blush); color: var(--blush);
+  background: rgba(227,104,136,0.07); border: 1.5px solid rgba(227,104,136,0.40);
+  color: var(--blush);
   font-family: 'Montserrat', sans-serif;
-  font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
-  border-radius: 8px; padding: 8px 11px; cursor: pointer; white-space: nowrap;
-  transition: background 0.15s, color 0.15s;
+  font-size: 9px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase;
+  border-radius: 50px; padding: 8px 11px; cursor: pointer; white-space: nowrap;
+  transition: background 0.15s, border-color 0.15s;
 }
-.sp-attach-btn:hover { background: var(--blush); color: #fff; }
+.sp-attach-btn:hover { background: rgba(227,104,136,0.18); border-color: rgba(227,104,136,0.65); }
 
 .sp-hint {
   display: flex; align-items: flex-start; gap: 8px;
@@ -496,13 +497,13 @@ body::before {
   display: flex; align-items: center; justify-content: space-between; gap: 8px;
 }
 .copy-link-btn {
-  width: 100%; background: rgba(92,45,45,0.08); border: 1.5px solid rgba(92,45,45,0.15);
-  border-radius: 10px; padding: 10px;
+  width: 100%; background: rgba(227,104,136,0.07); border: 1.5px solid rgba(227,104,136,0.40);
+  border-radius: 50px; padding: 10px;
   font-family: 'Montserrat', sans-serif;
-  font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
-  color: #5c2d2d; cursor: pointer; transition: background 0.15s, border-color 0.15s;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase;
+  color: var(--blush); cursor: pointer; transition: background 0.15s, border-color 0.15s;
 }
-.copy-link-btn:hover { background: rgba(92,45,45,0.14); border-color: rgba(92,45,45,0.3); }
+.copy-link-btn:hover { background: rgba(227,104,136,0.18); border-color: rgba(227,104,136,0.65); }
 
 .sp-how-link {
   font-size: 10px; color: rgba(92,45,45,0.5);
@@ -511,13 +512,14 @@ body::before {
 }
 .sp-how-link:hover { color: var(--blush); }
 .sp-share-btn {
-  background: var(--blush); color: #fff; border: none;
-  border-radius: 20px; padding: 10px 16px;
+  background: rgba(227,104,136,0.07); color: var(--blush);
+  border: 1.5px solid rgba(227,104,136,0.40);
+  border-radius: 50px; padding: 10px 16px;
   font-family: 'Montserrat', sans-serif;
-  font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
-  cursor: pointer; transition: opacity 0.15s; white-space: nowrap;
+  font-size: 9px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase;
+  cursor: pointer; transition: background 0.15s, border-color 0.15s; white-space: nowrap;
 }
-.sp-share-btn:hover { opacity: 0.88; }
+.sp-share-btn:hover { background: rgba(227,104,136,0.18); border-color: rgba(227,104,136,0.65); }
 .sp-share-btn:disabled { opacity: 0.4; cursor: default; }
 
 /* ── Previous Experiences ── */
@@ -549,29 +551,31 @@ body::before {
 .prev-actions { display: flex; gap: 5px; align-items: center; flex-shrink: 0; }
 .prev-activate {
   font-family: 'Montserrat', sans-serif;
-  font-size: 9px; padding: 4px 10px; border-radius: 20px;
+  font-size: 9px; padding: 4px 10px; border-radius: 50px;
   color: var(--blush); border: 1.5px solid rgba(227,104,136,0.40);
   background: rgba(227,104,136,0.07); cursor: pointer;
-  font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase; white-space: nowrap;
+  transition: background 0.15s, border-color 0.15s;
 }
-.prev-activate:hover { background: var(--blush); color: #fff; border-color: var(--blush); }
+.prev-activate:hover { background: rgba(227,104,136,0.18); border-color: rgba(227,104,136,0.65); }
 .prev-copy {
   font-family: 'Montserrat', sans-serif;
-  font-size: 9px; padding: 4px 8px; border-radius: 20px;
-  color: var(--ink-lt); border: 1.5px solid rgba(58,36,24,0.14);
-  background: transparent; cursor: pointer;
-  font-weight: 600; letter-spacing: 0.04em; white-space: nowrap;
-  transition: border-color 0.15s, color 0.15s;
+  font-size: 9px; padding: 4px 8px; border-radius: 50px;
+  color: var(--blush); border: 1.5px solid rgba(227,104,136,0.40);
+  background: rgba(227,104,136,0.07); cursor: pointer;
+  font-weight: 700; letter-spacing: 0.10em; white-space: nowrap;
+  transition: background 0.15s, border-color 0.15s;
 }
-.prev-copy:hover { color: var(--ink); border-color: rgba(58,36,24,0.30); }
+.prev-copy:hover { background: rgba(227,104,136,0.18); border-color: rgba(227,104,136,0.65); }
 .prev-more {
   font-family: 'Montserrat', sans-serif;
-  font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
-  color: var(--tangerine); text-align: center; cursor: pointer;
-  padding: 4px 0; opacity: 0.75;
+  font-size: 9px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase;
+  background: rgba(227,104,136,0.07); border: 1.5px solid rgba(227,104,136,0.40);
+  border-radius: 50px; color: var(--blush); text-align: center; cursor: pointer;
+  padding: 5px 0; width: 100%;
+  transition: background 0.15s, border-color 0.15s;
 }
-.prev-more:hover { opacity: 1; text-decoration: underline; }
+.prev-more:hover { background: rgba(227,104,136,0.18); border-color: rgba(227,104,136,0.65); }
 
 
 /* ── Import block ── */
@@ -600,20 +604,21 @@ body::before {
 
 /* ── Generic button (name save + import) ── */
 .btn {
-  background: rgba(58,36,24,0.06);
-  border: 1.5px solid rgba(58,36,24,0.14);
-  color: var(--ink); border-radius: 8px;
+  background: rgba(227,104,136,0.07);
+  border: 1.5px solid rgba(227,104,136,0.40);
+  color: var(--blush); border-radius: 50px;
   padding: 7px 13px;
   font-family: 'Montserrat', sans-serif;
-  font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.10em;
+  text-transform: uppercase;
   cursor: pointer; white-space: nowrap;
-  transition: background 0.12s;
+  transition: background 0.15s, border-color 0.15s;
 }
-.btn:hover { background: rgba(58,36,24,0.12); }
+.btn:hover { background: rgba(227,104,136,0.18); border-color: rgba(227,104,136,0.65); }
 .btn.primary {
-  background: var(--tangerine); color: #fff; border-color: var(--tangerine);
+  background: rgba(227,104,136,0.07); color: var(--blush); border-color: rgba(227,104,136,0.40);
 }
-.btn.primary:hover { opacity: 0.88; }
+.btn.primary:hover { background: rgba(227,104,136,0.18); border-color: rgba(227,104,136,0.65); }
 
 
 /* ── Stretch all card textures to fill their container wall-to-wall ── */
