@@ -94,6 +94,7 @@
       justify-content: center;
       text-align: center;
       padding: 0 24px;
+      margin-top: -60px; /* pull content up toward the top third */
     }
     .hero-eyebrow {
       font-family: 'Montserrat', sans-serif;
@@ -107,7 +108,7 @@
     }
     .hero-title {
       font-family: 'Lora', Georgia, serif;
-      font-size: clamp(28px, 5vw, 50px);
+      font-size: clamp(36px, 6.5vw, 64px);
       font-weight: 700;
       color: var(--ink);
       line-height: 1.15;
@@ -122,10 +123,20 @@
     }
     .hero-artist strong { font-weight: 700; }
     .hero-divider {
-      font-size: 12px;
-      color: var(--tangerine);
-      opacity: 0.6;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: min(280px, 60vw);
       margin-bottom: 10px;
+      color: var(--tangerine);
+      font-size: 12px;
+    }
+    .hero-divider::before,
+    .hero-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(58, 36, 24, 0.18);
     }
     .hero-count {
       font-family: 'Lora', Georgia, serif;
