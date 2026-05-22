@@ -101,16 +101,64 @@
       </div>
       <div id="notes" class="notes"></div>
 
-      <!-- Share stamp -->
-      <div class="share-card">
-        <div id="shareSummary" class="share-summary"></div>
-        <div class="playlist-wrap">
-          <span class="playlist-icon">🖇</span>
-          <input id="playlistUrl" class="playlist-input" type="text" placeholder="Add playlist link" />
+      <!-- Share panel -->
+      <div class="share-panel">
+
+        <!-- Header row -->
+        <div class="sp-header">
+          <div class="sp-title">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+            SHARE WITH <span id="spRecipient" class="sp-recipient">someone</span>
+          </div>
+          <div id="spPill" class="sp-pill sp-pill--needed">● Playlist needed</div>
         </div>
-        <button id="copyShare" class="share-btn">Send all notes</button>
+
+        <!-- State A / C: track or playlist card -->
+        <div id="spCard" class="sp-card hidden">
+          <img id="spThumb" class="sp-thumb" src="" alt="" />
+          <div class="sp-card-info">
+            <div id="spCardTitle" class="sp-card-title"></div>
+            <div id="spCardSub" class="sp-card-sub"></div>
+          </div>
+          <div class="sp-spotify-badge">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+            Spotify
+          </div>
+        </div>
+
+        <!-- State B: playlist input needed -->
+        <div id="spInputSection" class="sp-input-section hidden">
+          <div class="sp-input-label">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+            </svg>
+            Playlist link <span class="sp-required">(required)</span>
+          </div>
+          <div class="sp-input-row">
+            <input id="playlistUrl" class="sp-url-input" type="text" placeholder="Paste Spotify playlist link" autocomplete="off" />
+            <button id="attachBtn" class="sp-attach-btn">Attach</button>
+          </div>
+          <div class="sp-hint">
+            <span class="sp-hint-icon">✦</span>
+            <div class="sp-hint-body">
+              <div class="sp-hint-title">Add a playlist to start sharing</div>
+              <div class="sp-hint-sub">Your notes will be saved here and shared instantly.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="sp-footer">
+          <a href="https://aishwaryachulaki.github.io/songnotes/faq.html" target="_blank" class="sp-how-link">ⓘ How sharing works</a>
+          <button id="copyShare" class="sp-share-btn">Start Sharing</button>
+        </div>
         <div id="shareInfo" class="share-info"></div>
         <button id="resetShare" class="new-share-btn">New share</button>
+
       </div>
 
       <!-- Previous Experiences -->

@@ -232,6 +232,7 @@ function ensureActive(store, sender) {
       playlist_id: null,
       playlist_url: null,
       playlist_name: null,
+      thumbnail_url: null,
       sender_name: sender || "someone",
       recipient_name: null,
       notes: [],
@@ -253,6 +254,8 @@ let currentTrack = null;
 let senderName = "";
 let shareOrigin = CONFIGURED_ORIGIN || "";
 let activeShare = null; // reference into store.shares[active]
+let trackThumbUrl = null;  // cached thumbnail for the current single track
+let trackThumbId  = null;  // trackId the above corresponds to
 
 async function getActiveTab() {
   const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
@@ -412,26 +415,135 @@ async function renderNotes() {
       // Fire-and-forget — local delete already happened above.
       getSession().then(s => deleteNoteRemote(deletedId, s?.access_token));
       renderNotes();
-      renderSummary();
+      renderSharePanel().catch(console.error);
       notifyContentRefresh();
     }),
   );
 }
 
-function renderSummary() {
-  if (!activeShare) return;
-  const ownNotes = activeShare.notes;
-  const songCount = new Set(ownNotes.map((n) => n.track_id)).size;
-  const noteCount = ownNotes.length;
-  const el = $("shareSummary");
-  if (!noteCount) {
-    el.textContent = "No notes yet — write one above to start a shared experience.";
+async function attachPlaylist() {
+  const v = $("playlistUrl")?.value.trim() || "";
+  activeShare.playlist_url = v || null;
+  activeShare.playlist_id  = parsePlaylistId(v);
+  activeShare.type = deriveType(activeShare);
+  activeShare.thumbnail_url = null;
+
+  if (v && activeShare.playlist_id) {
+    try {
+      const r = await fetch(`https://open.spotify.com/oembed?url=${encodeURIComponent(v)}`);
+      if (r.ok) {
+        const d = await r.json();
+        activeShare.playlist_name = d.title || "A Playlist Share";
+        activeShare.thumbnail_url = d.thumbnail_url || null;
+      } else {
+        activeShare.playlist_name = "A Playlist Share";
+      }
+    } catch {
+      activeShare.playlist_name = "A Playlist Share";
+    }
   } else {
-    const t = deriveType(activeShare);
-    const tag = t === "playlist" ? " · playlist" : t === "multi" ? " · across multiple songs" : "";
-    el.textContent = `${noteCount} note${noteCount === 1 ? "" : "s"} across ${songCount} song${songCount === 1 ? "" : "s"}${tag}`;
+    activeShare.playlist_name = null;
   }
 
+  const { store } = await loadStore();
+  store.shares[activeShare.id] = activeShare;
+  await saveStore(store).catch(console.error);
+  renderSharePanel().catch(console.error);
+}
+
+async function renderSharePanel() {
+  if (!activeShare) return;
+
+  const notes     = activeShare.notes || [];
+  const noteCount = notes.length;
+  const uniqueIds = new Set(notes.map((n) => n.track_id).filter(Boolean));
+  const songCount = uniqueIds.size;
+  const isMulti   = songCount > 1;
+  const hasPlaylist = !!activeShare.playlist_id;
+
+  // state: 'single' | 'needsPlaylist' | 'playlist'
+  const state = isMulti ? (hasPlaylist ? "playlist" : "needsPlaylist") : "single";
+
+  // ── Header ──
+  const recipientEl = $("spRecipient");
+  if (recipientEl) recipientEl.textContent = activeShare.recipient_name || "someone";
+
+  const pillEl = $("spPill");
+  if (pillEl) {
+    if (state === "needsPlaylist") {
+      pillEl.textContent = "● Playlist needed";
+      pillEl.className = "sp-pill sp-pill--needed";
+    } else if (state === "playlist") {
+      pillEl.textContent = "✓ Playlist ready";
+      pillEl.className = "sp-pill sp-pill--ready";
+    } else {
+      pillEl.textContent = "✓ Ready to share";
+      pillEl.className = "sp-pill sp-pill--ready";
+    }
+  }
+
+  // ── Show / hide sections ──
+  const cardEl  = $("spCard");
+  const inputEl = $("spInputSection");
+
+  if (state === "needsPlaylist") {
+    cardEl?.classList.add("hidden");
+    inputEl?.classList.remove("hidden");
+  } else {
+    cardEl?.classList.remove("hidden");
+    inputEl?.classList.add("hidden");
+
+    // ── Populate card ──
+    let thumbUrl = null;
+    let cardTitle = "";
+    let cardSub   = "";
+
+    if (state === "single") {
+      cardTitle = currentTrack?.title || "No song playing";
+      cardSub   = noteCount
+        ? `${noteCount} note${noteCount !== 1 ? "s" : ""}`
+        : "Play a song and write notes above";
+
+      // Fetch thumbnail for the current track (cached by trackId)
+      if (currentTrack?.trackId && !currentTrack.trackId.startsWith("local:")) {
+        if (currentTrack.trackId !== trackThumbId) {
+          try {
+            const trackUrl = `https://open.spotify.com/track/${currentTrack.trackId}`;
+            const r = await fetch(`https://open.spotify.com/oembed?url=${encodeURIComponent(trackUrl)}`);
+            if (r.ok) {
+              const d = await r.json();
+              trackThumbUrl = d.thumbnail_url || null;
+              trackThumbId  = currentTrack.trackId;
+            }
+          } catch { /* no thumbnail — show none */ }
+        }
+        thumbUrl = trackThumbUrl;
+      }
+    } else {
+      cardTitle = activeShare.playlist_name || "A Playlist Share";
+      cardSub   = `${noteCount} note${noteCount !== 1 ? "s" : ""} across ${songCount} song${songCount !== 1 ? "s" : ""}`;
+      thumbUrl  = activeShare.thumbnail_url || null;
+    }
+
+    const thumbEl = $("spThumb");
+    if (thumbEl) {
+      if (thumbUrl) {
+        thumbEl.src = thumbUrl;
+        thumbEl.style.display = "";
+      } else {
+        thumbEl.src = "";
+        thumbEl.style.display = "none";
+      }
+    }
+    const titleEl = $("spCardTitle");
+    if (titleEl) titleEl.textContent = cardTitle;
+    const subEl = $("spCardSub");
+    if (subEl) subEl.textContent = cardSub;
+  }
+
+  // ── Share button ──
+  const shareBtn = $("copyShare");
+  if (shareBtn) shareBtn.disabled = state === "needsPlaylist";
 }
 
 async function renderPrevious() {
@@ -576,7 +688,7 @@ async function activateShare(id) {
   $("recipientName").value = activeShare.recipient_name || "";
   setMode("editing");
   renderNotes();
-  renderSummary();
+  renderSharePanel().catch(console.error);
   renderPrevious();
   notifyContentRefresh();
 }
@@ -621,7 +733,7 @@ async function init() {
   setMode(activeShare.mode || "editing");
   showComposer(!!senderName);
   renderNotes();
-  renderSummary();
+  renderSharePanel().catch(console.error);
   renderPrevious();
 
   // ── Auth UI ──
@@ -731,33 +843,11 @@ $("save").addEventListener("click", async () => {
   $("status").textContent = "Saved ✓";
   setTimeout(() => ($("status").textContent = ""), 2000);
   renderNotes();
-  renderSummary();
+  renderSharePanel().catch(console.error);
   notifyContentRefresh();
 });
 
-$("playlistUrl").addEventListener("change", async () => {
-  const v = $("playlistUrl").value.trim();
-  activeShare.playlist_url = v || null;
-  activeShare.playlist_id = parsePlaylistId(v);
-  activeShare.type = deriveType(activeShare);
-  // Capture the playlist name from the Spotify tab title while the user is on
-  // the playlist page. Spotify sets the tab title to the playlist name.
-  if (v && parsePlaylistId(v)) {
-    try {
-      const res = await fetch(`https://open.spotify.com/oembed?url=${encodeURIComponent(v)}`);
-      if (res.ok) {
-        const data = await res.json();
-        if (data.title) activeShare.playlist_name = data.title;
-      }
-    } catch { /* network error — proceed without name */ }
-  } else {
-    activeShare.playlist_name = null;
-  }
-  const { store } = await loadStore();
-  store.shares[activeShare.id] = activeShare;
-  await saveStore(store).catch(console.error);
-  renderSummary();
-});
+$("attachBtn").addEventListener("click", attachPlaylist);
 
 $("copyShare").addEventListener("click", async () => {
   const shareBtn = $("copyShare");
@@ -815,6 +905,7 @@ $("copyShare").addEventListener("click", async () => {
       if (oembed.ok) {
         const d = await oembed.json();
         activeShare.playlist_name = d.title || "A Playlist Share";
+        activeShare.thumbnail_url = d.thumbnail_url || null;
       } else {
         activeShare.playlist_name = "A Playlist Share";
       }
@@ -823,6 +914,7 @@ $("copyShare").addEventListener("click", async () => {
     }
   } else if (!activeShare.playlist_id) {
     activeShare.playlist_name = null;
+    activeShare.thumbnail_url = null;
   }
   activeShare.notes = sanitizeNotes(activeShare.notes);
   const seen = new Set();
@@ -952,12 +1044,14 @@ $("copyShare").addEventListener("click", async () => {
   // the share page detects e=1 without a key and shows a helpful
   // "part of your link got cut off" message instead of a generic error.
   const url = `${shareUrl(activeShare.id)}&e=1#k=${keyB64}`;
-  try {
-    await navigator.clipboard.writeText(url);
-    $("shareInfo").innerHTML = `Copied! Send this to a friend:<br/><a href="${url}" target="_blank">${url}</a>`;
-  } catch {
-    $("shareInfo").innerHTML = `Share link: <a href="${url}" target="_blank">${url}</a>`;
-  }
+  try { await navigator.clipboard.writeText(url); } catch { /* fallback below */ }
+  $("shareInfo").innerHTML =
+    `<button id="copyLinkBtn" class="copy-link-btn">✦ Copy link to share</button>`;
+  $("copyLinkBtn").addEventListener("click", async () => {
+    await navigator.clipboard.writeText(url).catch(() => {});
+    $("copyLinkBtn").textContent = "Copied!";
+    setTimeout(() => { if ($("copyLinkBtn")) $("copyLinkBtn").textContent = "✦ Copy link to share"; }, 2000);
+  });
 });
 
 $("resetShare").addEventListener("click", async () => {
@@ -973,7 +1067,7 @@ $("resetShare").addEventListener("click", async () => {
   $("recipientName").value = "";
   setMode("editing");
   renderNotes();
-  renderSummary();
+  renderSharePanel().catch(console.error);
   renderPrevious();
   notifyContentRefresh();
 });
@@ -1072,7 +1166,7 @@ $("importBtn").addEventListener("click", async () => {
   setMode("editing");
   $("importStatus").textContent = `Imported ${remote.length} note${remote.length === 1 ? "" : "s"}.`;
   renderNotes();
-  renderSummary();
+  renderSharePanel().catch(console.error);
   renderPrevious();
   notifyContentRefresh();
 
@@ -1113,7 +1207,7 @@ chrome.runtime.onMessage.addListener((msg) => {
     $("trackTitle").textContent = msg.title  || "Unknown track";
     $("trackArtist").textContent = msg.artist || "";
     renderNotes();
-    renderSummary();
+    renderSharePanel().catch(console.error);
   }
 });
 
@@ -1154,6 +1248,6 @@ function startLiveTracking() {
     }
 
     renderNotes();
-    renderSummary();
+    renderSharePanel().catch(console.error);
   }, 2000);
 }

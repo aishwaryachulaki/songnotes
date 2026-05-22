@@ -14,17 +14,19 @@ Get the Keepsake Chrome extension ready for public launch and Chrome Web Store s
 - **Overlays** — content.js fires note toasts at the right timestamps on Spotify; no duplicate fires per play-through
 - **Auth** — Google OAuth, email/password, magic link; session synced to extension storage via auth-bridge.js
 - **Credits** — 3 lifetime free credits (`free_credits_used` column), paid bundles via Razorpay, lifetime option; `use_credit` RPC called after successful push; credits badge updates immediately after save without needing to reopen
-- **Song detection** — `document.title` is the PRIMARY source (updates immediately on every song change); DOM href cross-validated against title to prevent React staleness bugs; push-based `KS_TRACK_CHANGED` message from content.js to side panel on every track change
+- **Song detection** — `document.title` is the PRIMARY source (updates immediately on every song change); DOM href cross-validated against title to prevent React staleness bugs; push-based `KS_TRACK_CHANGED` message from content.js to side panel on every track change; background.js caches last known track so side panel can detect already-playing songs on open via `KS_GET_CACHED_TRACK`
 - **Side panel** — extension icon opens persistent side panel; listens for `KS_TRACK_CHANGED` push messages rather than polling; `init()` and `startLiveTracking()` run independently (one failing doesn't block the other)
-- **Website** — all non-index pages (account, sent, received, faq, privacy, notes, auth) are contained to 560px max-width centered layout; consistent Spectral italic rose logo across all pages
+- **Website** — all non-index pages (account, sent, received, faq, privacy, notes, auth) are contained to 560px max-width centered layout; consistent Spectral italic rose (#c0544e) logo across all pages
 - **sent.html** — looksEncrypted() catches purely alphanumeric ciphertext (no + / = required); playlist/multi shares show a song+note count summary instead of first track name; archive/unarchive tab support
+- **share.html** — fully redesigned: single-screen, non-scrollable hero; "You've received" eyebrow + large Lora title + blush artist line + ✦ divider + note count + recipient; pale pink pill buttons (Import first, then Open in Spotify); share-envelope.png anchored at bottom of hero (half-cropped); "New to Keepsake?" discovery link to index.html; all spacings use clamp() + vh so it scales with browser resize
+- **share panel (extension)** — three-state design: single track (auto-fetches album thumbnail via oEmbed), needsPlaylist (shows input + Attach button), playlist (shows thumbnail card); copy-link button after sharing; pale pink pill buttons consistent with site style
+- **index.html** — responsive hero: single-column at ≤1100px (illustration hides, envelope centres); `object-position: top center` prevents card clipping; heading uses `clamp()` to prevent text overflow at narrow widths
 
 ### What's NOT done yet (blocks launch)
 1. **First-run / onboarding** — no `chrome.runtime.onInstalled` handler, no welcome screen. New users open the side panel to a blank composer with no guidance. Needs at minimum: open Spotify prompt, name setup explanation.
 2. **Razorpay server-side signature verification** — payments work but the Razorpay signature is not verified server-side. Fine for testing, not for real money. Implement as a Supabase Edge Function before going live. (Flagged in memory: `keepsake_payments.md`)
 3. **account.html hero assets** — `credits-flower.png` and `credits-sparkles.png` for the credits hero card are still pending.
-
-4. **Playlist share title on sent.html** — playlist shares still show the first song title instead of "A Playlist Share". Root cause is unclear after multiple attempts: `share_type`, `playlist_url`, `playlist_id`, and `playlist_name` are all null in Supabase for these shares, so `isPlaylist` detection always fails. `playlist_name` column exists (added via SQL) and the push includes it, but it arrives as null — possibly because `playlist_url`/`playlist_id` columns don't exist in the DB so PostgREST silently drops them, and the oEmbed fetch either races with the share action or isn't triggering. The `uniqueTracks > 1` annotation-count fallback in `renderCard` is also in place but not helping. Needs fresh debugging — recommend checking the Supabase `shares` table schema and verifying what actually gets stored on a new share push.
+4. **Playlist share title on sent.html** — playlist shares still show the first song title instead of "A Playlist Share". Root cause: `share_type`, `playlist_url`, `playlist_id`, and `playlist_name` are all null in Supabase for these shares. `playlist_name` column exists (added via SQL) and the push includes it, but it arrives as null — likely because `playlist_url`/`playlist_id` columns don't exist in the DB so PostgREST silently drops them, causing the oEmbed name fetch to never store. The `uniqueTracks > 1` fallback in `renderCard` is in place but not helping. Needs fresh debugging — check the Supabase `shares` table schema and verify what actually gets stored on a new share push.
 
 ### Low priority / pre-submission only
 - Delete dev files before Chrome Web Store submission: `faq-demo.html`, `PRD.md`, `reference.jpg`, `faq-reference.png`, `ChatGPT Image May 5, 2026, 11_16_27 AM.png`
@@ -42,12 +44,14 @@ Get the Keepsake Chrome extension ready for public launch and Chrome Web Store s
 - If you ever need to recreate the RPC: `DROP FUNCTION IF EXISTS use_credit(uuid)` first (Supabase errors on return-type change without drop)
 - Default credits object when DB row is missing: `{ paid_credits: 0, lifetime: false, free_credits_used: 0 }`
 
-### Song detection (content.js)
+### Song detection (content.js + background.js)
 - `getTrackInfo()` uses `document.title` as PRIMARY (format: `"Song • Artist"` or `"Spotify – Song · Artist"`)
 - DOM `<a href="/track/...">` links are cross-validated: only trusted if link text matches title (prevents React href-lag bug)
 - On track change, content.js sends `chrome.runtime.sendMessage({ type: "KS_TRACK_CHANGED", trackId, title, artist })`
+- background.js caches the last `KS_TRACK_CHANGED` payload in `cachedTrack`; side panel requests it via `KS_GET_CACHED_TRACK` on open so songs already playing are detected immediately
 - Side panel registers `chrome.runtime.onMessage` listener for `KS_TRACK_CHANGED` in `startLiveTracking()`
 - Removed `document.hidden` guard from poll loop — Chrome marks side panel as hidden when Spotify tab has focus, which was suppressing all polls
+- `getActiveTab()` uses `lastFocusedWindow: true` (not `currentWindow: true`) — side panel has its own window context
 
 ### Share types
 - `share.type` / `share_type` in Supabase: `"single"` | `"multi"` | `"playlist"`
@@ -57,6 +61,15 @@ Get the Keepsake Chrome extension ready for public launch and Chrome Web Store s
 ### Encryption
 - AES-256-GCM via Web Crypto API; key lives only in the URL fragment (`#k=...`), never server-side
 - `looksEncrypted(s)`: `s.length > 30 && !/\s/.test(s) && /^[A-Za-z0-9+\/=]+$/.test(s)` — catches both padded and unpadded base64 ciphertext
+- `recipient_name` is stored **plaintext** in Supabase (not encrypted) — share.html guards with `looksEncrypted()` before attempting decryption for backwards compatibility with old shares
+
+### share.html design
+- Single-screen, `overflow: hidden`, no scroll
+- Hero is `height: 100vh` flex column: nav → hero-content (flex:1, centered) → hero-envelope (half-cropped at bottom)
+- All spacings use `clamp(min, Xvh/Xvw, max)` for fluid scaling
+- Envelope: `width: min(720px, 88vw)`, container `height: clamp(160px, 35vh, 400px)` with `overflow: hidden`
+- Buttons: `rgba(227,104,136,0.07)` bg, `rgba(227,104,136,0.40)` border, blush text; hover deepens to `rgba(227,104,136,0.18)` — matches `.prev-activate` in popup.css exactly
+- Import button injected dynamically after extension detection (1s timeout); if extension not installed and CWS URL is set, shows "Get Keepsake" install link instead
 
 ---
 
@@ -65,23 +78,28 @@ Get the Keepsake Chrome extension ready for public launch and Chrome Web Store s
 | File | What changed |
 |---|---|
 | `manifest.json` | `sidePanel` permission, `side_panel.default_path`, background service worker, v1.4.0 |
-| `background.js` | `setPanelBehavior({ openPanelOnActionClick: true })` |
-| `content.js` | `document.title` primary source; DOM href cross-validation; `KS_TRACK_CHANGED` push on track change; removed `document.hidden` guard |
-| `popup.js` | `freeCreditsRemaining()` (3 lifetime free, not monthly); credits badge refresh after save; `startLiveTracking()` with push-based `KS_TRACK_CHANGED` listener; `init()` and `startLiveTracking()` independent; song change detection uses title+trackId comparison |
-| `account.html` | Full pricing redesign: 560px contained layout, 2×2 bundle grid + lifetime card, neutral texture backgrounds, soft typography |
-| `sent.html` | `looksEncrypted()` — no `+/=` requirement; `renderCard()` — playlist/multi show song+note count; 560px contained layout |
+| `background.js` | `setPanelBehavior`; track state cache (`cachedTrack`, `KS_GET_CACHED_TRACK` handler) |
+| `content.js` | `document.title` primary source; DOM href cross-validation; `KS_TRACK_CHANGED` push; removed `document.hidden` guard |
+| `popup.js` | `freeCreditsRemaining()` (3 lifetime free); credits badge refresh; `startLiveTracking()` push-based; `getActiveTab()` uses `lastFocusedWindow`; three-state `renderSharePanel()`; oEmbed thumbnail fetch; copy-link button; `attachPlaylist()` handler; `recipient_name` stored plaintext |
+| `sidepanel.html` | Replaced share card with three-state share panel (sp-* structure) |
+| `popup.css` | All sp-* styles for share panel; `.copy-link-btn` style |
+| `account.html` | Full pricing redesign: 560px contained, 2×2 bundle grid + lifetime card |
+| `sent.html` | `looksEncrypted()` fix; `renderCard()` playlist/multi summary; 560px layout |
 | `received.html` | 560px contained layout |
 | `notes.html` | 560px contained layout, 2-column grid |
 | `faq.html` | 560px contained layout; nav max-width 560px; floral illustration removed |
-| `index.html` | Floral illustration removed |
+| `index.html` | Floral illustration removed; responsive hero (clamp heading, `object-position: top center`, single-col breakpoint 1100px, block repositioning in media query) |
 | `privacy.html` | Spectral italic logo; 560px contained layout |
 | `auth.html` | Logo color `var(--rose)` |
+| `share.html` | Full redesign: single-screen hero, envelope illustration, blush pill buttons, clamp() responsive spacings, discovery link, hollow ✧ sparkle in buttons |
+| `share-envelope.png` | New illustration asset (replaced twice) |
 
 ---
 
 ## Known remaining bugs / issues
-- **Song detection while panel is open** — push architecture is in place but there may still be edge cases where the panel misses a track change if it was already open when the song changed. If this recurs: the `KS_GET_STATE` poll path (triggered by `startLiveTracking`) is the fallback; check that `chrome.tabs.sendMessage` is reaching the correct Spotify tab.
-- **Received tab recipient decryption** — imported shares decrypt in the extension fine, but the website `received.html` shows whatever is in `received_shares.sender_name` (stored encrypted). Not a bug per se — decryption only happens inside the extension.
+- **Song detection while panel is open** — push architecture is in place but there may still be edge cases where the panel misses a track change if it was already open when the song changed. Fallback: `KS_GET_STATE` poll path in `startLiveTracking()`; check `chrome.tabs.sendMessage` is reaching the correct Spotify tab.
+- **Received tab recipient decryption** — `received.html` shows whatever is in `received_shares.sender_name` (stored encrypted). Not a bug per se — decryption only happens inside the extension.
+- **index.html single-column envelope** — content blocks repositioned in media query but may still need fine-tuning at specific viewport sizes. All positions are `%` of `.env-wrap` height — adjust `top`/`left` values in the `@media (max-width: 1100px)` block.
 
 ---
 
