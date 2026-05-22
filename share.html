@@ -144,72 +144,56 @@
       margin-top: 24px;
       min-height: 52px;
     }
-    .btn-spotify {
-      display: flex;
+    /* shared pill style */
+    .hero-btn {
+      display: inline-flex;
       align-items: center;
-      gap: 9px;
-      background: #1DB954;
-      color: #fff;
+      gap: 8px;
       border: none;
       border-radius: 50px;
-      padding: 13px 26px;
-      font-size: 13px;
+      padding: 13px 28px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
       font-weight: 700;
-      cursor: pointer;
-      letter-spacing: 0.02em;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
       text-decoration: none;
-      box-shadow: 0 4px 16px rgba(29,185,84,0.28);
+      cursor: pointer;
       transition: opacity 0.15s, transform 0.12s;
     }
-    .btn-spotify:hover { opacity: 0.9; transform: translateY(-1px); }
-    .btn-spotify svg { flex-shrink: 0; }
+    .hero-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+    .hero-btn:disabled { opacity: 0.4; cursor: default; transform: none; }
+
+    .btn-spotify {
+      background: var(--olive);
+      color: var(--cream);
+      box-shadow: 0 4px 16px rgba(59,58,39,0.22);
+    }
     .btn-import {
       background: var(--tangerine);
       color: #fff;
-      border: none;
-      border-radius: 50px;
-      padding: 13px 26px;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-      letter-spacing: 0.04em;
-      box-shadow: 0 4px 16px rgba(240,140,33,0.28);
-      transition: opacity 0.15s, transform 0.12s;
-    }
-    .btn-import:hover { opacity: 0.9; transform: translateY(-1px); }
-    .btn-import:disabled { opacity: 0.45; cursor: default; transform: none; }
-    .action-note {
-      font-size: 11px;
-      color: var(--ink-mid);
-      opacity: 0.75;
+      box-shadow: 0 4px 16px rgba(240,140,33,0.25);
     }
     .btn-install {
-      display: inline-block;
-      background: rgba(58,36,24,0.08);
+      background: transparent;
       color: var(--ink-mid);
-      border: 1.5px solid rgba(58,36,24,0.18);
-      border-radius: 50px;
-      padding: 11px 22px;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.04em;
-      text-decoration: none;
-      cursor: pointer;
-      transition: opacity 0.15s;
+      border: 1.5px solid rgba(58,36,24,0.25);
+      box-shadow: none;
     }
-    .btn-install:hover { opacity: 0.7; }
 
-    /* ── Envelope ── */
+    /* ── Envelope — shows top ~55%, cropped at bottom edge ── */
     .hero-envelope {
       display: flex;
       justify-content: center;
-      align-items: flex-end;
+      align-items: flex-start;
       flex-shrink: 0;
+      height: 220px;
+      overflow: hidden;
     }
     .envelope-img {
-      width: min(320px, 65vw);
+      width: min(580px, 90vw);
       display: block;
-      filter: drop-shadow(0 -4px 18px rgba(58,36,24,0.08));
+      filter: drop-shadow(0 -6px 24px rgba(58,36,24,0.10));
     }
 
     /* ── Loading / error states ── */
@@ -369,9 +353,8 @@
       ${recipient ? `<div class="hero-recipient">for <strong>${escHtml(recipient)}</strong></div>` : ""}
       <div class="hero-actions" id="heroActions">
         ${spLink ? `
-          <a class="btn-spotify" href="${escHtml(spLink)}" target="_blank" rel="noopener">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.586 14.424a.623.623 0 0 1-.857.208c-2.348-1.435-5.304-1.76-8.785-.964a.623.623 0 1 1-.277-1.215c3.809-.87 7.076-.496 9.712 1.115a.623.623 0 0 1 .207.856zm1.223-2.723a.78.78 0 0 1-1.072.257C14.1 12.307 10.64 11.75 7.4 12.66a.781.781 0 0 1-.356-1.52c3.648-1.054 7.494-.468 10.488 1.488a.78.78 0 0 1 .277 1.073zm.105-2.835c-3.023-1.796-8.01-1.96-10.898-1.086a.936.936 0 1 1-.543-1.79c3.317-1.007 8.831-.812 12.315 1.256a.935.935 0 1 1-.874 1.62z"/></svg>
-            ${spotifyLabel(meta, notes)}
+          <a class="hero-btn btn-spotify" href="${escHtml(spLink)}" target="_blank" rel="noopener">
+            ♪ ${spotifyLabel(meta, notes)}
           </a>` : ""}
       </div>
     `;
@@ -386,7 +369,7 @@
       const actions = document.getElementById("heroActions");
       if (!actions) return;
       const btn = document.createElement("button");
-      btn.className = "btn-import";
+      btn.className = "hero-btn btn-import";
       btn.id = "importBtn";
       btn.textContent = "♫ Import into Keepsake";
       actions.appendChild(btn);
@@ -408,7 +391,7 @@
       const actions = document.getElementById("heroActions");
       if (!actions) return;
       const a = document.createElement("a");
-      a.className = "btn-install";
+      a.className = "hero-btn btn-install";
       a.href = EXTENSION_CWS_URL;
       a.target = "_blank";
       a.rel = "noopener";
