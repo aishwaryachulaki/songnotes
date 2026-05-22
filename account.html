@@ -175,21 +175,22 @@
 
     /* ── Lifetime card ── */
     .lifetime-card {
-      background: #FFFBF4;
-      border: 1.5px solid rgba(58,36,24,0.10);
+      background: #f0c0c8 url('lifetime-background.png') top / cover no-repeat;
+      border: 1.5px solid rgba(217,107,124,0.45);
+      box-shadow: inset 0 0 0 1px rgba(240,192,200,0.6);
       border-radius: 14px; padding: 20px 24px;
       position: relative; overflow: hidden;
-      cursor: pointer; transition: background 0.15s;
-      color: var(--ink);
+      cursor: pointer; transition: filter 0.15s;
+      color: #5c2d2d;
       display: flex; align-items: center; justify-content: space-between; gap: 20px;
     }
-    .lifetime-card:hover { background: #f5f0e8; }
+    .lifetime-card:hover { filter: brightness(0.97); }
     .lifetime-content { position: relative; z-index: 1; flex: 1; }
     .lifetime-title {
       font-family: 'Lora', Georgia, serif;
       font-size: 17px; font-weight: 400;
       line-height: 1.2; margin-bottom: 2px;
-      color: var(--ink);
+      color: #5c2d2d;
     }
     .lifetime-sub {
       font-family: 'Spectral', Georgia, serif;
@@ -204,7 +205,7 @@
       font-family: 'Lora', Georgia, serif;
       font-size: 24px; font-weight: 500; line-height: 1; color: var(--rose);
     }
-    .lifetime-desc { font-size: 10px; line-height: 1.4; opacity: 0.55; text-align: right; color: var(--ink-mid); }
+    .lifetime-desc { font-size: 10px; line-height: 1.4; opacity: 0.65; text-align: right; color: #5c2d2d; }
 
     /* ── Trust line ── */
     .trust-line {
