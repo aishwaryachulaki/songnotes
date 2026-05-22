@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Privacy Policy — Keepsake</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@500;600;700&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@1,400&family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@500;600;700&display=swap" />
   <style>
     :root {
       --butter:   #F4D9A6;
@@ -44,26 +44,17 @@
       justify-content: space-between;
       margin-bottom: 48px;
     }
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
+    .nav-logo {
+      font-family: 'Spectral', Georgia, serif;
+      font-style: italic; font-weight: 400; font-size: 26px;
+      color: var(--blush); text-decoration: none; letter-spacing: -0.01em;
+      display: flex; align-items: center; gap: 5px;
+      text-shadow: 0 1px 12px rgba(140,50,60,0.13);
     }
-    .logo-mark {
-      width: 34px; height: 34px;
-      background: var(--blush);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 15px;
-      flex-shrink: 0;
-    }
-    .logo-text {
-      font-family: 'Montserrat', sans-serif;
-      font-weight: 700;
-      font-size: 17px;
-      color: var(--ink);
-      letter-spacing: -0.01em;
+    .nav-logo .logo-spark {
+      font-style: normal; font-family: sans-serif;
+      font-size: 11px; color: var(--tangerine); font-weight: 400;
+      vertical-align: super; line-height: 0;
     }
 
     /* ── Hero ── */
@@ -212,10 +203,7 @@
 <div class="page">
 
   <header class="site-header">
-    <a href="index.html" class="logo">
-      <div class="logo-mark">♪</div>
-      <span class="logo-text">Keepsake</span>
-    </a>
+    <a href="index.html" class="nav-logo">keepsake.<span class="logo-spark">✦</span></a>
     <a href="index.html" style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-lt);text-decoration:none;opacity:0.7;">← Home</a>
   </header>
 
