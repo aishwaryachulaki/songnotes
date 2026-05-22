@@ -189,6 +189,22 @@
       filter: drop-shadow(0 -6px 24px rgba(58,36,24,0.10));
     }
 
+    /* ── Discover link ── */
+    .discover-link {
+      display: block;
+      margin-top: 16px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-mid);
+      text-decoration: none;
+      opacity: 0.5;
+      transition: opacity 0.15s;
+    }
+    .discover-link:hover { opacity: 1; }
+
     /* ── Loading / error states ── */
     .state {
       text-align: center;
@@ -348,9 +364,10 @@
         <!-- import btn injected here by extension detection -->
         ${spLink ? `
           <a class="hero-btn" id="spotifyBtn" href="${escHtml(spLink)}" target="_blank" rel="noopener">
-            ♪ ${spotifyLabel(meta, notes)}
+            ✦ ${spotifyLabel(meta, notes)}
           </a>` : ""}
       </div>
+      <a href="index.html" class="discover-link">New to Keepsake? Find out more →</a>
     `;
 
     window.__KS_PAYLOAD = { share_id: shareId, share: meta || {}, notes };
@@ -365,14 +382,14 @@
       const btn = document.createElement("button");
       btn.className = "hero-btn";
       btn.id = "importBtn";
-      btn.textContent = "♫ Import into Keepsake";
+      btn.textContent = "✦ Import into Keepsake";
       actions.insertBefore(btn, actions.firstChild);
       btn.addEventListener("click", () => {
         window.__KS_PAYLOAD = { share_id: shareId, share: meta || {}, notes };
         window.dispatchEvent(new CustomEvent("keepsake:import", { detail: window.__KS_PAYLOAD }));
         window.addEventListener("keepsake:imported", () => {
           btn.disabled = true;
-          btn.textContent = "✓ Imported!";
+          btn.textContent = "✦ Imported!";
         }, { once: true });
       });
       window.dispatchEvent(new CustomEvent("keepsake:import", { detail: window.__KS_PAYLOAD }));
@@ -389,7 +406,7 @@
       a.href = EXTENSION_CWS_URL;
       a.target = "_blank";
       a.rel = "noopener";
-      a.textContent = "Add Keepsake to Chrome — free";
+      a.textContent = "✦ Get Keepsake — it's free";
       actions.appendChild(a);
     }
 
