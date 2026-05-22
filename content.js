@@ -43,62 +43,61 @@
 
   function getTrackInfo() {
     const nowPlaying = queryFirst(NOW_PLAYING_SELECTORS);
-    let title = "", artist = "", trackId = "";
-    // detected = true means we found the player container, even if track parse fails
     const detected = !!nowPlaying;
+    let title = "", artist = "", trackId = "";
 
+    // PRIMARY source: document.title — Spotify updates this immediately on every
+    // song change, well before React finishes patching href attributes in the DOM.
+    // Using it first means song changes are always detected on the very next poll.
+    const docTitle = document.title || "";
+    // Spotify formats: "Song • Artist" or "Spotify – Song · Artist"
+    const dtMatch =
+      docTitle.match(/^Spotify\s*[–-]\s*(.+?)\s*[·•]\s*(.+)$/) ||
+      (!docTitle.startsWith("Spotify") && docTitle.match(/^(.+?)\s*[·•]\s*(.+)$/));
+    if (dtMatch) { title = dtMatch[1].trim(); artist = dtMatch[2].trim(); }
+
+    // ENHANCEMENT: try to get the real Spotify track ID from DOM links.
+    // Cross-validate text vs our title so we don't pick up a stale href that
+    // React hasn't updated yet (the root cause of the "stuck on first song" bug).
     if (nowPlaying) {
-      const titleEl = queryFirst(TITLE_SELECTORS, nowPlaying);
-      if (titleEl) {
-        title = titleEl.textContent.trim();
-        const href = titleEl.getAttribute("href") || "";
-        const m = href.match(/\/track\/([a-zA-Z0-9]+)/);
-        if (m) trackId = m[1];
-      }
-
-      // If the primary selector didn't yield a /track/ URL (e.g. it matched an
-      // album/context link instead), scan every link in the widget for one that
-      // explicitly points to a track. This is the most common cause of the player
-      // getting stuck on the first song when consecutive songs share an album link.
-      if (!trackId) {
-        const trackLinks = nowPlaying.querySelectorAll('a[href*="/track/"]');
-        for (const link of trackLinks) {
-          const m = link.getAttribute("href").match(/\/track\/([a-zA-Z0-9]+)/);
-          if (m) {
+      const trackLinks = nowPlaying.querySelectorAll('a[href*="/track/"]');
+      for (const link of trackLinks) {
+        const m = link.getAttribute("href").match(/\/track\/([a-zA-Z0-9]+)/);
+        if (m) {
+          const linkText = link.textContent.trim();
+          // Only trust this href if its visible text matches the title we already
+          // know from document.title — if they differ, React hasn't flushed the
+          // href update yet and the old track ID would cause a false "no change".
+          if (!title || linkText === title) {
             trackId = m[1];
-            if (!title) title = link.textContent.trim();
-            break;
+            if (!title) title = linkText;
           }
+          break;
         }
       }
 
+      // Artist from DOM (document.title sometimes omits featuring artists)
       const artistEls = nowPlaying.querySelectorAll('a[href^="/artist/"]');
-      artist = Array.from(artistEls).map((a) => a.textContent.trim()).join(", ");
+      if (artistEls.length) artist = Array.from(artistEls).map((a) => a.textContent.trim()).join(", ");
     }
 
-    // Fallback 1: page URL (works when the user navigated directly to a track page)
+    // URL fallback (when user navigated directly to a track page)
     if (!trackId) {
       const m = location.href.match(/\/track\/([a-zA-Z0-9]+)/);
       if (m) trackId = m[1];
     }
 
-    // Fallback 2: document.title ("Spotify – Song · Artist")
-    if (!title) {
-      const t = document.title || "";
-      const m = t.match(/^Spotify\s*[–-]\s*(.+?)\s*[·•]\s*(.+)$/);
-      if (m) { title = m[1].trim(); artist = m[2].trim(); }
-    }
-
-    // Fallback 3: og:title meta tag (some Spotify pages set this)
+    // og:title fallback for title
     if (!title) {
       const og = document.querySelector('meta[property="og:title"]');
       if (og) title = og.getAttribute("content")?.trim() || "";
     }
 
+    // Final fallback: derive a surrogate track ID from title+artist.
+    // This still changes with every song so the popup's change detection works
+    // even when no real Spotify track URL can be found.
     if (!trackId && title) trackId = `local:${title}::${artist}`;
 
-    // playerVisible tells the popup whether we can see the Spotify player at all,
-    // so it can show a helpful message if selectors broke vs. Spotify just not open
     return { title, artist, trackId, playerVisible: detected };
   }
   function parseTime(str) {
