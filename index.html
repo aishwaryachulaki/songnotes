@@ -719,14 +719,25 @@
         grid-template-columns: 1fr;
         gap: 20px;
         padding-bottom: 32px;
+        flex: unset; /* don't stretch to fill viewport height in single col */
       }
-      /* Hide illustration — envelope hero is enough */
       .illus-col { display: none; }
-      /* Let envelope keep its natural aspect ratio — no more stretch */
       .env-col { display: flex; justify-content: center; }
-      .env-wrap { width: min(600px, 90vw); height: auto; margin: 0 auto; }
-      .env-img  { height: auto; object-fit: unset; }
-      .env-overlay { top: 12%; left: 10%; right: 10%; bottom: 12%; }
+      /* Fix height so card area is always fully visible */
+      .env-wrap {
+        width: min(560px, 88vw);
+        height: clamp(400px, 70vw, 640px);
+        margin: 0 auto;
+      }
+      .env-img {
+        object-fit: cover;
+        object-position: top center;
+      }
+      /* Pull all content blocks up so they stay inside the card */
+      .env-label-row  { top: 14%; left: 16%; width: 66%; }
+      .env-heading-block { top: 24%; left: 16%; width: 66%; }
+      .env-body-block    { top: 40%; left: 16%; width: 66%; }
+      .env-cta-block     { top: 53%; left: 16%; width: 66%; }
     }
 
     @media (max-width: 700px) {
