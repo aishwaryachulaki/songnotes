@@ -94,32 +94,32 @@
       justify-content: center;
       text-align: center;
       padding: 0 24px;
-      margin-top: 20px;
+      margin-top: clamp(0px, 2vh, 30px);
     }
     .hero-eyebrow {
       font-family: 'Montserrat', sans-serif;
-      font-size: 10px;
+      font-size: clamp(9px, 1vw, 11px);
       font-weight: 600;
       letter-spacing: 0.18em;
       text-transform: uppercase;
       color: var(--ink-mid);
       opacity: 0.6;
-      margin-bottom: 14px;
+      margin-bottom: clamp(6px, 1.2vh, 14px);
     }
     .hero-title {
       font-family: 'Lora', Georgia, serif;
-      font-size: clamp(30px, 4.5vw, 52px);
+      font-size: clamp(26px, 4vw, 52px);
       font-weight: 700;
       color: var(--ink);
       line-height: 1.15;
       max-width: 520px;
-      margin-bottom: 10px;
+      margin-bottom: clamp(6px, 1vh, 12px);
     }
     .hero-artist {
       font-family: 'Lora', Georgia, serif;
-      font-size: 15px;
+      font-size: clamp(13px, 1.4vw, 16px);
       color: var(--blush);
-      margin-bottom: 14px;
+      margin-bottom: clamp(8px, 1.4vh, 16px);
     }
     .hero-artist strong { font-weight: 700; }
     .hero-divider {
@@ -127,7 +127,7 @@
       align-items: center;
       gap: 10px;
       width: min(280px, 60vw);
-      margin-bottom: 10px;
+      margin-bottom: clamp(6px, 1.2vh, 12px);
       color: var(--tangerine);
       font-size: 12px;
     }
@@ -141,12 +141,12 @@
     .hero-count {
       font-family: 'Lora', Georgia, serif;
       font-style: italic;
-      font-size: 13px;
+      font-size: clamp(12px, 1.2vw, 14px);
       color: var(--ink-mid);
-      margin-bottom: 4px;
+      margin-bottom: clamp(2px, 0.5vh, 6px);
     }
     .hero-recipient {
-      font-size: 12px;
+      font-size: clamp(11px, 1.1vw, 13px);
       color: var(--ink-mid);
       opacity: 0.75;
       margin-bottom: 0;
@@ -161,8 +161,7 @@
       justify-content: center;
       flex-wrap: wrap;
       gap: 10px;
-      margin-top: 24px;
-      min-height: 44px;
+      margin-top: clamp(14px, 2.5vh, 28px);
     }
     /* shared pale-pink pill — same values as .prev-activate in popup.css */
     .hero-btn {
@@ -196,7 +195,7 @@
       justify-content: center;
       align-items: flex-start;
       flex-shrink: 0;
-      height: 360px;
+      height: clamp(160px, 35vh, 400px);
       overflow: hidden;
     }
     .envelope-img {
