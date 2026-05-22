@@ -131,7 +131,7 @@ body::before {
 .stamp-eyebrow {
   font-family: 'Montserrat', sans-serif;
   font-size: 8px; font-weight: 600; text-transform: uppercase;
-  letter-spacing: 0.20em; color: var(--ink-3);
+  letter-spacing: 0.20em; color: var(--blush);
   margin-bottom: 8px;
 }
 .track-title {
