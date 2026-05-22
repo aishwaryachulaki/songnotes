@@ -362,7 +362,7 @@
         <!-- import btn injected here by extension detection -->
         ${spLink ? `
           <a class="hero-btn" id="spotifyBtn" href="${escHtml(spLink)}" target="_blank" rel="noopener">
-            ✦ ${spotifyLabel(meta, notes)}
+            ✧ ${spotifyLabel(meta, notes)}
           </a>` : ""}
       </div>
       <a href="index.html" class="discover-link">New to Keepsake? Find out more →</a>
@@ -380,14 +380,14 @@
       const btn = document.createElement("button");
       btn.className = "hero-btn";
       btn.id = "importBtn";
-      btn.textContent = "✦ Import into Keepsake";
+      btn.textContent = "✧ Import into Keepsake";
       actions.insertBefore(btn, actions.firstChild);
       btn.addEventListener("click", () => {
         window.__KS_PAYLOAD = { share_id: shareId, share: meta || {}, notes };
         window.dispatchEvent(new CustomEvent("keepsake:import", { detail: window.__KS_PAYLOAD }));
         window.addEventListener("keepsake:imported", () => {
           btn.disabled = true;
-          btn.textContent = "✦ Imported!";
+          btn.textContent = "✧ Imported!";
         }, { once: true });
       });
       window.dispatchEvent(new CustomEvent("keepsake:import", { detail: window.__KS_PAYLOAD }));
@@ -404,7 +404,7 @@
       a.href = EXTENSION_CWS_URL;
       a.target = "_blank";
       a.rel = "noopener";
-      a.textContent = "✦ Get Keepsake — it's free";
+      a.textContent = "✧ Get Keepsake — it's free";
       actions.appendChild(a);
     }
 
