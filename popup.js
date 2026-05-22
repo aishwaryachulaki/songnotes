@@ -881,6 +881,19 @@ $("copyShare").addEventListener("click", async () => {
     console.warn("Credit deduction failed after successful push:", creditErr);
   }
 
+  // Refresh the credits badge immediately so the user sees the deduction
+  // without needing to close and reopen the extension.
+  fetchCredits(session.access_token, session.user.id).then((c) => {
+    const badge = $("creditsBadge");
+    if (!badge) return;
+    badge.textContent = creditsLabel(c);
+    if (c && !c.lifetime && c.paid_credits === 0 && freeCreditsRemaining(c) === 0) {
+      badge.classList.add("empty");
+    } else {
+      badge.classList.remove("empty");
+    }
+  }).catch(() => {});
+
   // ── Step 8: Finalise local state and show the link ──
   // Key lives only in the URL fragment — never stored anywhere server-side.
   try {

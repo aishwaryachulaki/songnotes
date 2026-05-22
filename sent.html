@@ -249,8 +249,10 @@
   // AES-GCM ciphertext is long base64 with no spaces — real names are short and human-readable.
   // Used to avoid displaying raw ciphertext when the extension key isn't present.
   function looksEncrypted(s) {
+    // AES-GCM ciphertext may be purely alphanumeric (no + / =) depending on encoding.
+    // Real names are short and human-readable; raw ciphertext is long with no spaces.
     return typeof s === "string" && s.length > 30 && !/\s/.test(s) &&
-      /[+\/=]/.test(s) && /^[A-Za-z0-9+\/=]+$/.test(s);
+      /^[A-Za-z0-9+\/=]+$/.test(s);
   }
   function escHtml(s) {
     return String(s).replace(/[&<>"']/g, c =>
@@ -404,24 +406,30 @@
     const anns = share.annotations || [];
     const noteCount = anns.length;
     const isPlaylist = share.share_type === "playlist";
+    const isMulti    = share.share_type === "multi";
 
-    // Primary display info
+    // Primary display info — for single-track shares, show the track; for
+    // multi/playlist shares, show a summary so the first song doesn't mislead.
     let trackTitle = "";
     let trackArtist = "";
-    if (anns.length > 0) {
-      trackTitle = anns[0].track_title || "";
+    if (anns.length > 0 && !isPlaylist && !isMulti) {
+      trackTitle  = anns[0].track_title  || "";
       trackArtist = anns[0].track_artist || "";
     }
 
-    const typePill = isPlaylist
-      ? `<div class="share-type-pill">Playlist · ${noteCount} song${noteCount !== 1 ? "s" : ""}</div>`
+    // Count unique songs across all annotations
+    const uniqueTracks = new Set(anns.map(a => a.track_title).filter(Boolean)).size || anns.length;
+
+    const typePill = (isPlaylist || isMulti)
+      ? `<div class="share-type-pill">${isPlaylist ? "Playlist" : "Multi-song"} · ${uniqueTracks} song${uniqueTracks !== 1 ? "s" : ""}</div>`
       : "";
 
-    const displayTitle = trackTitle
-      ? escHtml(trackTitle)
-      : isPlaylist
-        ? "Playlist share"
-        : "Untitled note";
+    let displayTitle;
+    if (isPlaylist || isMulti) {
+      displayTitle = `${uniqueTracks} song${uniqueTracks !== 1 ? "s" : ""}, ${noteCount} note${noteCount !== 1 ? "s" : ""}`;
+    } else {
+      displayTitle = trackTitle ? escHtml(trackTitle) : "Untitled note";
+    }
 
     const displayArtist = trackArtist
       ? escHtml(trackArtist)
