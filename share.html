@@ -7,36 +7,35 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@1,400&family=Lora:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@500;600;700&display=swap" />
   <style>
-    /* ── Palette ── */
     :root {
       --butter:    #F2D88F;
       --blush:     #E36888;
       --tangerine: #F08C21;
-      --sea:       #6698CC;
       --cream:     #FFFBF4;
       --ink:       #3a2418;
       --ink-mid:   #8a5a48;
-      --ink-lt:    #c4977a;
       --rose:      #c0544e;
       --olive:     #3b3a27;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body {
-      background: var(--cream);
-      color: var(--ink);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-      min-height: 100vh;
+    html, body {
+      height: 100%;
+      overflow: hidden;
     }
 
-    /* ── Hero ── */
-    .hero {
-      min-height: 100vh;
+    body {
       background: var(--cream) url('background.png') center / cover no-repeat fixed;
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    }
+
+    /* ── Hero: full viewport, no scroll ── */
+    .hero {
+      height: 100vh;
       display: flex;
       flex-direction: column;
-      position: relative;
       overflow: hidden;
     }
 
@@ -49,6 +48,7 @@
       width: 100%;
       margin: 0 auto;
       padding: 22px 24px;
+      flex-shrink: 0;
     }
     .nav-logo {
       font-family: 'Spectral', Georgia, serif;
@@ -75,11 +75,9 @@
       border: 1.5px solid rgba(58,36,24,0.3);
       border-radius: 50px;
       padding: 5px 12px;
-      opacity: 0.5;
     }
-    .nav-link--pill:hover { opacity: 1; }
 
-    /* ── Hero content ── */
+    /* ── Hero content (centered middle) ── */
     .hero-content {
       flex: 1;
       width: 100%;
@@ -88,9 +86,7 @@
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding: 20px 24px 0;
-      position: relative;
-      z-index: 1;
+      padding: 0 24px;
     }
     .hero-eyebrow {
       font-family: 'Montserrat', sans-serif;
@@ -100,203 +96,73 @@
       text-transform: uppercase;
       color: var(--ink-mid);
       opacity: 0.6;
-      margin-bottom: 18px;
+      margin-bottom: 14px;
     }
     .hero-title {
       font-family: 'Lora', Georgia, serif;
-      font-size: clamp(32px, 6vw, 54px);
+      font-size: clamp(28px, 5vw, 50px);
       font-weight: 700;
       color: var(--ink);
       line-height: 1.15;
       max-width: 520px;
-      margin-bottom: 14px;
+      margin-bottom: 10px;
     }
     .hero-artist {
       font-family: 'Lora', Georgia, serif;
-      font-size: 16px;
+      font-size: 15px;
       color: var(--rose);
-      margin-bottom: 18px;
+      margin-bottom: 14px;
     }
     .hero-artist strong { font-weight: 700; }
     .hero-divider {
-      font-size: 13px;
+      font-size: 12px;
       color: var(--tangerine);
       opacity: 0.6;
-      margin-bottom: 14px;
+      margin-bottom: 10px;
     }
     .hero-count {
       font-family: 'Lora', Georgia, serif;
       font-style: italic;
-      font-size: 14px;
-      color: var(--ink-mid);
-      margin-bottom: 6px;
-    }
-    .hero-recipient {
       font-size: 13px;
       color: var(--ink-mid);
+      margin-bottom: 4px;
+    }
+    .hero-recipient {
+      font-size: 12px;
+      color: var(--ink-mid);
       opacity: 0.75;
-      margin-bottom: 28px;
+      margin-bottom: 0;
     }
     .hero-recipient strong { color: var(--ink); font-weight: 700; }
-    .hero-cta {
-      display: inline-block;
-      background: var(--olive);
-      color: var(--cream);
-      font-family: 'Montserrat', sans-serif;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      text-decoration: none;
-      border: none;
-      border-radius: 50px;
-      padding: 14px 32px;
-      cursor: pointer;
-      margin-top: 10px;
-      margin-bottom: 40px;
-      transition: opacity 0.15s, transform 0.12s;
-      box-shadow: 0 4px 16px rgba(59,58,39,0.25);
-    }
-    .hero-cta:hover { opacity: 0.88; transform: translateY(-1px); }
 
-    /* ── Envelope image ── */
-    .hero-envelope {
-      display: flex;
-      justify-content: center;
-      align-items: flex-end;
-      flex-shrink: 0;
-      margin-top: auto;
-    }
-    .envelope-img {
-      width: min(360px, 75vw);
-      display: block;
-      /* Slightly crop the bottom so it bleeds into the next section */
-      margin-bottom: -24px;
-      filter: drop-shadow(0 -4px 18px rgba(58,36,24,0.10));
-    }
-
-    /* ── Notes section ── */
-    .notes-section {
-      background: var(--butter) url('background.png') center / cover no-repeat fixed;
-      padding: 52px 16px 72px;
-    }
-    .notes-inner {
-      max-width: 560px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    /* ── Section divider ── */
-    .song-label {
-      font-family: 'Montserrat', sans-serif;
-      font-size: 9px;
-      text-transform: uppercase;
-      letter-spacing: 0.13em;
-      color: var(--ink-mid);
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      opacity: 0.65;
-    }
-    .song-label::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: rgba(58,36,24,0.18);
-    }
-
-    /* ── Song group ── */
-    .song-group { display: flex; flex-direction: column; gap: 10px; }
-
-    .song-title-block {
-      display: flex;
-      align-items: baseline;
-      gap: 8px;
-    }
-    .song-title-block strong { font-size: 14px; font-weight: 700; color: var(--ink); }
-    .song-title-block span  { font-size: 12px; color: var(--ink-mid); }
-
-    /* ── Notes grid ── */
-    .notes-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      align-items: start;
-    }
-
-    .note-card {
-      background: var(--cream);
-      border-radius: 10px;
-      padding: 10px 12px;
-    }
-    .note-ts {
-      font-size: 9px;
-      font-weight: 700;
-      color: var(--tangerine);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 8px;
-      font-family: 'Montserrat', sans-serif;
-    }
-    .note-redacted {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-    .note-redacted span {
-      display: block;
-      height: 8px;
-      background: rgba(58,36,24,0.1);
-      border-radius: 4px;
-    }
-    .note-redacted span:last-child { width: 60%; }
-
-    /* ── Spotify button ── */
-    .spotify-area {
+    /* ── Action buttons ── */
+    .hero-actions {
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 10px;
-      padding: 8px 0 4px;
+      margin-top: 24px;
+      min-height: 52px;
     }
     .btn-spotify {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 9px;
       background: #1DB954;
       color: #fff;
       border: none;
       border-radius: 50px;
-      padding: 14px 28px;
-      font-size: 14px;
+      padding: 13px 26px;
+      font-size: 13px;
       font-weight: 700;
       cursor: pointer;
       letter-spacing: 0.02em;
       text-decoration: none;
-      box-shadow: 0 6px 20px rgba(29,185,84,0.28);
+      box-shadow: 0 4px 16px rgba(29,185,84,0.28);
       transition: opacity 0.15s, transform 0.12s;
     }
     .btn-spotify:hover { opacity: 0.9; transform: translateY(-1px); }
     .btn-spotify svg { flex-shrink: 0; }
-    .spotify-note {
-      font-size: 11px;
-      color: var(--ink-mid);
-      text-align: center;
-      line-height: 1.6;
-      opacity: 0.75;
-    }
-
-    /* ── Import into extension ── */
-    .import-area {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      min-height: 52px;
-    }
     .btn-import {
       background: var(--tangerine);
       color: #fff;
@@ -307,64 +173,44 @@
       font-weight: 700;
       cursor: pointer;
       letter-spacing: 0.04em;
-      box-shadow: 0 5px 18px rgba(240,140,33,0.28);
+      box-shadow: 0 4px 16px rgba(240,140,33,0.28);
       transition: opacity 0.15s, transform 0.12s;
     }
     .btn-import:hover { opacity: 0.9; transform: translateY(-1px); }
     .btn-import:disabled { opacity: 0.45; cursor: default; transform: none; }
-    .import-note {
+    .action-note {
       font-size: 11px;
       color: var(--ink-mid);
-      text-align: center;
-      line-height: 1.6;
       opacity: 0.75;
-      margin: 0;
-    }
-
-    /* ── Install nudge ── */
-    .install-nudge {
-      background: var(--cream);
-      border-radius: 14px;
-      padding: 20px 22px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      text-align: center;
-      width: 100%;
-    }
-    .install-nudge-eyebrow {
-      font-family: 'Montserrat', sans-serif;
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.13em;
-      color: var(--ink-mid);
-      font-weight: 700;
-      opacity: 0.65;
-    }
-    .install-nudge-body {
-      font-size: 13px;
-      color: var(--ink);
-      line-height: 1.55;
-      max-width: 340px;
     }
     .btn-install {
       display: inline-block;
-      background: var(--tangerine);
-      color: #fff;
-      border: none;
+      background: rgba(58,36,24,0.08);
+      color: var(--ink-mid);
+      border: 1.5px solid rgba(58,36,24,0.18);
       border-radius: 50px;
-      padding: 13px 26px;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
+      padding: 11px 22px;
+      font-size: 11px;
+      font-weight: 600;
       letter-spacing: 0.04em;
       text-decoration: none;
-      box-shadow: 0 5px 18px rgba(240,140,33,0.28);
-      transition: opacity 0.15s, transform 0.12s;
-      margin-top: 2px;
+      cursor: pointer;
+      transition: opacity 0.15s;
     }
-    .btn-install:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-install:hover { opacity: 0.7; }
+
+    /* ── Envelope ── */
+    .hero-envelope {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      flex-shrink: 0;
+    }
+    .envelope-img {
+      width: min(320px, 65vw);
+      display: block;
+      filter: drop-shadow(0 -4px 18px rgba(58,36,24,0.08));
+    }
 
     /* ── Loading / error states ── */
     .state {
@@ -384,23 +230,6 @@
       0%, 100% { opacity: 1;   transform: scale(1); }
       50%       { opacity: 0.3; transform: scale(0.85); }
     }
-
-    .imported-banner {
-      background: rgba(240,140,33,0.12);
-      border: 1.5px solid rgba(240,140,33,0.3);
-      border-radius: 10px;
-      padding: 14px 18px;
-      font-size: 13px;
-      color: var(--tangerine);
-      text-align: center;
-      font-weight: 600;
-    }
-
-    /* Loading state lives in hero */
-    .hero--loading {
-      align-items: center;
-      justify-content: center;
-    }
   </style>
 </head>
 <body>
@@ -414,33 +243,24 @@
       <a href="auth.html" class="nav-link nav-link--pill">Sign out</a>
     </div>
   </nav>
-  <div id="heroContent">
+  <div id="heroContent" class="hero-content">
     <div class="state loading"><span class="loading-dot">✦</span> opening your letter…</div>
   </div>
-</div>
-<div class="notes-section" id="notesSection" style="display:none">
-  <div class="notes-inner" id="notesInner"></div>
+  <div class="hero-envelope">
+    <img src="share-envelope.png" alt="" class="envelope-img" />
+  </div>
 </div>
 
 <script>
-  // ── Config ──────────────────────────────────────────────────
   const SUPABASE_URL = "https://kkasgbkgwjxiutdalbbm.supabase.co";
   const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtrYXNnYmtnd2p4aXV0ZGFsYmJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyNjU3OTQsImV4cCI6MjA5Mjg0MTc5NH0.z1JLMTzz3X_swbWHdt2z4UDKyUwjEfNYys5kdDMq3R4";
   const EXTENSION_CWS_URL = null;
 
-  // ── Helpers ──────────────────────────────────────────────────
   function getShareId() {
     const params = new URLSearchParams(window.location.search);
     if (params.get("id")) return params.get("id");
     const m = window.location.pathname.match(/\/share\/([a-z0-9_-]+)/i);
     return m ? m[1] : null;
-  }
-
-  function formatTs(sec) {
-    if (sec == null) return "Song start";
-    const m = Math.floor(sec / 60);
-    const s = sec % 60;
-    return `${m}:${String(s).padStart(2, "0")}`;
   }
 
   function escHtml(s) {
@@ -466,7 +286,6 @@
     }
   }
 
-  // ── Decryption ───────────────────────────────────────────────
   async function importEncKey(b64) {
     const raw = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
     return crypto.subtle.importKey("raw", raw, { name: "AES-GCM" }, false, ["decrypt"]);
@@ -484,9 +303,7 @@
         buf.slice(12)
       );
       return new TextDecoder().decode(dec);
-    } catch {
-      return b64;
-    }
+    } catch { return b64; }
   }
   async function decryptNoteFields(note, key) {
     return {
@@ -498,7 +315,6 @@
     };
   }
 
-  // ── Spotify link logic ───────────────────────────────────────
   function isLocalTrack(trackId) {
     return !trackId || trackId.startsWith("local:");
   }
@@ -516,128 +332,88 @@
   function spotifyLabel(meta, notes) {
     if (meta?.playlist_url || meta?.playlist_id) return "Open playlist in Spotify";
     const trackId = notes[0]?.track_id;
-    if (isLocalTrack(trackId)) return "Search song on Spotify";
-    return "Open song in Spotify";
+    if (isLocalTrack(trackId)) return "Search on Spotify";
+    return "Open in Spotify";
   }
 
-  // ── Show error in hero ───────────────────────────────────────
   function showHeroError(html) {
     document.getElementById("heroContent").innerHTML = `<div class="state">${html}</div>`;
   }
 
-  // ── Render ───────────────────────────────────────────────────
   function render(shareId, meta, notes) {
     const sender = meta?.sender_name || notes[0]?.sender_name || "someone";
 
-    // Group + sort notes by track
     const byTrack = {};
     notes.forEach(n => {
-      const key = n.track_id;
-      if (!byTrack[key]) byTrack[key] = { title: n.track_title, artist: n.track_artist, trackId: n.track_id, notes: [] };
-      byTrack[key].notes.push(n);
+      if (!byTrack[n.track_id]) byTrack[n.track_id] = { title: n.track_title, artist: n.track_artist };
     });
-    Object.values(byTrack).forEach(g =>
-      g.notes.sort((a, b) => (a.timestamp ?? -1) - (b.timestamp ?? -1))
-    );
-
     const trackCount = Object.keys(byTrack).length;
     const recipient = meta?.recipient_name || null;
     const totalNotes = notes.length;
 
-    // Hero title / subtitle
     const isPlaylist = trackCount > 1 || !!(meta?.playlist_name);
     const heroTitle = isPlaylist
       ? (meta?.playlist_name || "A Playlist Share")
       : (notes[0]?.track_title || "A song");
     const heroArtist = isPlaylist ? sender : (notes[0]?.track_artist || "");
 
-    // ── Hero content ──
+    const spLink = spotifyLink(meta, notes);
+
     const heroEl = document.getElementById("heroContent");
     heroEl.innerHTML = `
-      <div class="hero-content">
-        <div class="hero-eyebrow">You've received</div>
-        <h1 class="hero-title">${escHtml(heroTitle)}</h1>
-        ${heroArtist ? `<div class="hero-artist">by <strong>${escHtml(heroArtist)}</strong></div>` : ""}
-        <div class="hero-divider">✦</div>
-        <div class="hero-count">${totalNotes} note${totalNotes === 1 ? "" : "s"} inside</div>
-        ${recipient ? `<div class="hero-recipient">for <strong>${escHtml(recipient)}</strong></div>` : ""}
-        <a href="#notesSection" class="hero-cta" id="readNotesBtn">READ NOTES ✦</a>
-      </div>
-      <div class="hero-envelope">
-        <img src="share-envelope.png" alt="" class="envelope-img" />
+      <div class="hero-eyebrow">You've received</div>
+      <h1 class="hero-title">${escHtml(heroTitle)}</h1>
+      ${heroArtist ? `<div class="hero-artist">by <strong>${escHtml(heroArtist)}</strong></div>` : ""}
+      <div class="hero-divider">✦</div>
+      <div class="hero-count">${totalNotes} note${totalNotes === 1 ? "" : "s"} inside</div>
+      ${recipient ? `<div class="hero-recipient">for <strong>${escHtml(recipient)}</strong></div>` : ""}
+      <div class="hero-actions" id="heroActions">
+        ${spLink ? `
+          <a class="btn-spotify" href="${escHtml(spLink)}" target="_blank" rel="noopener">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.586 14.424a.623.623 0 0 1-.857.208c-2.348-1.435-5.304-1.76-8.785-.964a.623.623 0 1 1-.277-1.215c3.809-.87 7.076-.496 9.712 1.115a.623.623 0 0 1 .207.856zm1.223-2.723a.78.78 0 0 1-1.072.257C14.1 12.307 10.64 11.75 7.4 12.66a.781.781 0 0 1-.356-1.52c3.648-1.054 7.494-.468 10.488 1.488a.78.78 0 0 1 .277 1.073zm.105-2.835c-3.023-1.796-8.01-1.96-10.898-1.086a.936.936 0 1 1-.543-1.79c3.317-1.007 8.831-.812 12.315 1.256a.935.935 0 1 1-.874 1.62z"/></svg>
+            ${spotifyLabel(meta, notes)}
+          </a>` : ""}
       </div>
     `;
 
-    // Smooth scroll for READ NOTES button
-    document.getElementById("readNotesBtn").addEventListener("click", e => {
-      e.preventDefault();
-      document.getElementById("notesSection").scrollIntoView({ behavior: "smooth" });
-    });
-
-    // ── Notes section ──
-    const notesSection = document.getElementById("notesSection");
-    const notesInner = document.getElementById("notesInner");
-    notesSection.style.display = "";
-
-    let notesHtml = "";
-    Object.values(byTrack).forEach(group => {
-      notesHtml += `<div class="song-group">`;
-      if (trackCount > 1) {
-        notesHtml += `<div class="song-label">Song</div>
-          <div class="song-title-block">
-            <strong>${escHtml(group.title || "Unknown track")}</strong>
-            <span>${escHtml(group.artist || "")}</span>
-          </div>`;
-      }
-      notesHtml += `<div class="notes-grid">`;
-      group.notes.forEach(n => {
-        notesHtml += `
-          <div class="note-card">
-            <div class="note-ts">${escHtml(formatTs(n.timestamp))}</div>
-            <div class="note-redacted">
-              <span></span><span></span><span></span>
-            </div>
-          </div>`;
-      });
-      notesHtml += `</div></div>`;
-    });
-
-    // Spotify button
-    const spLink = spotifyLink(meta, notes);
-    if (spLink) {
-      notesHtml += `
-        <div class="spotify-area">
-          <a class="btn-spotify" href="${escHtml(spLink)}" target="_blank" rel="noopener">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.586 14.424a.623.623 0 0 1-.857.208c-2.348-1.435-5.304-1.76-8.785-.964a.623.623 0 1 1-.277-1.215c3.809-.87 7.076-.496 9.712 1.115a.623.623 0 0 1 .207.856zm1.223-2.723a.78.78 0 0 1-1.072.257C14.1 12.307 10.64 11.75 7.4 12.66a.781.781 0 0 1-.356-1.52c3.648-1.054 7.494-.468 10.488 1.488a.78.78 0 0 1 .277 1.073zm.105-2.835c-3.023-1.796-8.01-1.96-10.898-1.086a.936.936 0 1 1-.543-1.79c3.317-1.007 8.831-.812 12.315 1.256a.935.935 0 1 1-.874 1.62z"/>
-            </svg>
-            ${spotifyLabel(meta, notes)}
-          </a>
-        </div>`;
-    }
-
-    notesHtml += `<p class="spotify-note">Music data from <a href="https://spotify.com" target="_blank" rel="noopener" style="color:inherit">Spotify</a></p>`;
-    notesHtml += `<div id="importArea" class="import-area"></div>`;
-
-    notesInner.innerHTML = notesHtml;
-
-    // Set payload for share-bridge.js
     window.__KS_PAYLOAD = { share_id: shareId, share: meta || {}, notes };
 
-    // ── Extension detection ──
     let detected = false;
 
     function onExtensionReady() {
       if (detected) return;
       detected = true;
-      renderImportInstalled(shareId, meta, notes);
+      const actions = document.getElementById("heroActions");
+      if (!actions) return;
+      const btn = document.createElement("button");
+      btn.className = "btn-import";
+      btn.id = "importBtn";
+      btn.textContent = "♫ Import into Keepsake";
+      actions.appendChild(btn);
+      btn.addEventListener("click", () => {
+        window.__KS_PAYLOAD = { share_id: shareId, share: meta || {}, notes };
+        window.dispatchEvent(new CustomEvent("keepsake:import", { detail: window.__KS_PAYLOAD }));
+        window.addEventListener("keepsake:imported", () => {
+          btn.disabled = true;
+          btn.textContent = "✓ Imported!";
+        }, { once: true });
+      });
       window.dispatchEvent(new CustomEvent("keepsake:import", { detail: window.__KS_PAYLOAD }));
     }
 
     function onDetectionTimeout() {
       if (detected) return;
       detected = true;
-      renderImportNotInstalled();
+      if (!EXTENSION_CWS_URL) return; // not published yet — show nothing
+      const actions = document.getElementById("heroActions");
+      if (!actions) return;
+      const a = document.createElement("a");
+      a.className = "btn-install";
+      a.href = EXTENSION_CWS_URL;
+      a.target = "_blank";
+      a.rel = "noopener";
+      a.textContent = "Add Keepsake to Chrome — free";
+      actions.appendChild(a);
     }
 
     window.addEventListener("keepsake:ready", onExtensionReady, { once: true });
@@ -648,51 +424,8 @@
     }
   }
 
-  // ── Import UI: extension installed ──────────────────────────
-  function renderImportInstalled(shareId, meta, notes) {
-    const area = document.getElementById("importArea");
-    if (!area) return;
-    area.innerHTML = `
-      <button class="btn-import" id="importBtn">♫ Import into Keepsake</button>
-      <p class="import-note">Notes will pop up as you listen in Spotify.</p>
-    `;
-    document.getElementById("importBtn").addEventListener("click", () => {
-      window.__KS_PAYLOAD = { share_id: shareId, share: meta || {}, notes };
-      window.dispatchEvent(new CustomEvent("keepsake:import", { detail: window.__KS_PAYLOAD }));
-      window.addEventListener("keepsake:imported", () => {
-        const btn = document.getElementById("importBtn");
-        const note = area.querySelector(".import-note");
-        if (btn) btn.disabled = true;
-        if (note) note.innerHTML = `<span style="color:var(--tangerine);font-weight:600">✓ Imported! Open Spotify and hit play.</span>`;
-      }, { once: true });
-    });
-  }
-
-  // ── Import UI: extension not installed ──────────────────────
-  function renderImportNotInstalled() {
-    const area = document.getElementById("importArea");
-    if (!area) return;
-    const cwsHref = EXTENSION_CWS_URL || "#";
-    const isPublished = !!EXTENSION_CWS_URL;
-    area.innerHTML = `
-      <div class="install-nudge">
-        <div class="install-nudge-eyebrow">Want to hear it their way?</div>
-        <div class="install-nudge-body">
-          Keepsake pops up their notes as you listen — right on the Spotify page.
-        </div>
-        <a class="btn-install" href="${cwsHref}" target="_blank" rel="noopener"
-          ${!isPublished ? 'aria-disabled="true" style="opacity:0.5;cursor:default;pointer-events:none"' : ""}>
-          Add Keepsake to Chrome — it's free
-        </a>
-        ${!isPublished ? `<p class="import-note" style="color:var(--blush);opacity:1">Not yet published — coming soon.</p>` : ""}
-      </div>
-    `;
-  }
-
-  // ── Main ────────────────────────────────────────────────────
   (async () => {
     const shareId = getShareId();
-
     if (!shareId) {
       showHeroError(`<strong>No letter here</strong>You need a share link to open a letter.`);
       return;
@@ -700,7 +433,6 @@
 
     const fragment = new URLSearchParams(window.location.hash.slice(1));
     const keyB64 = fragment.get("k");
-
     const isEncrypted = new URLSearchParams(window.location.search).get("e") === "1";
     if (isEncrypted && !keyB64) {
       showHeroError(`<strong>Part of your link got cut off</strong>Ask the sender to resend it, or try opening it in a different browser.`);
@@ -709,9 +441,8 @@
 
     let encKey = null;
     if (keyB64) {
-      try {
-        encKey = await importEncKey(keyB64);
-      } catch {
+      try { encKey = await importEncKey(keyB64); }
+      catch {
         showHeroError(`<strong>Invalid link</strong>This share link appears to be corrupted or incomplete.`);
         return;
       }
@@ -750,9 +481,7 @@
       const isTimeout = err.message === "timeout";
       showHeroError(`
         <strong>${isTimeout ? "Still loading…" : "Couldn't load your letter"}</strong>
-        ${isTimeout
-          ? "This is taking longer than usual. Check your connection and try again."
-          : "Something went wrong. Check your connection and try again."}
+        ${isTimeout ? "Check your connection and try again." : "Something went wrong. Check your connection and try again."}
         <a href="" style="display:block;margin-top:14px;color:var(--blush);font-weight:600;font-size:13px;">Try again</a>
       `);
     }
