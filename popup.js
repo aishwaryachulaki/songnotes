@@ -1055,12 +1055,18 @@ init().then(startLiveTracking);
 // Only re-renders when the track actually changes — no UI flicker.
 function startLiveTracking() {
   setInterval(async () => {
-    if (document.hidden) return;
+    // NOTE: do not guard on document.hidden — in a side panel Chrome may consider
+    // the panel hidden whenever the user is focused on Spotify, which would cause
+    // every poll to be skipped and the track to never update.
     const state = await fetchTrack();
     if (!state) return;
     const newId = state.trackId || null;
+    const newTitle = state.title || null;
     const curId = currentTrack?.trackId ?? null;
-    if (newId === curId) return; // nothing changed
+    const curTitle = currentTrack?.title ?? null;
+    // Compare both trackId AND title — the href React uses for trackId can lag
+    // behind the title update by one render cycle, so title alone is enough signal.
+    if (newId === curId && newTitle === curTitle) return; // nothing changed
 
     currentTrack = state.trackId ? state : null;
 
