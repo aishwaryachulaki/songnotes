@@ -55,18 +55,41 @@
         const m = href.match(/\/track\/([a-zA-Z0-9]+)/);
         if (m) trackId = m[1];
       }
+
+      // If the primary selector didn't yield a /track/ URL (e.g. it matched an
+      // album/context link instead), scan every link in the widget for one that
+      // explicitly points to a track. This is the most common cause of the player
+      // getting stuck on the first song when consecutive songs share an album link.
+      if (!trackId) {
+        const trackLinks = nowPlaying.querySelectorAll('a[href*="/track/"]');
+        for (const link of trackLinks) {
+          const m = link.getAttribute("href").match(/\/track\/([a-zA-Z0-9]+)/);
+          if (m) {
+            trackId = m[1];
+            if (!title) title = link.textContent.trim();
+            break;
+          }
+        }
+      }
+
       const artistEls = nowPlaying.querySelectorAll('a[href^="/artist/"]');
       artist = Array.from(artistEls).map((a) => a.textContent.trim()).join(", ");
     }
 
-    // Fallback 1: document.title ("Spotify – Song · Artist")
+    // Fallback 1: page URL (works when the user navigated directly to a track page)
+    if (!trackId) {
+      const m = location.href.match(/\/track\/([a-zA-Z0-9]+)/);
+      if (m) trackId = m[1];
+    }
+
+    // Fallback 2: document.title ("Spotify – Song · Artist")
     if (!title) {
       const t = document.title || "";
       const m = t.match(/^Spotify\s*[–-]\s*(.+?)\s*[·•]\s*(.+)$/);
       if (m) { title = m[1].trim(); artist = m[2].trim(); }
     }
 
-    // Fallback 2: og:title meta tag (some Spotify pages set this)
+    // Fallback 3: og:title meta tag (some Spotify pages set this)
     if (!title) {
       const og = document.querySelector('meta[property="og:title"]');
       if (og) title = og.getAttribute("content")?.trim() || "";
