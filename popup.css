@@ -272,7 +272,7 @@ body::before {
 .save-btn {
   flex: 1; background: rgba(227,104,136,0.07); color: var(--blush);
   border: 1.5px solid rgba(227,104,136,0.40); border-radius: 50px;
-  padding: 10px 16px;
+  padding: 8px 16px;
   font-family: 'Montserrat', sans-serif;
   font-size: 11px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase;
   cursor: pointer; transition: background 0.15s, border-color 0.15s;
@@ -382,7 +382,7 @@ body::before {
 
 .share-btn {
   width: 100%; background: rgba(227,104,136,0.07); color: var(--blush);
-  border: 1.5px solid rgba(227,104,136,0.40); border-radius: 50px; padding: 11px;
+  border: 1.5px solid rgba(227,104,136,0.40); border-radius: 50px; padding: 8px 16px;
   font-family: 'Montserrat', sans-serif;
   font-size: 11px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase;
   cursor: pointer; transition: background 0.15s, border-color 0.15s;
@@ -511,7 +511,7 @@ body::before {
 }
 .copy-link-btn {
   width: 100%; background: rgba(227,104,136,0.07); border: 1.5px solid rgba(227,104,136,0.40);
-  border-radius: 50px; padding: 10px;
+  border-radius: 50px; padding: 8px 16px;
   font-family: 'Montserrat', sans-serif;
   font-size: 10px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase;
   color: var(--blush); cursor: pointer; transition: background 0.15s, border-color 0.15s;
@@ -527,7 +527,7 @@ body::before {
 .sp-share-btn {
   background: rgba(227,104,136,0.07); color: var(--blush);
   border: 1.5px solid rgba(227,104,136,0.40);
-  border-radius: 50px; padding: 10px 16px;
+  border-radius: 50px; padding: 8px 16px;
   font-family: 'Montserrat', sans-serif;
   font-size: 9px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase;
   cursor: pointer; transition: background 0.15s, border-color 0.15s; white-space: nowrap;
@@ -615,19 +615,13 @@ body::before {
 .import-block .status { color: var(--ink-3); font-size: 11px; margin-top: 4px; display: block; font-family: 'Spectral', Georgia, serif; font-style: italic; }
 
 
-/* ── Uniform button height across all pill buttons ── */
-.btn, .save-btn, .share-btn, .now-btn, .new-share-btn,
-.sp-share-btn, .sp-attach-btn, .copy-link-btn,
-.prev-activate, .prev-copy {
-  min-height: 38px;
-}
 
 /* ── Generic button (name save + import) ── */
 .btn {
   background: rgba(227,104,136,0.07);
   border: 1.5px solid rgba(227,104,136,0.40);
   color: var(--blush); border-radius: 50px;
-  padding: 7px 13px;
+  padding: 8px 16px;
   font-family: 'Montserrat', sans-serif;
   font-size: 11px; font-weight: 700; letter-spacing: 0.10em;
   text-transform: uppercase;
