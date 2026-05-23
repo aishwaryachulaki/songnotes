@@ -206,12 +206,23 @@
     }
     .lifetime-desc { font-size: 10px; line-height: 1.4; opacity: 0.65; text-align: right; color: #5c2d2d; }
 
-    /* ── Trust line ── */
+    /* ── Trust line + region line ── */
     .trust-line {
       display: flex; align-items: center; justify-content: center; gap: 6px;
       font-family: 'Montserrat', sans-serif;
       font-size: 10.5px; color: var(--ink-lt); letter-spacing: 0.03em;
     }
+    .region-line {
+      text-align: center;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9.5px; color: var(--ink-lt); letter-spacing: 0.03em;
+      margin-top: -4px;
+    }
+    .region-link {
+      color: var(--rose); text-decoration: none; opacity: 0.7;
+      transition: opacity 0.15s;
+    }
+    .region-link:hover { opacity: 1; text-decoration: underline; }
 
     /* ── Purchase history ── */
     .history-card {
@@ -295,7 +306,7 @@
 <script>
   const SUPABASE_URL = "https://kkasgbkgwjxiutdalbbm.supabase.co";
   const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtrYXNnYmtnd2p4aXV0ZGFsYmJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyNjU3OTQsImV4cCI6MjA5Mjg0MTc5NH0.z1JLMTzz3X_swbWHdt2z4UDKyUwjEfNYys5kdDMq3R4";
-  const RAZORPAY_KEY = "rzp_test_SiSA0de5zVIh2x";
+  const RAZORPAY_KEY = "rzp_test_SiSA0de5zVIh2x"; // TODO: swap for live key before launch
 
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -303,12 +314,156 @@
     return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   }
 
-  const BUNDLES = [
-    { letters: 5,  price_paise: 15000, label: "₹150", name: "Small moments",      desc: "For quick thoughts you don't want to lose." },
-    { letters: 12, price_paise: 29900, label: "₹299", name: "A little collection", desc: "For when songs start meaning more." },
-    { letters: 25, price_paise: 54900, label: "₹549", name: "Memory stack",        desc: "For the ones you'll come back to." },
-  ];
+  // ── Pricing tiers ────────────────────────────────────────────────────────────
+  // price_units = paise for INR (Razorpay), cents for USD (Stripe)
+  const TIERS = {
+    1: {
+      currency: "INR", symbol: "₹", payment: "razorpay", region: "India",
+      lifetime: { price_units: 99900, label: "₹999" },
+      bundles: [
+        { letters: 5,  price_units: 14900, label: "₹149", name: "A spark",        desc: "For quick thoughts you don't want to lose." },
+        { letters: 10, price_units: 24900, label: "₹249", name: "A collection",   desc: "For when songs start meaning more." },
+        { letters: 15, price_units: 34900, label: "₹349", name: "A memory stack", desc: "For the ones you'll come back to." },
+      ],
+    },
+    2: {
+      currency: "USD", symbol: "$", payment: "stripe", region: "your region",
+      lifetime: { price_units: 999, label: "$9.99" },
+      bundles: [
+        { letters: 5,  price_units: 199, label: "$1.99", name: "A spark",        desc: "For quick thoughts you don't want to lose." },
+        { letters: 10, price_units: 349, label: "$3.49", name: "A collection",   desc: "For when songs start meaning more." },
+        { letters: 15, price_units: 499, label: "$4.99", name: "A memory stack", desc: "For the ones you'll come back to." },
+      ],
+    },
+    3: {
+      currency: "USD", symbol: "$", payment: "stripe", region: "your region",
+      lifetime: { price_units: 1699, label: "$16.99" },
+      bundles: [
+        { letters: 5,  price_units: 299, label: "$2.99", name: "A spark",        desc: "For quick thoughts you don't want to lose." },
+        { letters: 10, price_units: 549, label: "$5.49", name: "A collection",   desc: "For when songs start meaning more." },
+        { letters: 15, price_units: 799, label: "$7.99", name: "A memory stack", desc: "For the ones you'll come back to." },
+      ],
+    },
+    4: {
+      currency: "USD", symbol: "$", payment: "stripe", region: "your region",
+      lifetime: { price_units: 2499, label: "$24.99" },
+      bundles: [
+        { letters: 5,  price_units:  499, label:  "$4.99", name: "A spark",        desc: "For quick thoughts you don't want to lose." },
+        { letters: 10, price_units:  899, label:  "$8.99", name: "A collection",   desc: "For when songs start meaning more." },
+        { letters: 15, price_units: 1299, label: "$12.99", name: "A memory stack", desc: "For the ones you'll come back to." },
+      ],
+    },
+  };
 
+  // ── Timezone → tier lookup ───────────────────────────────────────────────────
+  // Any timezone not listed here defaults to Tier 4 (high income).
+  // Tier and country_tier column in Supabase (user_credits) can override this.
+  const TZ_TIER = {
+    // Tier 1 — India only
+    "Asia/Calcutta": 1, "Asia/Kolkata": 1,
+
+    // Tier 2 — Developing economies
+    // South & Central Asia
+    "Asia/Karachi": 2, "Asia/Dhaka": 2, "Asia/Kathmandu": 2, "Asia/Colombo": 2,
+    "Asia/Kabul": 2, "Asia/Bishkek": 2, "Asia/Dushanbe": 2, "Asia/Tashkent": 2,
+    // Southeast Asia (lower income)
+    "Asia/Rangoon": 2, "Asia/Yangon": 2, "Asia/Phnom_Penh": 2, "Asia/Vientiane": 2,
+    "Asia/Dili": 2,
+    // Eastern Europe (lower income)
+    "Europe/Kyiv": 2, "Europe/Kiev": 2, "Europe/Uzhgorod": 2, "Europe/Zaporozhye": 2,
+    "Europe/Minsk": 2, "Europe/Chisinau": 2,
+    // Central America (lower income)
+    "America/Tegucigalpa": 2, "America/Guatemala": 2, "America/Managua": 2,
+    "America/El_Salvador": 2, "America/Port-au-Prince": 2,
+    // Africa — Sub-Saharan
+    "Africa/Lagos": 2, "Africa/Nairobi": 2, "Africa/Addis_Ababa": 2,
+    "Africa/Dar_es_Salaam": 2, "Africa/Kampala": 2, "Africa/Accra": 2,
+    "Africa/Abidjan": 2, "Africa/Dakar": 2, "Africa/Douala": 2,
+    "Africa/Khartoum": 2, "Africa/Mogadishu": 2, "Africa/Bamako": 2,
+    "Africa/Ouagadougou": 2, "Africa/Conakry": 2, "Africa/Freetown": 2,
+    "Africa/Banjul": 2, "Africa/Bissau": 2, "Africa/Monrovia": 2,
+    "Africa/Lome": 2, "Africa/Porto-Novo": 2, "Africa/Niamey": 2,
+    "Africa/Ndjamena": 2, "Africa/Bangui": 2, "Africa/Brazzaville": 2,
+    "Africa/Kinshasa": 2, "Africa/Lubumbashi": 2, "Africa/Luanda": 2,
+    "Africa/Kigali": 2, "Africa/Bujumbura": 2, "Africa/Maputo": 2,
+    "Africa/Lusaka": 2, "Africa/Harare": 2, "Africa/Maseru": 2,
+    "Africa/Mbabane": 2, "Africa/Libreville": 2, "Africa/Malabo": 2,
+    "Africa/Djibouti": 2, "Africa/Sao_Tome": 2, "Africa/Nouakchott": 2,
+    "Indian/Antananarivo": 2, "Indian/Comoro": 2, "Indian/Mayotte": 2,
+    // Middle East (lower income)
+    "Asia/Aden": 2, "Asia/Sanaa": 2, "Asia/Damascus": 2,
+
+    // Tier 3 — Mid-income economies
+    // Eastern Europe
+    "Europe/Bucharest": 3, "Europe/Sofia": 3, "Europe/Budapest": 3, "Europe/Warsaw": 3,
+    "Europe/Belgrade": 3, "Europe/Sarajevo": 3, "Europe/Skopje": 3,
+    "Europe/Podgorica": 3, "Europe/Tirane": 3, "Europe/Zagreb": 3,
+    "Europe/Bratislava": 3,
+    // Russia & Turkey
+    "Europe/Istanbul": 3,
+    "Europe/Moscow": 3, "Europe/Samara": 3, "Europe/Saratov": 3,
+    "Europe/Ulyanovsk": 3, "Europe/Volgograd": 3, "Europe/Kaliningrad": 3,
+    // Caucasus
+    "Asia/Tbilisi": 3, "Asia/Yerevan": 3, "Asia/Baku": 3,
+    // Central Asia (upper)
+    "Asia/Almaty": 3, "Asia/Aqtau": 3, "Asia/Aqtobe": 3, "Asia/Atyrau": 3,
+    "Asia/Oral": 3, "Asia/Qostanay": 3, "Asia/Qyzylorda": 3,
+    // Middle East (mid)
+    "Asia/Tehran": 3, "Asia/Amman": 3, "Asia/Beirut": 3, "Asia/Baghdad": 3,
+    // Southeast Asia (mid)
+    "Asia/Bangkok": 3, "Asia/Ho_Chi_Minh": 3, "Asia/Saigon": 3,
+    "Asia/Manila": 3, "Asia/Jakarta": 3, "Asia/Makassar": 3, "Asia/Jayapura": 3,
+    "Asia/Kuala_Lumpur": 3, "Asia/Kuching": 3,
+    // China & Mongolia
+    "Asia/Shanghai": 3, "Asia/Urumqi": 3, "Asia/Chongqing": 3,
+    "Asia/Harbin": 3, "Asia/Kashgar": 3, "Asia/Ulaanbaatar": 3,
+    // Russia — Asia
+    "Asia/Yekaterinburg": 3, "Asia/Omsk": 3, "Asia/Novosibirsk": 3,
+    "Asia/Barnaul": 3, "Asia/Tomsk": 3, "Asia/Novokuznetsk": 3,
+    "Asia/Krasnoyarsk": 3, "Asia/Irkutsk": 3, "Asia/Chita": 3,
+    "Asia/Yakutsk": 3, "Asia/Khandyga": 3, "Asia/Vladivostok": 3,
+    "Asia/Ust-Nera": 3, "Asia/Magadan": 3, "Asia/Sakhalin": 3,
+    "Asia/Srednekolymsk": 3, "Asia/Kamchatka": 3, "Asia/Anadyr": 3,
+    // Africa (upper)
+    "Africa/Johannesburg": 3, "Africa/Cairo": 3, "Africa/Casablanca": 3,
+    "Africa/El_Aaiun": 3, "Africa/Tunis": 3, "Africa/Algiers": 3,
+    "Africa/Tripoli": 3, "Africa/Windhoek": 3, "Africa/Gaborone": 3,
+    // South America
+    "America/Sao_Paulo": 3, "America/Manaus": 3, "America/Belem": 3,
+    "America/Fortaleza": 3, "America/Recife": 3, "America/Araguaina": 3,
+    "America/Maceio": 3, "America/Bahia": 3, "America/Cuiaba": 3,
+    "America/Campo_Grande": 3, "America/Porto_Velho": 3, "America/Boa_Vista": 3,
+    "America/Santarem": 3, "America/Noronha": 3,
+    "America/Bogota": 3, "America/Lima": 3, "America/Guayaquil": 3,
+    "America/Caracas": 3, "America/Asuncion": 3, "America/Montevideo": 3,
+    "America/Santiago": 3, "America/Punta_Arenas": 3, "Pacific/Easter": 3,
+    "America/La_Paz": 3,
+    // Mexico
+    "America/Mexico_City": 3, "America/Cancun": 3, "America/Merida": 3,
+    "America/Monterrey": 3, "America/Matamoros": 3, "America/Mazatlan": 3,
+    "America/Chihuahua": 3, "America/Ojinaga": 3, "America/Hermosillo": 3,
+    "America/Tijuana": 3, "America/Ensenada": 3, "America/Santa_Isabel": 3,
+    "America/Bahia_Banderas": 3,
+    // Central America (upper)
+    "America/Costa_Rica": 3, "America/Panama": 3, "America/Santo_Domingo": 3,
+    "America/Havana": 3, "America/Jamaica": 3, "America/Paramaribo": 3,
+    "America/Guyana": 3, "America/Georgetown": 3,
+    // Pacific
+    "Pacific/Port_Moresby": 3, "Pacific/Fiji": 3,
+  };
+
+  // ── Tier detection (VPN-resistant: uses OS timezone, not IP) ─────────────────
+  function detectTier() {
+    // Supabase-stored override (set manually by support) takes top priority —
+    // checked in loadAndRender() after the DB fetch, not here.
+    // localStorage override is written there too so it survives page refreshes.
+    const cached = localStorage.getItem("ks_tier_override");
+    if (cached && ["1","2","3","4"].includes(cached)) return parseInt(cached);
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    return TZ_TIER[tz] ?? 4;
+  }
+
+  let activeTier = 4; // resolved in loadAndRender after DB fetch
   let currentUser = null;
   let creditsData = null;
 
@@ -325,6 +480,19 @@
       sb.from("purchases").select("*").eq("user_id", currentUser.id).order("created_at", { ascending: false }).limit(20),
     ]);
     creditsData = cRes.data || { paid_credits: 0, lifetime: false, free_credits_used: 0 };
+
+    // country_tier column in user_credits (set by support, nullable INT 1–4).
+    // Takes precedence over everything — cache it in localStorage so it
+    // survives page refreshes without a round-trip.
+    // NOTE: run this SQL in Supabase before deploying:
+    //   ALTER TABLE user_credits ADD COLUMN IF NOT EXISTS country_tier INT;
+    if (creditsData.country_tier && [1,2,3,4].includes(creditsData.country_tier)) {
+      activeTier = creditsData.country_tier;
+      localStorage.setItem("ks_tier_override", String(activeTier));
+    } else {
+      activeTier = detectTier();
+    }
+
     render(creditsData, pRes.data || []);
   }
 
@@ -333,6 +501,7 @@
   }
 
   function render(c, purchases) {
+    const tier = TIERS[activeTier];
     const freeRemaining = freeCreditsRemaining(c);
     const total = c.lifetime ? null : c.paid_credits + freeRemaining;
 
@@ -349,7 +518,7 @@
       heroCta = total === 0 ? `<button class="hero-cta" onclick="document.querySelector('.pricing-grid').scrollIntoView({behavior:'smooth'})">Top up your notes →</button>` : "";
     }
 
-    const bundleCards = BUNDLES.map((b, i) => `
+    const bundleCards = tier.bundles.map((b, i) => `
       <div class="bundle" data-bundle="${i}">
         <div class="bundle-sparkles"></div>
         <div class="bundle-top">
@@ -364,16 +533,35 @@
       </div>
     `).join("");
 
+    const isStripe = tier.payment === "stripe";
+    const trustLine = isStripe
+      ? "🔒 Secure payments · Cards, Apple Pay, Google Pay"
+      : "🔒 Secure payments · UPI, cards, netbanking";
+
+    // "Wrong region?" link pre-fills a support email with the user's account
+    // email so you can look them up and update country_tier in Supabase.
+    const supportEmail = "aishwaryachulaki@gmail.com";
+    const regionSubject = encodeURIComponent("Region correction request");
+    const regionBody = encodeURIComponent(`Hi,\n\nMy account email is ${currentUser.email} and I believe my region was detected incorrectly.\n\nMy actual location: [please fill in your country]\n\nThanks`);
+    const regionHref = `mailto:${supportEmail}?subject=${regionSubject}&body=${regionBody}`;
+    const regionLabel = activeTier === 1
+      ? `Prices shown for India · <a href="${regionHref}" class="region-link">Not in India?</a>`
+      : `Prices adjusted for your region · <a href="${regionHref}" class="region-link">Wrong region?</a>`;
+
     const purchaseRows = purchases.length
-      ? purchases.map(p => `
-          <div class="purchase-row">
-            <div>
-              <div class="purchase-desc">${p.is_lifetime ? "Lifetime plan" : `${escHtml(String(p.credits_added))} letter${p.credits_added > 1 ? "s" : ""} bundle`}</div>
-              <div class="purchase-date">${escHtml(new Date(p.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }))}</div>
-            </div>
-            <div class="purchase-amount">₹${escHtml(String(Math.round(p.amount_paise / 100)))}</div>
-          </div>
-        `).join("")
+      ? purchases.map(p => {
+          const amtDisplay = p.currency === "USD"
+            ? `$${(p.amount_paise / 100).toFixed(2)}`
+            : `₹${Math.round(p.amount_paise / 100)}`;
+          return `
+            <div class="purchase-row">
+              <div>
+                <div class="purchase-desc">${p.is_lifetime ? "Lifetime plan" : `${escHtml(String(p.credits_added))} letter${p.credits_added > 1 ? "s" : ""} bundle`}</div>
+                <div class="purchase-date">${escHtml(new Date(p.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }))}</div>
+              </div>
+              <div class="purchase-amount">${escHtml(amtDisplay)}</div>
+            </div>`;
+        }).join("")
       : `<div class="empty-history">
            <div class="empty-history-img"></div>
            <div>
@@ -416,12 +604,13 @@
           <div class="lifetime-sub">Unlimited, forever</div>
         </div>
         <div class="lifetime-price-row">
-          <div class="lifetime-price">₹999</div>
+          <div class="lifetime-price">${tier.lifetime.label}</div>
           <div class="lifetime-desc">Write as much as you want. No limits.</div>
         </div>
       </div>
 
-      <div class="trust-line">🔒 Secure payments · UPI, cards, netbanking</div>
+      <div class="trust-line">${trustLine}</div>
+      <div class="region-line">${regionLabel}</div>
 
       <div id="paymentMsg"></div>
 
@@ -444,13 +633,23 @@
     document.getElementById("bundleGrid").addEventListener("click", (e) => {
       const el = e.target.closest("[data-bundle]");
       if (!el) return;
-      const b = BUNDLES[parseInt(el.dataset.bundle)];
-      openRazorpay(b.price_paise, b.letters, false, `${b.letters} Letter${b.letters > 1 ? "s" : ""} Bundle`);
+      const b = TIERS[activeTier].bundles[parseInt(el.dataset.bundle)];
+      handlePurchase(b.price_units, b.letters, false, `${b.letters} Letter${b.letters > 1 ? "s" : ""} Bundle`);
     });
 
     document.getElementById("lifetimeCard").addEventListener("click", () => {
-      openRazorpay(99900, 0, true, "Lifetime Plan");
+      const lt = TIERS[activeTier].lifetime;
+      handlePurchase(lt.price_units, 0, true, "Lifetime Plan");
     });
+  }
+
+  // ── Payment routing ──────────────────────────────────────────────────────────
+  function handlePurchase(priceUnits, numCredits, isLifetime, description) {
+    if (activeTier === 1) {
+      openRazorpay(priceUnits, numCredits, isLifetime, description);
+    } else {
+      openStripe(priceUnits, numCredits, isLifetime, description);
+    }
   }
 
   function openRazorpay(amountPaise, numCredits, isLifetime, description) {
@@ -483,6 +682,16 @@
     };
     const rzp = new window.Razorpay(options);
     rzp.open();
+  }
+
+  // Stripe — wired up once the Stripe account is live.
+  // Until then, show prices correctly but direct purchase attempts to email.
+  function openStripe(amountCents, numCredits, isLifetime, description) {
+    const msg = document.getElementById("paymentMsg");
+    const supportEmail = "aishwaryachulaki@gmail.com";
+    const subject = encodeURIComponent(`Purchase request: ${description}`);
+    const body = encodeURIComponent(`Hi,\n\nI'd like to purchase: ${description}\nMy account email: ${currentUser.email}\n\nThanks`);
+    msg.innerHTML = `<div class="msg error">International card payments are coming very soon. In the meantime, email us at <a href="mailto:${supportEmail}?subject=${subject}&body=${body}" style="color:var(--rose);font-weight:600">${supportEmail}</a> and we'll sort it out manually.</div>`;
   }
 </script>
 </body>
