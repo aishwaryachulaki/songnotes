@@ -474,10 +474,10 @@ async function renderSharePanel() {
       pillEl.textContent = "● Playlist needed";
       pillEl.className = "sp-pill sp-pill--needed";
     } else if (state === "playlist") {
-      pillEl.textContent = "✓ Playlist ready";
+      pillEl.textContent = "● Playlist ready";
       pillEl.className = "sp-pill sp-pill--ready";
     } else {
-      pillEl.textContent = "✓ Ready to share";
+      pillEl.textContent = "● Ready to share";
       pillEl.className = "sp-pill sp-pill--ready";
     }
   }

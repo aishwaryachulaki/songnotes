@@ -438,7 +438,7 @@ body::before {
   border-radius: 20px; padding: 4px 9px; white-space: nowrap; flex-shrink: 0;
 }
 .sp-pill--needed { border: 1.5px solid var(--blush); color: var(--blush); background: transparent; }
-.sp-pill--ready  { background: #1a9e5a; color: #fff; border: none; }
+.sp-pill--ready  { background: rgba(88,120,58,0.12); color: rgba(50,78,28,0.90); border: 1.5px solid rgba(88,120,58,0.38); }
 
 .sp-card {
   display: flex; align-items: center; gap: 10px;
