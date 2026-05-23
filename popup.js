@@ -379,20 +379,72 @@ async function renderNotes() {
   const list = $("notes");
   if (!currentTrack || !activeShare) {
     list.innerHTML = '<div class="empty">No song detected.</div>';
+    renderSongIndex();
     return;
   }
   const notes = activeShare.notes.filter((n) => n.track_id === currentTrack.trackId);
   if (!notes.length) {
     list.innerHTML = '<div class="empty">No notes on this song yet.</div>';
+    renderSongIndex();
     return;
   }
   list.innerHTML = "";
   notes.slice().sort((a, b) => (a.timestamp ?? -1) - (b.timestamp ?? -1)).forEach((n) => {
     const div = document.createElement("div");
     div.className = "note";
-    div.innerHTML = `<div class="meta">${formatTs(n.timestamp)}</div><div>${escapeHtml(n.note)}</div><button class="del" data-id="${n.id}" title="Delete">×</button>`;
+    div.dataset.noteId = n.id;
+    div.innerHTML = `
+      <div class="meta">${formatTs(n.timestamp)}</div>
+      <div class="note-text">${escapeHtml(n.note)}</div>
+      <div class="note-actions">
+        <button class="del" data-id="${n.id}" title="Delete">×</button>
+        <button class="note-edit" data-id="${n.id}" title="Edit">✎</button>
+      </div>`;
     list.appendChild(div);
   });
+
+  list.querySelectorAll(".note-edit").forEach((b) =>
+    b.addEventListener("click", (e) => {
+      const noteId = e.currentTarget.dataset.id;
+      const n = activeShare.notes.find((x) => x.id === noteId);
+      if (!n) return;
+      const noteDiv = list.querySelector(`.note[data-note-id="${noteId}"]`);
+      if (!noteDiv) return;
+      noteDiv.classList.add("note--editing");
+      noteDiv.innerHTML = `
+        <textarea class="note-edit-textarea" maxlength="260">${escapeHtml(n.note)}</textarea>
+        <input class="note-edit-ts" type="text" value="${n.timestamp != null ? escapeHtml(formatTs(n.timestamp)) : ""}" placeholder="Timestamp (e.g. 1:24) — optional" />
+        <div class="note-edit-actions">
+          <button class="note-save-edit" data-id="${noteId}">Save</button>
+          <button class="note-cancel-edit">Cancel</button>
+        </div>`;
+      noteDiv.querySelector(".note-edit-textarea").focus();
+
+      noteDiv.querySelector(".note-save-edit").addEventListener("click", async () => {
+        const newText = noteDiv.querySelector(".note-edit-textarea").value.trim();
+        if (!newText) return;
+        const newTs = parseTimestamp(noteDiv.querySelector(".note-edit-ts").value);
+        const { store } = await loadStore();
+        for (const shareId in store.shares) {
+          const match = store.shares[shareId].notes.find((x) => x.id === noteId);
+          if (match) { match.note = newText; match.timestamp = newTs; }
+        }
+        try {
+          await saveStore(store);
+        } catch {
+          $("status").textContent = "Couldn't save — storage is full.";
+          return;
+        }
+        activeShare.notes = store.shares[activeShare.id]?.notes ?? [];
+        renderNotes();
+        renderSharePanel().catch(console.error);
+        notifyContentRefresh();
+      });
+
+      noteDiv.querySelector(".note-cancel-edit").addEventListener("click", () => renderNotes());
+    }),
+  );
+
   list.querySelectorAll(".del").forEach((b) =>
     b.addEventListener("click", async (e) => {
       const deletedId = e.currentTarget.dataset.id;
@@ -419,6 +471,53 @@ async function renderNotes() {
       notifyContentRefresh();
     }),
   );
+
+  renderSongIndex();
+}
+
+function renderSongIndex() {
+  const header = $("songIndexHeader");
+  const container = $("songIndex");
+  if (!container) return;
+
+  if (!activeShare || !activeShare.notes.length) {
+    if (header) header.style.display = "none";
+    container.innerHTML = "";
+    return;
+  }
+
+  // Group notes by track_id, preserving insertion order (first seen = listed first)
+  const trackMap = new Map();
+  for (const n of activeShare.notes) {
+    if (!n.track_id) continue;
+    if (!trackMap.has(n.track_id)) {
+      trackMap.set(n.track_id, { title: n.track_title || "Unknown track", artist: n.track_artist || "", count: 0 });
+    }
+    trackMap.get(n.track_id).count++;
+  }
+
+  if (!trackMap.size) {
+    if (header) header.style.display = "none";
+    container.innerHTML = "";
+    return;
+  }
+
+  if (header) header.style.display = "";
+  container.innerHTML = "";
+
+  for (const [trackId, info] of trackMap) {
+    const isPlaying = currentTrack?.trackId === trackId;
+    const row = document.createElement("div");
+    row.className = "song-row" + (isPlaying ? " song-row--active" : "");
+    row.innerHTML = `
+      <div class="song-row-info">
+        <div class="song-row-title">${escapeHtml(info.title)}</div>
+        ${info.artist ? `<div class="song-row-artist">${escapeHtml(info.artist)}</div>` : ""}
+      </div>
+      <div class="song-row-count">${info.count} note${info.count !== 1 ? "s" : ""}</div>
+      ${isPlaying ? '<div class="song-row-playing">✧</div>' : ""}`;
+    container.appendChild(row);
+  }
 }
 
 async function attachPlaylist() {

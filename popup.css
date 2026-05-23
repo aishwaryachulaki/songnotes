@@ -323,17 +323,69 @@ body::before {
   font-size: 8px; font-weight: 600; color: var(--blush);
   letter-spacing: 0.08em; margin-bottom: 4px; text-transform: uppercase;
 }
+.note-actions {
+  position: absolute; top: 5px; right: 5px;
+  display: flex; flex-direction: column; gap: 2px;
+}
 .note .del {
-  position: absolute; top: 6px; right: 5px;
   background: none; border: none;
-  color: rgba(58,36,24,0.20); cursor: pointer; font-size: 14px;
-  width: 18px; height: 18px; padding: 0;
+  color: rgba(58,36,24,0.50); cursor: pointer; font-size: 16px;
+  width: 20px; height: 20px; padding: 0;
   display: flex; align-items: center; justify-content: center;
   border-radius: 4px; line-height: 1;
 }
+.note .note-edit {
+  background: none; border: none;
+  color: rgba(58,36,24,0.50); cursor: pointer; font-size: 13px;
+  width: 20px; height: 20px; padding: 0;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 4px;
+}
+.note .note-edit:hover { color: var(--blush); background: rgba(227,104,136,0.10); }
 
 .note:nth-child(even) { background: url('faq-bg-olive.png') center / cover no-repeat; }
 .note .del:hover { color: var(--blush); background: rgba(227,104,136,0.10); }
+
+/* Note edit mode — spans full width so there's room to type */
+.note--editing {
+  grid-column: 1 / -1;
+  padding: 10px 12px 10px 10px;
+}
+.note-edit-textarea {
+  width: 100%; background: transparent;
+  border: none; border-bottom: 1.5px solid rgba(58,36,24,0.22);
+  border-radius: 0; padding: 2px 0 4px;
+  font: inherit; font-size: 12px; color: var(--ink-2);
+  resize: none; outline: none; line-height: 1.55;
+  min-height: 52px; margin-bottom: 6px; display: block;
+}
+.note-edit-textarea:focus { border-bottom-color: var(--blush); }
+.note-edit-ts {
+  width: 100%; background: transparent;
+  border: none; border-bottom: 1.5px solid rgba(58,36,24,0.14);
+  border-radius: 0; padding: 2px 0 3px;
+  font: inherit; font-size: 10px; color: var(--ink-3);
+  outline: none; display: block; margin-bottom: 8px;
+}
+.note-edit-ts:focus { border-bottom-color: var(--blush); }
+.note-edit-ts::placeholder { color: var(--ink-5); }
+.note-edit-actions { display: flex; gap: 6px; }
+.note-save-edit, .note-cancel-edit {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 8px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase;
+  border-radius: 50px; padding: 4px 10px; cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.note-save-edit {
+  background: rgba(227,104,136,0.07); color: var(--blush);
+  border: 1.5px solid rgba(227,104,136,0.40);
+}
+.note-save-edit:hover { background: rgba(227,104,136,0.18); border-color: rgba(227,104,136,0.65); }
+.note-cancel-edit {
+  background: transparent; color: var(--ink-4);
+  border: 1.5px solid rgba(58,36,24,0.18);
+}
+.note-cancel-edit:hover { color: var(--ink-2); border-color: rgba(58,36,24,0.35); }
 .empty {
   font-family: 'Spectral', Georgia, serif;
   font-style: italic;
@@ -395,6 +447,22 @@ body::before {
   word-break: break-all; line-height: 1.5;
 }
 .share-info a { color: var(--blush); font-weight: 600; }
+
+.sp-divider {
+  display: flex; align-items: center; gap: 0;
+  width: 100%;
+}
+.sp-divider::before,
+.sp-divider::after {
+  content: '';
+  flex: 1; height: 1px;
+  border-top: 1.5px dashed rgba(227,104,136,0.35);
+}
+.sp-divider-sparkle {
+  font-size: 11px; color: rgba(227,104,136,0.60);
+  padding: 0 8px; flex-shrink: 0;
+  line-height: 1;
+}
 
 .new-share-btn {
   background: transparent; border: none;
@@ -556,7 +624,7 @@ body::before {
   font-family: 'Montserrat', sans-serif;
   font-size: 9px; color: var(--ink-4); letter-spacing: 0.03em;
 }
-.prev-actions { display: flex; gap: 5px; align-items: center; flex-shrink: 0; }
+.prev-actions { display: flex; flex-direction: column; gap: 5px; align-items: stretch; flex-shrink: 0; }
 .prev-activate {
   font-family: 'Montserrat', sans-serif;
   font-size: 9px; padding: 4px 10px; border-radius: 50px;
@@ -571,7 +639,7 @@ body::before {
   font-size: 9px; padding: 4px 8px; border-radius: 50px;
   color: var(--blush); border: 1.5px solid rgba(227,104,136,0.40);
   background: rgba(227,104,136,0.07); cursor: pointer;
-  font-weight: 700; letter-spacing: 0.10em; white-space: nowrap;
+  font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase; white-space: nowrap;
   transition: background 0.15s, border-color 0.15s;
 }
 .prev-copy:hover { background: rgba(227,104,136,0.18); border-color: rgba(227,104,136,0.65); }
@@ -628,6 +696,41 @@ body::before {
   background: rgba(227,104,136,0.07); color: var(--blush); border-color: rgba(227,104,136,0.40);
 }
 .btn.primary:hover { background: rgba(227,104,136,0.18); border-color: rgba(227,104,136,0.65); }
+
+
+/* ── Song index ── */
+.song-index { display: flex; flex-direction: column; gap: 5px; }
+.song-row {
+  display: flex; align-items: center; gap: 10px;
+  background: url('faq-bg-pink.png') top / 100% 100% no-repeat;
+  border: 1px solid rgba(58,36,24,0.08);
+  border-radius: 9px; padding: 7px 10px;
+  box-shadow: 0 1px 3px rgba(58,36,24,0.06), 0 2px 6px rgba(58,36,24,0.04);
+}
+.song-row:nth-child(even) { background: url('faq-bg-olive.png') center / 100% 100% no-repeat; }
+.song-row--active {
+  border-color: rgba(227,104,136,0.30);
+  background: url('faq-bg-pink.png') top / 100% 100% no-repeat;
+}
+.song-row-info { flex: 1; min-width: 0; }
+.song-row-title {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 11.5px; font-weight: 600; color: var(--ink-2);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.song-row-artist {
+  font-size: 9.5px; color: var(--ink-4); font-style: italic; margin-top: 1px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.song-row-count {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 8px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase;
+  color: var(--blush); flex-shrink: 0;
+  background: rgba(227,104,136,0.10); border-radius: 20px; padding: 3px 8px;
+}
+.song-row-playing {
+  font-size: 10px; color: var(--blush); flex-shrink: 0; opacity: 0.70;
+}
 
 
 /* ── Stretch all card textures to fill their container wall-to-wall ── */

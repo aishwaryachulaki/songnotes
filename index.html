@@ -622,7 +622,7 @@
     /* ── Features tagline ── */
     .features-tagline {
       text-align: center;
-      margin-top: 44px;
+      margin-top: 64px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -668,13 +668,14 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      padding: 24px 16px 24px 32px;
+      overflow: hidden;
+      padding: clamp(10px, 1.8vw, 24px) clamp(6px, 1.1vw, 16px) clamp(10px, 1.8vw, 24px) clamp(14px, 2.4vw, 32px);
       gap: 5px;
     }
 
     .stamp-num {
       font-family: 'Montserrat', sans-serif;
-      font-size: 7.5px;
+      font-size: clamp(6.5px, 0.6vw, 7.5px);
       font-weight: 700;
       letter-spacing: 0.18em;
       text-transform: uppercase;
@@ -682,12 +683,12 @@
     }
     .stamp-title {
       font-family: 'Lora', Georgia, serif;
-      font-size: 15px;
+      font-size: clamp(11px, 1.15vw, 15px);
       font-weight: 700;
       line-height: 1.2;
     }
     .stamp-desc {
-      font-size: 11px;
+      font-size: clamp(9px, 0.88vw, 11px);
       line-height: 1.55;
       opacity: 0.72;
       margin-top: 2px;
@@ -711,7 +712,8 @@
     /* ── Responsive ── */
     @media (max-width: 900px) {
       nav, .page-top, .features { padding-left: 24px; padding-right: 24px; }
-      .stamp-grid { grid-template-columns: 1fr 1fr; }
+      .stamp-grid { grid-template-columns: 1fr; }
+      .screen-row { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 1100px) {
@@ -734,10 +736,10 @@
         object-position: top center;
       }
       /* Pull all content blocks up so they stay inside the card */
-      .env-label-row  { top: 14%; left: 16%; width: 66%; }
-      .env-heading-block { top: 24%; left: 16%; width: 66%; }
-      .env-body-block    { top: 40%; left: 16%; width: 66%; }
-      .env-cta-block     { top: 53%; left: 16%; width: 66%; }
+      .env-label-row  { top: 18%; left: 16%; width: 66%; }
+      .env-heading-block { top: 28%; left: 16%; width: 66%; }
+      .env-body-block    { top: 44%; left: 16%; width: 66%; }
+      .env-cta-block     { top: 56%; left: 16%; width: 66%; }
     }
 
     @media (max-width: 700px) {
@@ -928,7 +930,7 @@
   <div class="illus-col">
     <div class="illus-frame">
       <img
-        src="hero.jpg"
+        src="hero.png"
         alt="Illustrated scene — vinyl record, handwritten letter, and flowers on a warm desk"
       />
       <div class="note-overlay" aria-label="Example note">
