@@ -80,9 +80,11 @@ Get the Keepsake Chrome extension ready for public launch and Chrome Web Store s
 | `manifest.json` | `sidePanel` permission, `side_panel.default_path`, background service worker, v1.4.0 |
 | `background.js` | `setPanelBehavior`; track state cache (`cachedTrack`, `KS_GET_CACHED_TRACK` handler) |
 | `content.js` | `document.title` primary source; DOM href cross-validation; `KS_TRACK_CHANGED` push; removed `document.hidden` guard |
-| `popup.js` | `freeCreditsRemaining()` (3 lifetime free); credits badge refresh; `startLiveTracking()` push-based; `getActiveTab()` uses `lastFocusedWindow`; three-state `renderSharePanel()`; oEmbed thumbnail fetch; copy-link button; `attachPlaylist()` handler; `recipient_name` stored plaintext |
-| `sidepanel.html` | Replaced share card with three-state share panel (sp-* structure) |
-| `popup.css` | All sp-* styles for share panel; `.copy-link-btn` style |
+| `popup.js` | `freeCreditsRemaining()` (3 lifetime free); credits badge refresh; `startLiveTracking()` push-based; `getActiveTab()` uses `lastFocusedWindow`; three-state `renderSharePanel()`; oEmbed thumbnail fetch; copy-link button; `attachPlaylist()` handler; `recipient_name` stored plaintext; status pills use `●` dot instead of `✓` |
+| `sidepanel.html` | Replaced share card with three-state share panel (sp-* structure); ♪ → ✧ in NOW PLAYING eyebrow; share footer redesigned: paper plane SVG icon on START SHARING button, removed "How sharing works" link, + NEW SHARE text link |
+| `popup.html` | ♪ → ✧ in NOW PLAYING eyebrow; + NEW SHARE text updated |
+| `popup.css` | Full visual polish pass — see Design system notes below |
+| `background-extension.png` | Replaced with less-yellow version |
 | `account.html` | Full pricing redesign: 560px contained, 2×2 bundle grid + lifetime card |
 | `sent.html` | `looksEncrypted()` fix; `renderCard()` playlist/multi summary; 560px layout |
 | `received.html` | 560px contained layout |
@@ -93,6 +95,48 @@ Get the Keepsake Chrome extension ready for public launch and Chrome Web Store s
 | `auth.html` | Logo color `var(--rose)` |
 | `share.html` | Full redesign: single-screen hero, envelope illustration, blush pill buttons, clamp() responsive spacings, discovery link, hollow ✧ sparkle in buttons |
 | `share-envelope.png` | New illustration asset (replaced twice) |
+
+---
+
+## Design system notes (popup.css)
+
+### Depth & shadow hierarchy
+- All primary cards (`.stamp-track`, `.composer-card`, `.share-card`, `.share-panel`) use a 3-level warm shadow: `0 2px 4px / 0 6px 18px / 0 12px 32px` all in `rgba(58,36,24,…)`
+- Note cards and prev-items use a lighter 2-level shadow
+- All card textures set to `background-size: 100% 100%` to prevent pale-edge peek-through
+- `body::before` atmospheric vignette at `rgba(255,251,244,0.10)` — very subtle, do not increase or it washes everything out
+- `.composer-card::before` top-light overlay at `rgba(255,255,255,0.08)` — same caveat
+
+### Button system
+- **All buttons** use the same translucent blush pill: `background: rgba(227,104,136,0.07)`, `border: 1.5px solid rgba(227,104,136,0.40)`, `border-radius: 50px`, `color: var(--blush)`
+- Hover deepens to `rgba(227,104,136,0.18)` bg / `rgba(227,104,136,0.65)` border — no colour change, no solid fill
+- Vertical padding: `8px` on all main buttons
+- **Exception**: `.sp-share-btn` (START SHARING) follows the same blush pill style but is `width: 100%` and includes a paper plane SVG icon
+- **Exception**: `.new-share-btn` is a plain text link (no border/background), uppercase, blush, with opacity fade
+- **Exception**: `.sp-pill--ready` (READY TO SHARE status badge) uses pastel sage: `rgba(168,204,148,0.22)` bg, `rgba(145,185,120,0.45)` border, `rgba(68,105,48,0.88)` text
+
+### Typography / ink-density system
+Five tiers of `rgba(58,36,24,…)` so text reads as ink pressed into paper:
+- `--ink` `#3a2418` — Tier 0, song title only
+- `--ink-2` `rgba(…0.82)` — body text, input typed values, card titles
+- `--ink-3` `rgba(…0.62)` — labels, eyebrows, nav links, artist name, metadata
+- `--ink-4` `rgba(…0.44)` — helper text, sub-labels, hint copy
+- `--ink-5` `rgba(…0.28)` — placeholders, postmark detail, ghost elements
+
+Key type decisions:
+- All `--tangerine` accent text replaced with `--blush`
+- Track artist uses `font-style: italic` (Lora italic)
+- Status/save confirmation text uses Spectral italic
+- `.sp-hint-sub` and import status use italic
+- Nav links and composer header weight reduced to 500
+- Postmark detail retreated to `--ink-5` (decorative, not informational)
+- All hardcoded `#5c2d2d` / `rgba(92,45,45,…)` replaced with ink-tier tokens
+
+### Now Playing card specifics
+- Postmark: `top: 50%; transform: translateY(-50%)` for true vertical centring; border `rgba(58,36,24,0.45)`; text at `--ink-3`
+- Track title: `-webkit-line-clamp: 2` with ellipsis; `padding-right: 72px` to clear postmark
+- Track artist: wraps freely (no `white-space: nowrap`) so error messages display in full
+- NOW PLAYING eyebrow: `✧` symbol, `--blush` colour
 
 ---
 
