@@ -743,7 +743,15 @@ function showComposer(show) {
 async function archiveActive(store) {
   if (!store.active) return;
   const share = store.shares[store.active];
-  if (share?.enc_key) {
+  if (!share) return;
+  // Blank unsent shares (no notes, no recipient, never sent) are ghost cards —
+  // silently delete rather than push into Previous Experiences.
+  const isBlank = !share.enc_key && !share.notes?.length && !share.recipient_name;
+  if (isBlank) {
+    delete store.shares[store.active];
+    return;
+  }
+  if (share.enc_key) {
     // Share was sent — notes live in Supabase, no need to keep them locally.
     // Save counts first so renderPrevious can still show "3 notes · 2 songs".
     share.note_count = share.notes.length;
@@ -775,6 +783,13 @@ async function activateShare(id) {
   }
 
   if (store.active && store.active !== id) {
+    // Save the displaced share's ID so + New Share can restore it rather than
+    // creating a blank. Only worth saving if it has real content (notes or a
+    // recipient) and hasn't already been sent (no enc_key).
+    const displaced = store.shares[store.active];
+    const isWorthRestoring = displaced && !displaced.enc_key &&
+      (displaced.notes?.length > 0 || !!displaced.recipient_name);
+    store.displacedActive = isWorthRestoring ? store.active : null;
     await archiveActive(store);
   }
   store.previous = (store.previous || []).filter((x) => x !== id);
@@ -1154,16 +1169,37 @@ $("copyShare").addEventListener("click", async () => {
 });
 
 $("resetShare").addEventListener("click", async () => {
-  if (!confirm("Start a new share? Your current letter will be moved to ‘previous experiences’.")) return;
   const { store } = await loadStore();
+  const current = store.shares[store.active];
+  const isReactivated = !!current?.enc_key;
+
+  // Tailor the confirm message: reactivated shares go *back*, new shares get *moved*.
+  const confirmMsg = isReactivated
+    ? "Return this letter to previous experiences?"
+    : "Start a new share? Your current letter will be moved to ‘previous experiences’.";
+  if (!confirm(confirmMsg)) return;
+
   await archiveActive(store);
   store.active = null;
-  ensureActive(store, senderName);
-  activeShare = store.shares[store.active];
+
+  // If we just finished reviewing a reactivated share and there was a working
+  // share open before reactivation, restore it instead of creating a blank.
+  const displaced = store.displacedActive;
+  if (isReactivated && displaced && store.shares[displaced]) {
+    store.active = displaced;
+    store.previous = (store.previous || []).filter((x) => x !== displaced);
+    store.displacedActive = null;
+    activeShare = store.shares[displaced];
+  } else {
+    store.displacedActive = null;
+    ensureActive(store, senderName);
+    activeShare = store.shares[store.active];
+  }
+
   await saveStore(store).catch(console.error);
   $("shareInfo").textContent = "";
-  $("playlistUrl").value = "";
-  $("recipientName").value = "";
+  $("playlistUrl").value = activeShare.playlist_url || "";
+  $("recipientName").value = activeShare.recipient_name || "";
   setMode("editing");
   renderNotes();
   renderSharePanel().catch(console.error);
