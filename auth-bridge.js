@@ -10,6 +10,9 @@
   });
 
   window.addEventListener("keepsake:signout", () => {
-    chrome.storage.local.remove("ks_session");
+    chrome.storage.local.remove("ks_session", () => {
+      // Tell the page the storage is clear — it waits for this before navigating
+      window.dispatchEvent(new CustomEvent("keepsake:signout_done"));
+    });
   });
 })();

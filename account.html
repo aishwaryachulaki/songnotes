@@ -626,7 +626,14 @@
 
     document.getElementById("signoutBtn").addEventListener("click", async () => {
       await sb.auth.signOut();
-      window.dispatchEvent(new CustomEvent("keepsake:signout"));
+      // Wait for the extension to clear its stored session before navigating —
+      // otherwise the page unloads before the async chrome.storage.remove completes.
+      // 800 ms fallback covers the case where the extension isn't installed.
+      await new Promise(resolve => {
+        window.addEventListener("keepsake:signout_done", resolve, { once: true });
+        window.dispatchEvent(new CustomEvent("keepsake:signout"));
+        setTimeout(resolve, 800);
+      });
       window.location.href = "index.html";
     });
 

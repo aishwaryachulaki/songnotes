@@ -377,7 +377,11 @@
     if (btn) {
       btn.addEventListener("click", async () => {
         await sb.auth.signOut();
-        window.dispatchEvent(new CustomEvent("keepsake:signout"));
+        await new Promise(resolve => {
+          window.addEventListener("keepsake:signout_done", resolve, { once: true });
+          window.dispatchEvent(new CustomEvent("keepsake:signout"));
+          setTimeout(resolve, 800);
+        });
         window.location.href = "index.html";
       });
     }
