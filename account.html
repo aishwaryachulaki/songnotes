@@ -627,7 +627,7 @@
     document.getElementById("signoutBtn").addEventListener("click", async () => {
       await sb.auth.signOut();
       window.dispatchEvent(new CustomEvent("keepsake:signout"));
-      window.location.href = "auth.html";
+      window.location.href = "index.html";
     });
 
     document.getElementById("bundleGrid").addEventListener("click", (e) => {
