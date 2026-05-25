@@ -911,6 +911,12 @@ async function init() {
   renderPrevious();
 
   // ── Auth UI ──
+  await refreshAuthUI();
+}
+
+// Extracted so it can be called both from init() and from the
+// storage-change listener that fires when the user logs in externally.
+async function refreshAuthUI() {
   const session = await getSession();
   if (session) {
     $("authGate").classList.add("hidden");
@@ -920,7 +926,11 @@ async function init() {
     const c = await fetchCredits(session.access_token, session.user.id);
     const badge = $("creditsBadge");
     badge.textContent = creditsLabel(c);
-    if (c && !c.lifetime && c.paid_credits === 0 && freeCreditsRemaining(c) === 0) badge.classList.add("empty");
+    if (c && !c.lifetime && c.paid_credits === 0 && freeCreditsRemaining(c) === 0) {
+      badge.classList.add("empty");
+    } else {
+      badge.classList.remove("empty");
+    }
   } else {
     $("authGate").classList.remove("hidden");
     $("authBar").classList.add("hidden");
@@ -1470,3 +1480,14 @@ function startLiveTracking() {
     renderSharePanel().catch(console.error);
   }, 2000);
 }
+
+// Auto-refresh auth UI when ks_session is written by auth-bridge.js
+// (fires when the user logs in via auth.html without needing to restart the extension)
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area !== "local") return;
+  if (changes.ks_session) {
+    _session = null; // invalidate in-memory cache so getSession() re-reads
+    _sessionExpired = false;
+    refreshAuthUI().catch(console.error);
+  }
+});
