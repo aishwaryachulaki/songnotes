@@ -378,13 +378,7 @@
       <div class="hero-divider">✦</div>
       <div class="hero-count">${totalNotes} note${totalNotes === 1 ? "" : "s"} inside</div>
       ${recipient ? `<div class="hero-recipient">for <strong>${escHtml(recipient)}</strong></div>` : ""}
-      <div class="hero-actions" id="heroActions">
-        <!-- import btn injected here by extension detection -->
-        ${spLink ? `
-          <a class="hero-btn" id="spotifyBtn" href="${escHtml(spLink)}" target="_blank" rel="noopener">
-            ✧ ${spotifyLabel(meta, notes)}
-          </a>` : ""}
-      </div>
+      <div class="hero-actions" id="heroActions"></div>
       <a href="index.html" class="discover-link">New to Keepsake? Find out more →</a>
     `;
 
@@ -397,11 +391,13 @@
       detected = true;
       const actions = document.getElementById("heroActions");
       if (!actions) return;
+
+      // Import button
       const btn = document.createElement("button");
       btn.className = "hero-btn";
       btn.id = "importBtn";
       btn.textContent = "✧ Import into Keepsake";
-      actions.insertBefore(btn, actions.firstChild);
+      actions.appendChild(btn);
       btn.addEventListener("click", () => {
         window.__KS_PAYLOAD = { share_id: shareId, share: meta || {}, notes };
         window.dispatchEvent(new CustomEvent("keepsake:import", { detail: window.__KS_PAYLOAD }));
@@ -410,13 +406,26 @@
           btn.textContent = "✧ Imported!";
         }, { once: true });
       });
+
+      // Spotify button — only shown once extension is confirmed
+      if (spLink) {
+        const a = document.createElement("a");
+        a.className = "hero-btn";
+        a.href = spLink;
+        a.target = "_blank";
+        a.rel = "noopener";
+        a.textContent = `✧ ${spotifyLabel(meta, notes)}`;
+        actions.appendChild(a);
+      }
+
       window.dispatchEvent(new CustomEvent("keepsake:import", { detail: window.__KS_PAYLOAD }));
     }
 
     function onDetectionTimeout() {
       if (detected) return;
       detected = true;
-      if (!EXTENSION_CWS_URL) return; // not published yet — show nothing
+      // Extension not installed — only show the install prompt, no Spotify access
+      if (!EXTENSION_CWS_URL) return;
       const actions = document.getElementById("heroActions");
       if (!actions) return;
       const a = document.createElement("a");
