@@ -49,7 +49,7 @@ body::before {
 
 /* ── Auth gate ── */
 .auth-gate {
-  background: url('composer-bg.png') center / cover no-repeat;
+  background: url('faq-bg-pink.png') center / 100% 100% no-repeat;
   border: 1.5px solid var(--border);
   border-radius: 14px;
   padding: 18px 16px;
