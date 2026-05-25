@@ -735,7 +735,7 @@ async function renderPrevious() {
       const { store: s } = await loadStore();
       const share = s.shares[sid];
       if (!share?.enc_key) return;
-      const url = `${shareUrl(share.id)}&e=1#k=${share.enc_key}`;
+      const url = `${shareUrl(share.id)}&e=1#k=${encodeURIComponent(share.enc_key)}`;
       try {
         await navigator.clipboard.writeText(url);
         e.currentTarget.textContent = "Copied!";
@@ -1228,7 +1228,7 @@ $("copyShare").addEventListener("click", async () => {
     // Local state just couldn't be persisted. Show the link anyway so
     // the user can still copy and send it; warn about the storage issue.
     shareBtn.disabled = false;
-    const url = `${shareUrl(activeShare.id)}&e=1#k=${keyB64}`;
+    const url = `${shareUrl(activeShare.id)}&e=1#k=${encodeURIComponent(keyB64)}`;
     $("shareInfo").innerHTML = `Share sent! But storage is full — your local notes may be out of sync. Link: <a href="${url}" target="_blank">${url}</a>`;
     return;
   }
@@ -1240,7 +1240,7 @@ $("copyShare").addEventListener("click", async () => {
   // If a messaging app or email client strips the URL fragment (#k=…),
   // the share page detects e=1 without a key and shows a helpful
   // "part of your link got cut off" message instead of a generic error.
-  const url = `${shareUrl(activeShare.id)}&e=1#k=${keyB64}`;
+  const url = `${shareUrl(activeShare.id)}&e=1#k=${encodeURIComponent(keyB64)}`;
   try { await navigator.clipboard.writeText(url); } catch { /* fallback below */ }
   $("shareInfo").innerHTML =
     `<button id="copyLinkBtn" class="copy-link-btn">✦ Copy link to share</button>`;

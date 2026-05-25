@@ -443,8 +443,13 @@
       return;
     }
 
-    const fragment = new URLSearchParams(window.location.hash.slice(1));
-    const keyB64 = fragment.get("k");
+    // URLSearchParams must NOT be used here — it converts + to space,
+    // which corrupts base64 keys (+ is a valid base64 character).
+    // Regex + decodeURIComponent handles both old links (raw base64)
+    // and new links (encodeURIComponent'd key) safely.
+    const rawFragment = window.location.hash.slice(1);
+    const keyMatch = rawFragment.match(/(?:^|&)k=([^&]*)/);
+    const keyB64 = keyMatch ? decodeURIComponent(keyMatch[1]) : null;
     const isEncrypted = new URLSearchParams(window.location.search).get("e") === "1";
     if (isEncrypted && !keyB64) {
       showHeroError(`<strong>Part of your link got cut off</strong>Ask the sender to resend it, or try opening it in a different browser.`);
