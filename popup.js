@@ -649,6 +649,20 @@ async function renderSharePanel() {
     if (titleEl) titleEl.textContent = cardTitle;
     const subEl = $("spCardSub");
     if (subEl) subEl.textContent = cardSub;
+
+    // ── Make the card clickable to open the playlist / track in Spotify ──
+    // Works in both experience and edit modes; falls back to the track URL
+    // from notes if the user isn't currently on Spotify.
+    const openUrl = hasPlaylist
+      ? (activeShare.playlist_url || null)
+      : (() => {
+          const tid = currentTrack?.trackId || activeShare.notes?.[0]?.track_id;
+          return tid ? `https://open.spotify.com/track/${tid}` : null;
+        })();
+    if (cardEl) {
+      cardEl.onclick = openUrl ? () => chrome.tabs.create({ url: openUrl }) : null;
+      cardEl.classList.toggle("sp-card--clickable", !!openUrl);
+    }
   }
 
   // ── Share button ──
