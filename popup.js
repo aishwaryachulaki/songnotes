@@ -365,7 +365,7 @@ async function fetchShareMeta(id) {
 
 function shareUrl(id) {
   if (!shareOrigin) return id; // no host yet — just show the ID
-  return `${shareOrigin}/share.html?id=${id}`;
+  return `${shareOrigin}/share?id=${id}`;
 }
 
 // ---------- rendering ----------

@@ -3,8 +3,8 @@
   "name": "Keepsake",
   "version": "1.4.0",
   "description": "Attach personal notes to moments in Spotify songs and share them as a link.",
-  "homepage_url": "https://dropakeepsake.com/index.html",
-  "support_url": "https://dropakeepsake.com/faq.html",
+  "homepage_url": "https://dropakeepsake.com/",
+  "support_url": "https://dropakeepsake.com/faq",
   "permissions": ["storage", "activeTab", "tabs", "sidePanel"],
   "host_permissions": [
     "https://open.spotify.com/*",
@@ -35,23 +35,23 @@
       "run_at": "document_idle"
     },
     {
-      "matches": ["https://dropakeepsake.com/share.html*"],
+      "matches": ["https://dropakeepsake.com/share/*"],
       "js": ["share-bridge.js"],
       "run_at": "document_idle"
     },
     {
       "matches": [
-        "https://dropakeepsake.com/auth.html*",
-        "https://dropakeepsake.com/account.html*",
-        "https://dropakeepsake.com/sent.html*",
-        "https://dropakeepsake.com/received.html*",
-        "https://dropakeepsake.com/notes.html*"
+        "https://dropakeepsake.com/auth/*",
+        "https://dropakeepsake.com/account/*",
+        "https://dropakeepsake.com/sent/*",
+        "https://dropakeepsake.com/received/*",
+        "https://dropakeepsake.com/notes/*"
       ],
       "js": ["auth-bridge.js"],
       "run_at": "document_idle"
     },
     {
-      "matches": ["https://dropakeepsake.com/notes.html*"],
+      "matches": ["https://dropakeepsake.com/notes/*"],
       "js": ["notes-bridge.js"],
       "run_at": "document_idle"
     }
