@@ -3,12 +3,12 @@
   "name": "Keepsake",
   "version": "1.4.0",
   "description": "Attach personal notes to moments in Spotify songs and share them as a link.",
-  "homepage_url": "https://aishwaryachulaki.github.io/songnotes/index.html",
-  "support_url": "https://aishwaryachulaki.github.io/songnotes/faq.html",
+  "homepage_url": "https://dropakeepsake.com/index.html",
+  "support_url": "https://dropakeepsake.com/faq.html",
   "permissions": ["storage", "activeTab", "tabs", "sidePanel"],
   "host_permissions": [
     "https://open.spotify.com/*",
-    "https://aishwaryachulaki.github.io/*"
+    "https://dropakeepsake.com/*"
   ],
   "background": {
     "service_worker": "background.js"
@@ -35,23 +35,23 @@
       "run_at": "document_idle"
     },
     {
-      "matches": ["https://aishwaryachulaki.github.io/*/share.html*"],
+      "matches": ["https://dropakeepsake.com/share.html*"],
       "js": ["share-bridge.js"],
       "run_at": "document_idle"
     },
     {
       "matches": [
-        "https://aishwaryachulaki.github.io/*/auth.html*",
-        "https://aishwaryachulaki.github.io/*/account.html*",
-        "https://aishwaryachulaki.github.io/*/sent.html*",
-        "https://aishwaryachulaki.github.io/*/received.html*",
-        "https://aishwaryachulaki.github.io/*/notes.html*"
+        "https://dropakeepsake.com/auth.html*",
+        "https://dropakeepsake.com/account.html*",
+        "https://dropakeepsake.com/sent.html*",
+        "https://dropakeepsake.com/received.html*",
+        "https://dropakeepsake.com/notes.html*"
       ],
       "js": ["auth-bridge.js"],
       "run_at": "document_idle"
     },
     {
-      "matches": ["https://aishwaryachulaki.github.io/*/notes.html*"],
+      "matches": ["https://dropakeepsake.com/notes.html*"],
       "js": ["notes-bridge.js"],
       "run_at": "document_idle"
     }
