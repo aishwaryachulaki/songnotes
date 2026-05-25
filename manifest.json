@@ -42,7 +42,10 @@
     {
       "matches": [
         "https://aishwaryachulaki.github.io/*/auth.html*",
-        "https://aishwaryachulaki.github.io/*/account.html*"
+        "https://aishwaryachulaki.github.io/*/account.html*",
+        "https://aishwaryachulaki.github.io/*/sent.html*",
+        "https://aishwaryachulaki.github.io/*/received.html*",
+        "https://aishwaryachulaki.github.io/*/notes.html*"
       ],
       "js": ["auth-bridge.js"],
       "run_at": "document_idle"
