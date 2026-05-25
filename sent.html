@@ -435,7 +435,7 @@
 
     let displayTitle;
     if (isPlaylist) {
-      displayTitle = "A Playlist Share";
+      displayTitle = share.playlist_name ? escHtml(share.playlist_name) : "A Playlist Share";
     } else if (isMulti) {
       displayTitle = `${uniqueTracks} song${uniqueTracks !== 1 ? "s" : ""}, ${noteCount} note${noteCount !== 1 ? "s" : ""}`;
     } else {

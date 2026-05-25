@@ -259,6 +259,7 @@
         id, imported_at,
         shares (
           id, share_type, sender_name, recipient_name, created_at,
+          playlist_name, playlist_url, playlist_id,
           annotations ( id, track_title, track_artist, note )
         )
       `)
@@ -332,13 +333,19 @@
         if (!share) return "";
         const anns = share.annotations || [];
         const noteCount = anns.length;
-        const isPlaylist = share.share_type === "playlist";
+        const uniqueTracks = new Set(anns.map(a => a.track_title).filter(Boolean)).size || anns.length;
+        const isPlaylist = share.share_type === "playlist"
+          || !!(share.playlist_url || share.playlist_id)
+          || !!share.playlist_name
+          || uniqueTracks > 1;
 
-        const trackTitle = anns[0]?.track_title || (isPlaylist ? "Playlist share" : "Untitled note");
-        const trackArtist = anns[0]?.track_artist || "";
+        const trackTitle = isPlaylist
+          ? (share.playlist_name ? escHtml(share.playlist_name) : "A Playlist Share")
+          : (anns[0]?.track_title ? escHtml(anns[0].track_title) : "Untitled note");
+        const trackArtist = isPlaylist ? "" : (anns[0]?.track_artist || "");
 
         const typePill = isPlaylist
-          ? `<div class="share-type-pill">Playlist · ${noteCount} song${noteCount !== 1 ? "s" : ""}</div>`
+          ? `<div class="share-type-pill">Playlist · ${uniqueTracks} song${uniqueTracks !== 1 ? "s" : ""}</div>`
           : "";
 
         const noteLabel = noteCount === 1 ? "1 note inside" : `${noteCount} notes inside`;
@@ -351,7 +358,7 @@
           <div class="share-card">
             <div class="share-from">From ${share.sender_name ? escHtml(share.sender_name) : "someone"}</div>
             ${typePill}
-            <div class="share-track">${escHtml(trackTitle)}</div>
+            <div class="share-track">${trackTitle}</div>
             ${trackArtist ? `<div class="share-artist">${escHtml(trackArtist)}</div>` : ""}
             ${noteCount > 0 ? `<div class="share-notes-count">${noteLabel}</div>` : ""}
             <div class="share-footer">
