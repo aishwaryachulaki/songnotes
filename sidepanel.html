@@ -95,6 +95,15 @@
         </div>
       </div>
 
+      <!-- Experience banner — shown when viewing a reactivated sent share -->
+      <div id="experienceBanner" class="experience-banner hidden">
+        <div class="exp-top">
+          <span class="exp-badge">✧ Experience mode</span>
+          <button id="enterEditMode" class="exp-edit-btn">Enter Edit Mode</button>
+        </div>
+        <div id="expWho" class="exp-who"></div>
+      </div>
+
       <!-- Notes section -->
       <div class="section-header">
         <span>NOTES FOR THIS SONG</span>
@@ -155,6 +164,11 @@
               <div class="sp-hint-sub">Your notes will be saved here and shared instantly.</div>
             </div>
           </div>
+        </div>
+
+        <!-- Re-share heads-up — shown when editing a previously sent share -->
+        <div id="spReshareNote" class="sp-relink-note hidden">
+          ✦ Re-sharing creates a new link — the original still works.
         </div>
 
         <!-- Footer -->

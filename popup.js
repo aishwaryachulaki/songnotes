@@ -391,15 +391,17 @@ async function renderNotes() {
   list.innerHTML = "";
   notes.slice().sort((a, b) => (a.timestamp ?? -1) - (b.timestamp ?? -1)).forEach((n) => {
     const div = document.createElement("div");
-    div.className = "note";
+    const isExperience = activeShare?.mode === "experience";
+    div.className = "note" + (isExperience ? " note--readonly" : "");
     div.dataset.noteId = n.id;
     div.innerHTML = `
       <div class="meta">${formatTs(n.timestamp)}</div>
       <div class="note-text">${escapeHtml(n.note)}</div>
+      ${isExperience ? "" : `
       <div class="note-actions">
         <button class="del" data-id="${n.id}" title="Delete">×</button>
         <button class="note-edit" data-id="${n.id}" title="Edit">✎</button>
-      </div>`;
+      </div>`}`;
     list.appendChild(div);
   });
 
@@ -562,6 +564,8 @@ async function renderSharePanel() {
 
   // state: 'single' | 'needsPlaylist' | 'playlist'
   const state = isMulti ? (hasPlaylist ? "playlist" : "needsPlaylist") : "single";
+  const isExperience = activeShare?.mode === "experience";
+  const isEditingOldShare = activeShare?.mode === "editing" && !!activeShare?.enc_key;
 
   // ── Header ──
   const recipientEl = $("spRecipient");
@@ -569,7 +573,10 @@ async function renderSharePanel() {
 
   const pillEl = $("spPill");
   if (pillEl) {
-    if (state === "needsPlaylist") {
+    if (isExperience) {
+      pillEl.textContent = "● Already sent";
+      pillEl.className = "sp-pill sp-pill--ready";
+    } else if (state === "needsPlaylist") {
       pillEl.textContent = "● Playlist needed";
       pillEl.className = "sp-pill sp-pill--needed";
     } else if (state === "playlist") {
@@ -580,6 +587,10 @@ async function renderSharePanel() {
       pillEl.className = "sp-pill sp-pill--ready";
     }
   }
+
+  // ── Re-share heads-up note ──
+  const reshareNote = $("spReshareNote");
+  if (reshareNote) reshareNote.classList.toggle("hidden", !isEditingOldShare);
 
   // ── Show / hide sections ──
   const cardEl  = $("spCard");
@@ -642,7 +653,15 @@ async function renderSharePanel() {
 
   // ── Share button ──
   const shareBtn = $("copyShare");
-  if (shareBtn) shareBtn.disabled = state === "needsPlaylist";
+  if (shareBtn) {
+    if (isExperience) {
+      shareBtn.textContent = "COPY LINK";
+      shareBtn.disabled = false;
+    } else {
+      shareBtn.textContent = "SHARE";
+      shareBtn.disabled = state === "needsPlaylist";
+    }
+  }
 }
 
 async function renderPrevious() {
@@ -734,9 +753,34 @@ async function renderPrevious() {
 }
 
 function showComposer(show) {
+  // In experience mode the composer is always hidden — the banner owns that slot.
+  if (activeShare?.mode === "experience") return;
   $("composer").classList.toggle("hidden", !show);
   $("nameBlock").classList.toggle("hidden", show);
   if (show) $("whoami").textContent = senderName;
+}
+
+function renderExperienceBanner() {
+  const banner = $("experienceBanner");
+  if (!banner) return;
+  const isExperience = activeShare?.mode === "experience";
+  banner.classList.toggle("hidden", !isExperience);
+  if (isExperience) {
+    // Keep composer and name block out of the way.
+    $("composer")?.classList.add("hidden");
+    $("nameBlock")?.classList.add("hidden");
+    const who = activeShare.recipient_name
+      ? `Notes for ${activeShare.recipient_name}`
+      : "Notes (no recipient set)";
+    const dateStr = activeShare.created_at
+      ? new Date(activeShare.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+      : null;
+    const expWho = $("expWho");
+    if (expWho) expWho.textContent = dateStr ? `${who} · sent ${dateStr}` : who;
+  } else {
+    // Restore normal composer visibility.
+    showComposer(!!senderName);
+  }
 }
 
 // ---------- share lifecycle ----------
@@ -794,13 +838,14 @@ async function activateShare(id) {
   }
   store.previous = (store.previous || []).filter((x) => x !== id);
   store.active = id;
-  // Always reactivate in editing mode so popups fire when the user listens.
-  share.mode = "editing";
+  // Reactivated sent shares open in experience mode (read-only).
+  // Unsent shares (no enc_key) open in editing mode as normal.
+  share.mode = share.enc_key ? "experience" : "editing";
   store.shares[id] = share;
   await saveStore(store).catch(console.error);
   activeShare = store.shares[id];
   $("recipientName").value = activeShare.recipient_name || "";
-  setMode("editing");
+  renderExperienceBanner();
   renderNotes();
   renderSharePanel().catch(console.error);
   renderPrevious();
@@ -845,6 +890,7 @@ async function init() {
   $("playlistUrl").value = activeShare.playlist_url || "";
   $("recipientName").value = activeShare.recipient_name || "";
   setMode(activeShare.mode || "editing");
+  renderExperienceBanner();
   showComposer(!!senderName);
   renderNotes();
   renderSharePanel().catch(console.error);
@@ -967,6 +1013,19 @@ $("copyShare").addEventListener("click", async () => {
   const shareBtn = $("copyShare");
   if (shareBtn.disabled) return;
   shareBtn.disabled = true;
+
+  // ── Experience mode: just copy the already-generated link ──
+  if (activeShare?.mode === "experience") {
+    if (!activeShare.enc_key) { shareBtn.disabled = false; return; }
+    const url = `${shareUrl(activeShare.id)}&e=1#k=${activeShare.enc_key}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      shareBtn.textContent = "Copied!";
+      setTimeout(() => { shareBtn.textContent = "COPY LINK"; }, 2000);
+    } catch {}
+    shareBtn.disabled = false;
+    return;
+  }
 
   // ── Step 1: Auth check ──
   const session = await getSession();
@@ -1205,6 +1264,17 @@ $("resetShare").addEventListener("click", async () => {
   renderSharePanel().catch(console.error);
   renderPrevious();
   notifyContentRefresh();
+});
+
+$("enterEditMode")?.addEventListener("click", async () => {
+  if (!activeShare) return;
+  activeShare.mode = "editing";
+  const { store } = await loadStore();
+  store.shares[activeShare.id] = activeShare;
+  await saveStore(store).catch(console.error);
+  renderExperienceBanner(); // hides banner, restores composer
+  renderNotes();
+  renderSharePanel().catch(console.error);
 });
 
 $("importBtn").addEventListener("click", async () => {
