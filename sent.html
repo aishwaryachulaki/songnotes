@@ -409,6 +409,13 @@
   }
 
   function renderCard(share) {
+    // Temporary debug — remove before launch
+    console.log("KS share:", share.id, {
+      share_type: share.share_type,
+      playlist_name: share.playlist_name,
+      playlist_id: share.playlist_id,
+      anns: (share.annotations||[]).map(a => ({ track_id: a.track_id, track_title: a.track_title }))
+    });
     const anns = share.annotations || [];
     const noteCount = anns.length;
     // Count unique songs — compute first so it can inform type detection.
