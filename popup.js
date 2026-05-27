@@ -280,7 +280,7 @@ async function notifyContentRefresh() {
 }
 
 // ---------- backend ----------
-async function pushShareMeta(share, accessToken) {
+async function pushShareMeta(share, accessToken, userId) {
   const token = accessToken || SUPABASE_KEY;
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/shares`, {
@@ -293,6 +293,7 @@ async function pushShareMeta(share, accessToken) {
       },
       body: JSON.stringify({
         id: share.id,
+        user_id: userId || null,
         share_type: share.type,
         playlist_id: share.playlist_id,
         playlist_url: share.playlist_url,
@@ -302,8 +303,16 @@ async function pushShareMeta(share, accessToken) {
         sender_content: share.sender_content || null,
       }),
     });
-    return res.ok;
-  } catch { return false; }
+    if (!res.ok) {
+      const errText = await res.text().catch(() => res.status);
+      console.error("Keepsake: pushShareMeta failed", res.status, errText);
+      return { ok: false, error: `${res.status} — ${errText}` };
+    }
+    return { ok: true, error: null };
+  } catch (e) {
+    console.error("Keepsake: pushShareMeta exception", e);
+    return { ok: false, error: e.message };
+  }
 }
 async function pushNote(share, note, accessToken) {
   const token = accessToken || SUPABASE_KEY;
@@ -1166,15 +1175,17 @@ $("copyShare").addEventListener("click", async () => {
 
   // ── Step 6: Push encrypted data to Supabase BEFORE consuming credit ──
   $("shareInfo").textContent = "Sending…";
-  const metaOk = await pushShareMeta(shareToPush, session.access_token);
-  if (!metaOk) {
+  const metaResult = await pushShareMeta(shareToPush, session.access_token, session.user.id);
+  if (!metaResult.ok) {
     // Restore old ID so the user's local state is unchanged and they can retry.
     activeShare.id = oldId;
     delete store.shares[newId];
     store.shares[oldId] = activeShare;
     store.active = oldId;
     await saveStore(store).catch(console.error); // best-effort rollback
-    $("shareInfo").textContent = "Couldn't reach the server. Check your connection and try again.";
+    $("shareInfo").textContent = metaResult.error
+      ? `Couldn't save share: ${metaResult.error}`
+      : "Couldn't reach the server. Check your connection and try again.";
     shareBtn.disabled = false;
     return;
   }
