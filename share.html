@@ -245,11 +245,11 @@
 
 <div class="hero" id="heroSection">
   <nav class="nav">
-    <a class="nav-logo" href="/">keepsake.<span class="logo-spark">✦</span></a>
+    <a class="nav-logo" href="index.html">keepsake.<span class="logo-spark">✦</span></a>
     <div class="nav-links">
-      <a href="/notes" class="nav-link">Notes</a>
-      <a href="/account" class="nav-link">Account</a>
-      <a href="/auth" class="nav-link nav-link--pill">Sign out</a>
+      <a href="notes.html" class="nav-link">Notes</a>
+      <a href="account.html" class="nav-link">Account</a>
+      <a href="auth.html" class="nav-link nav-link--pill">Sign out</a>
     </div>
   </nav>
   <div id="heroContent" class="hero-content">
@@ -379,7 +379,7 @@
       <div class="hero-count">${totalNotes} note${totalNotes === 1 ? "" : "s"} inside</div>
       ${recipient ? `<div class="hero-recipient">for <strong>${escHtml(recipient)}</strong></div>` : ""}
       <div class="hero-actions" id="heroActions"></div>
-      <a href="/" class="discover-link">New to Keepsake? Find out more →</a>
+      <a href="index.html" class="discover-link">New to Keepsake? Find out more →</a>
     `;
 
     window.__KS_PAYLOAD = { share_id: shareId, share: meta || {}, notes };

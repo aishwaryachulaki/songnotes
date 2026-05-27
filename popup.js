@@ -78,12 +78,12 @@ function creditsLabel(c) {
 }
 
 function openAuthPage() {
-  const url = `https://aishwaryachulaki.github.io/songnotes/auth.html`;
+  const url = `https://dropakeepsake.com/auth.html`;
   chrome.tabs.create({ url });
 }
 
 function openAccountPage() {
-  const url = `https://aishwaryachulaki.github.io/songnotes/account.html`;
+  const url = `https://dropakeepsake.com/account.html`;
   chrome.tabs.create({ url });
 }
 
@@ -365,7 +365,7 @@ async function fetchShareMeta(id) {
 
 function shareUrl(id) {
   if (!shareOrigin) return id; // no host yet — just show the ID
-  return `${shareOrigin}/share?id=${id}`;
+  return `${shareOrigin}/share.html?id=${id}`;
 }
 
 // ---------- rendering ----------
