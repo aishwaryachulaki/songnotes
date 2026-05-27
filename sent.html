@@ -283,7 +283,7 @@
     // Try to fetch with archived column; if it fails, schema hasn't been updated yet
     let res = await sb
       .from("shares")
-      .select("*, annotations(id, track_title, track_artist, note, timestamp)")
+      .select("*, annotations(id, track_id, track_title, track_artist, note, timestamp)")
       .order("created_at", { ascending: false });
 
     // Check if archived column exists by inspecting returned data
@@ -412,7 +412,7 @@
     const anns = share.annotations || [];
     const noteCount = anns.length;
     // Count unique songs — compute first so it can inform type detection.
-    const uniqueTracks = new Set(anns.map(a => a.track_title).filter(Boolean)).size || anns.length;
+    const uniqueTracks = new Set(anns.map(a => a.track_id || a.track_title).filter(Boolean)).size || anns.length;
 
     // Detect playlist/multi. Fall back to annotation count for old shares where
     // the DB columns were never populated (PostgREST silently ignores unknown cols).

@@ -261,7 +261,7 @@
         shares (
           id, share_type, sender_name, recipient_name, created_at,
           playlist_name, playlist_url, playlist_id,
-          annotations ( id, track_title, track_artist, note )
+          annotations ( id, track_id, track_title, track_artist, note )
         )
       `)
       .order("imported_at", { ascending: false });
@@ -334,7 +334,7 @@
         if (!share) return "";
         const anns = share.annotations || [];
         const noteCount = anns.length;
-        const uniqueTracks = new Set(anns.map(a => a.track_title).filter(Boolean)).size || anns.length;
+        const uniqueTracks = new Set(anns.map(a => a.track_id || a.track_title).filter(Boolean)).size || anns.length;
         const isPlaylist = share.share_type === "playlist"
           || !!(share.playlist_url || share.playlist_id)
           || !!share.playlist_name
