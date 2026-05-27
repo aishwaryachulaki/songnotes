@@ -27,6 +27,7 @@ body {
   color: var(--ink);
   width: 340px;
   position: relative;
+  overscroll-behavior: none;
 }
 
 /* Atmospheric top-down lighting — warm lamp glow from above */
