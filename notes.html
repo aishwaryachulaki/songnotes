@@ -405,7 +405,9 @@
   async function loadAll() {
     const sentRes = await sb
       .from("shares")
-      .select("*, annotations(id, track_title, track_artist, track_id, note, timestamp)")
+      .select("id, user_id, share_type, playlist_id, playlist_url, playlist_name, sender_name, recipient_name, created_at, annotations(id, track_id, track_title, track_artist, timestamp, playlist_id)")
+      // 'note' omitted — encrypted blob, not displayed here
+      // explicit columns bypass PostgREST schema cache which silently drops new columns from select(*)
       .order("created_at", { ascending: false });
 
     sentShares = sentRes.data || [];
@@ -413,7 +415,7 @@
     // Load received shares
     const recRes = await sb
       .from("received_shares")
-      .select(`id, imported_at, shares(id, share_type, sender_name, recipient_name, created_at, annotations(id, track_title, track_artist, track_id, note))`)
+      .select(`id, imported_at, shares(id, share_type, playlist_id, playlist_url, playlist_name, sender_name, recipient_name, created_at, annotations(id, track_id, track_title, track_artist, playlist_id))`)
       .order("imported_at", { ascending: false });
 
     if (!recRes.error) {
@@ -607,12 +609,24 @@
     const cards = pageShares.map(share => {
       const anns = share.annotations || [];
       const noteCount = anns.length;
-      const isPlaylist = share.share_type === "playlist";
-      const rawTitle  = anns[0]?.track_title || "";
-      const rawArtist = anns[0]?.track_artist || "";
-      const trackTitle  = safeDisplay(rawTitle,  isPlaylist ? "Playlist share" : "Untitled note");
-      const trackArtist = safeDisplay(rawArtist, "");
-      const recipient   = safeDisplay(share.recipient_name, "someone special");
+
+      // Detect playlist via cascade — share_type is reliable for new shares; for old
+      // shares (where shares row columns are null) fall back to annotation-level playlist_id
+      // which pushNote() always wrote, then to unique track count as last resort.
+      const trackIdSet = new Set(anns.map(a => a.track_id).filter(Boolean));
+      const annotationPlaylistId = anns.find(a => a.playlist_id)?.playlist_id ?? null;
+      const isPlaylist = share.share_type === "playlist"
+        || !!(share.playlist_url || share.playlist_id)
+        || !!share.playlist_name
+        || !!annotationPlaylistId
+        || trackIdSet.size > 1;
+
+      // Display title: for playlists use the stored name; for single tracks use the track title
+      const displayTitle  = isPlaylist
+        ? safeDisplay(share.playlist_name, "Playlist share")
+        : safeDisplay(anns[0]?.track_title, "Untitled note");
+      const displayArtist = isPlaylist ? "" : safeDisplay(anns[0]?.track_artist, "");
+      const recipient     = safeDisplay(share.recipient_name, "someone special");
       const noteLabel = noteCount === 1 ? "1 note inside" : `${noteCount} notes inside`;
       const dateStr = new Date(share.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
       const spotify = spotifyUrl(share);
@@ -622,8 +636,8 @@
         <div class="share-card" data-share-id="${esc(share.id)}">
           <div class="share-label">For ${recipient}</div>
           <div class="share-body">
-            <div class="share-track">${trackTitle}</div>
-            ${trackArtist ? `<div class="share-artist">${trackArtist}</div>` : ""}
+            <div class="share-track">${displayTitle}</div>
+            ${displayArtist ? `<div class="share-artist">${displayArtist}</div>` : ""}
           </div>
           <div class="share-footer">
             <div class="share-meta">
@@ -691,9 +705,19 @@
       if (!share) return "";
       const anns = share.annotations || [];
       const noteCount = anns.length;
-      const isPlaylist = share.share_type === "playlist";
-      const trackTitle  = safeDisplay(anns[0]?.track_title,  isPlaylist ? "Playlist share" : "Untitled note");
-      const trackArtist = safeDisplay(anns[0]?.track_artist, "");
+
+      const trackIdSet2 = new Set(anns.map(a => a.track_id).filter(Boolean));
+      const annPlaylistId2 = anns.find(a => a.playlist_id)?.playlist_id ?? null;
+      const isPlaylist = share.share_type === "playlist"
+        || !!(share.playlist_url || share.playlist_id)
+        || !!share.playlist_name
+        || !!annPlaylistId2
+        || trackIdSet2.size > 1;
+
+      const trackTitle  = isPlaylist
+        ? safeDisplay(share.playlist_name, "Playlist share")
+        : safeDisplay(anns[0]?.track_title, "Untitled note");
+      const trackArtist = isPlaylist ? "" : safeDisplay(anns[0]?.track_artist, "");
       const senderName  = safeDisplay(share.sender_name, "someone");
       const noteLabel = noteCount === 1 ? "1 note inside" : `${noteCount} notes inside`;
       const dateStr = new Date(item.imported_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
