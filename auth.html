@@ -205,10 +205,95 @@
     .msg.success { background: rgba(240,140,33,0.10); color: var(--tangerine); font-weight: 600; }
 
     /* ── Success state ── */
-    .success-state { text-align: center; display: flex; flex-direction: column; gap: 14px; align-items: center; }
-    .success-icon { font-size: 44px; }
-    .success-state h2 { font-family: 'Lora', Georgia, serif; font-size: 20px; font-weight: 700; }
-    .success-state p { font-size: 13px; color: var(--ink-mid); line-height: 1.5; font-family: 'Spectral', Georgia, serif; font-style: italic; }
+    @keyframes ks-fade-up {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes ks-pulse-ring {
+      0%   { transform: scale(0.92); opacity: 0.6; }
+      50%  { transform: scale(1.06); opacity: 0.15; }
+      100% { transform: scale(0.92); opacity: 0.6; }
+    }
+    .success-state {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-items: center;
+      padding: 8px 0 4px;
+      animation: ks-fade-up 0.4s ease both;
+    }
+    .success-icon-wrap {
+      position: relative;
+      width: 64px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .success-icon-wrap::before {
+      content: '';
+      position: absolute;
+      inset: -6px;
+      border-radius: 50%;
+      background: var(--rose);
+      opacity: 0.12;
+      animation: ks-pulse-ring 2s ease-in-out infinite;
+    }
+    .success-icon-bg {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--rose) 0%, var(--tangerine) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 20px rgba(217,107,124,0.30);
+    }
+    .success-icon-bg svg {
+      width: 28px;
+      height: 28px;
+      color: white;
+      fill: none;
+      stroke: white;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .success-state h2 {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.2;
+    }
+    .success-state p {
+      font-size: 13px;
+      color: var(--ink-mid);
+      line-height: 1.6;
+      font-family: 'Spectral', Georgia, serif;
+      font-style: italic;
+    }
+    .success-dots {
+      display: flex;
+      gap: 5px;
+      justify-content: center;
+      margin-top: 2px;
+    }
+    .success-dots span {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--rose);
+      opacity: 0.35;
+      animation: ks-dot-bounce 1.2s ease-in-out infinite;
+    }
+    .success-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .success-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes ks-dot-bounce {
+      0%, 80%, 100% { transform: translateY(0); opacity: 0.35; }
+      40%            { transform: translateY(-5px); opacity: 0.8; }
+    }
 
     .privacy-note {
       margin-top: 16px;
@@ -325,9 +410,14 @@
       }));
       document.getElementById("card").innerHTML = `
         <div class="success-state">
-          <div class="success-icon">✉</div>
+          <div class="success-icon-wrap">
+            <div class="success-icon-bg">
+              <svg viewBox="0 0 24 24"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </div>
+          </div>
           <h2>You're in!</h2>
           <p>Taking you to your notes…</p>
+          <div class="success-dots"><span></span><span></span><span></span></div>
         </div>
       `;
       // Wait for the extension bridge to confirm the session is written to
