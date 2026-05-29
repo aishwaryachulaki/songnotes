@@ -283,7 +283,11 @@
     // Try to fetch with archived column; if it fails, schema hasn't been updated yet
     let res = await sb
       .from("shares")
-      .select("id, user_id, share_type, playlist_id, playlist_url, playlist_name, sender_name, recipient_name, sender_content, created_at, archived, annotations(id, track_id, track_title, track_artist, note, timestamp)")
+      .select("id, user_id, share_type, playlist_id, playlist_url, playlist_name, sender_name, recipient_name, created_at, archived, annotations(id, track_id, track_title, track_artist, timestamp, playlist_id)")
+      // 'note' omitted — it's an encrypted blob never displayed on this page
+      // 'playlist_id' added to annotations — old shares didn't write share_type onto the
+      // shares row, but pushNote() always wrote playlist_id onto every annotation in a
+      // playlist share, so this lets us detect old playlist shares reliably
       .order("created_at", { ascending: false });
 
     // Check if archived column exists by inspecting returned data
@@ -411,18 +415,28 @@
   function renderCard(share) {
     const anns = share.annotations || [];
     const noteCount = anns.length;
-    // Count unique songs — compute first so it can inform type detection.
-    const uniqueTracks = new Set(anns.map(a => a.track_id || a.track_title).filter(Boolean)).size || anns.length;
 
-    // Detect playlist/multi. Fall back to annotation count for old shares where
-    // the DB columns were never populated (PostgREST silently ignores unknown cols).
+    // Count unique tracks by track_id only — don't fall back to anns.length because
+    // "5 notes on the same song" ≠ "5 songs". track_title fallback is only for
+    // truly ancient shares that never stored a Spotify track ID.
+    const trackIdSet = new Set(anns.map(a => a.track_id).filter(Boolean));
+    const uniqueTracks = trackIdSet.size || new Set(anns.map(a => a.track_title).filter(Boolean)).size;
+
+    // Detect playlist share via cascading signals, most reliable first:
+    //   1. share_type column — written on all shares since the May 2026 schema fix
+    //   2. share-level playlist_id / playlist_url / playlist_name
+    //   3. annotation-level playlist_id — pushNote() always wrote this field onto every
+    //      annotation in a playlist share, so old shares (where the shares row has all
+    //      nulls) can still be detected correctly here
+    //   4. multiple unique tracks — last resort; fails for valid 1-song playlist shares
+    const annotationPlaylistId = anns.find(a => a.playlist_id)?.playlist_id ?? null;
     const isPlaylist = share.share_type === "playlist"
       || !!(share.playlist_url || share.playlist_id)
       || !!share.playlist_name
+      || !!annotationPlaylistId
       || uniqueTracks > 1;
-    const isMulti = false; // playlist covers all multi-track cases
 
-    // Primary display info — for single-track shares, show the track.
+    // Primary display info — only populated for single-track shares.
     let trackTitle = "";
     let trackArtist = "";
     if (anns.length > 0 && !isPlaylist) {
@@ -430,22 +444,24 @@
       trackArtist = anns[0].track_artist || "";
     }
 
-    const typePill = (isPlaylist || isMulti)
-      ? `<div class="share-type-pill">${isPlaylist ? "Playlist" : "Multi-song"} · ${uniqueTracks} song${uniqueTracks !== 1 ? "s" : ""}</div>`
+    // Pill: only show song count when we actually know it.
+    // "Playlist · 0 songs" would appear if annotations aren't returned yet.
+    const typePill = isPlaylist
+      ? `<div class="share-type-pill">Playlist${uniqueTracks > 0 ? ` · ${uniqueTracks} song${uniqueTracks !== 1 ? "s" : ""}` : ""}</div>`
       : "";
 
     let displayTitle;
     if (isPlaylist) {
-      displayTitle = share.playlist_name ? escHtml(share.playlist_name) : "A Playlist Share";
-    } else if (isMulti) {
-      displayTitle = `${uniqueTracks} song${uniqueTracks !== 1 ? "s" : ""}, ${noteCount} note${noteCount !== 1 ? "s" : ""}`;
+      // Prefer the stored playlist name. Fall back to generic label rather than
+      // leaking a song title as if it were the playlist name (the original bug).
+      displayTitle = share.playlist_name
+        ? escHtml(share.playlist_name)
+        : "A Playlist Share";
     } else {
       displayTitle = trackTitle ? escHtml(trackTitle) : "Untitled note";
     }
 
-    const displayArtist = trackArtist
-      ? escHtml(trackArtist)
-      : "";
+    const displayArtist = (!isPlaylist && trackArtist) ? escHtml(trackArtist) : "";
 
     const noteLabel = noteCount === 1 ? "1 note inside" : `${noteCount} notes inside`;
 
