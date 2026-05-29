@@ -300,9 +300,6 @@
     }
 
     allShares = res.data || [];
-    // TEMP DEBUG — remove before launch
-    console.log("KS shares raw:", JSON.stringify(res.data?.slice(0,3), null, 2));
-    if (res.error) console.error("KS shares error:", res.error);
     renderPage();
   }
 
