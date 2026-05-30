@@ -688,9 +688,18 @@ async function renderSharePanel() {
 }
 
 async function renderPrevious() {
-  const { store } = await loadStore();
+  const session = await getSession();
   const list = $("previousList");
   const header = $("prevHeader");
+
+  // Never show previous shares when logged out
+  if (!session) {
+    list.innerHTML = "";
+    if (header) header.style.display = "none";
+    return;
+  }
+
+  const { store } = await loadStore();
   const allPrev = (store.previous || []).filter((id) => store.shares[id]);
   const prev = allPrev.slice(0, 3);
 
@@ -962,6 +971,11 @@ $("signOutLink").addEventListener("click", async (e) => {
   _sessionExpired = false;
   $("authGate").classList.remove("hidden");
   $("authBar").classList.add("hidden");
+  // Clear previous shares from view immediately
+  const list = $("previousList");
+  const header = $("prevHeader");
+  if (list) list.innerHTML = "";
+  if (header) header.style.display = "none";
 });
 
 $("saveName").addEventListener("click", async () => {
