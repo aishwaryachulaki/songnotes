@@ -83,7 +83,7 @@ function openAuthPage() {
 }
 
 function openAccountPage() {
-  const url = `https://dropakeepsake.com/account.html`;
+  const url = `https://dropakeepsake.com/received.html`;
   chrome.tabs.create({ url });
 }
 
