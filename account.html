@@ -307,7 +307,9 @@
 <script>
   const SUPABASE_URL = "https://kkasgbkgwjxiutdalbbm.supabase.co";
   const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtrYXNnYmtnd2p4aXV0ZGFsYmJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyNjU3OTQsImV4cCI6MjA5Mjg0MTc5NH0.z1JLMTzz3X_swbWHdt2z4UDKyUwjEfNYys5kdDMq3R4";
-  const RAZORPAY_KEY = "rzp_test_SiSA0de5zVIh2x"; // TODO: swap for live key before launch
+  // Key ID is safe to expose in frontend — secret stays server-side only
+  // TODO: swap for live key before launch
+  const RAZORPAY_KEY = "rzp_live_REPLACE_WITH_LIVE_KEY_ID";
 
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -660,35 +662,91 @@
     }
   }
 
-  function openRazorpay(amountPaise, numCredits, isLifetime, description) {
+  async function openRazorpay(amountPaise, numCredits, isLifetime, description) {
+    const msg = document.getElementById("paymentMsg");
+    msg.innerHTML = `<div class="msg">Preparing payment…</div>`;
+
+    // Step 1: Create order server-side
+    let order;
+    try {
+      const res = await fetch(
+        `${SUPABASE_URL}/functions/v1/create-razorpay-order`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "apikey": SUPABASE_KEY },
+          body: JSON.stringify({
+            amount: amountPaise,
+            currency: "INR",
+            receipt: `${currentUser.id.slice(0, 8)}_${Date.now()}`,
+          }),
+        }
+      );
+      if (!res.ok) throw new Error(await res.text());
+      order = await res.json();
+    } catch (err) {
+      console.error("Order creation failed:", err);
+      msg.innerHTML = `<div class="msg error">Could not initiate payment. Please try again.</div>`;
+      return;
+    }
+
+    msg.innerHTML = "";
+
+    // Step 2: Open Razorpay checkout with order_id
     const options = {
-      key: RAZORPAY_KEY,
-      amount: amountPaise,
-      currency: "INR",
+      key: order.key_id || RAZORPAY_KEY,
+      amount: order.amount,
+      currency: order.currency,
+      order_id: order.order_id,
       name: "Keepsake",
       description,
       prefill: { email: currentUser.email },
       theme: { color: "#D96B7C" },
+
+      // Step 3: On success, verify signature server-side before adding credits
       handler: async function (response) {
-        const msg = document.getElementById("paymentMsg");
-        msg.innerHTML = `<div class="msg">Processing…</div>`;
-        const { error } = await sb.rpc("add_credits", {
-          p_user_id: currentUser.id,
-          p_credits: numCredits,
-          p_lifetime: isLifetime,
-          p_razorpay_id: response.razorpay_payment_id,
-          p_amount_paise: amountPaise,
-        });
-        if (error) {
-          msg.innerHTML = `<div class="msg error">Payment recorded but credit update failed — contact support with payment ID: ${escHtml(response.razorpay_payment_id)}</div>`;
-        } else {
-          msg.innerHTML = `<div class="msg success">✦ ${isLifetime ? "Lifetime plan activated!" : `${escHtml(String(numCredits))} letter${numCredits > 1 ? "s" : ""} added!`}</div>`;
-          await loadAndRender();
+        msg.innerHTML = `<div class="msg">Verifying payment…</div>`;
+        try {
+          const verifyRes = await fetch(
+            `${SUPABASE_URL}/functions/v1/verify-razorpay-payment`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json", "apikey": SUPABASE_KEY },
+              body: JSON.stringify({
+                razorpay_order_id:   response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature:  response.razorpay_signature,
+                user_id:      currentUser.id,
+                credits:      numCredits,
+                is_lifetime:  isLifetime,
+                amount_paise: amountPaise,
+              }),
+            }
+          );
+          const result = await verifyRes.json();
+          if (!verifyRes.ok || !result.success) {
+            const payId = escHtml(response.razorpay_payment_id);
+            msg.innerHTML = `<div class="msg error">${result.error || "Verification failed"} — contact support with payment ID: ${payId}</div>`;
+          } else {
+            msg.innerHTML = `<div class="msg success">✦ ${isLifetime ? "Lifetime plan activated!" : `${escHtml(String(numCredits))} letter${numCredits > 1 ? "s" : ""} added!`}</div>`;
+            await loadAndRender();
+          }
+        } catch (err) {
+          console.error("Verification error:", err);
+          msg.innerHTML = `<div class="msg error">Payment may have succeeded but verification failed — contact support with ID: ${escHtml(response.razorpay_payment_id)}</div>`;
         }
       },
-      modal: { ondismiss: () => {} }
+
+      modal: {
+        ondismiss: () => {
+          msg.innerHTML = "";
+        }
+      }
     };
+
     const rzp = new window.Razorpay(options);
+    rzp.on("payment.failed", (resp) => {
+      msg.innerHTML = `<div class="msg error">Payment failed: ${escHtml(resp.error?.description || "Unknown error")}</div>`;
+    });
     rzp.open();
   }
 
