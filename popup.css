@@ -239,6 +239,7 @@ body::before {
   resize: none; outline: none;
   height: 120px;
   overflow-y: auto;
+  overscroll-behavior: none;
 }
 .ruled-textarea::placeholder { color: var(--ink-5); }
 
@@ -305,6 +306,7 @@ body::before {
   display: grid; grid-template-columns: 1fr 1fr;
   gap: 7px; align-items: start;
   max-height: 220px; overflow-y: auto;
+  overscroll-behavior: none;
   scrollbar-width: thin;
   scrollbar-color: rgba(58,36,24,0.12) transparent;
 }
