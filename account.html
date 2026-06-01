@@ -279,6 +279,67 @@
     .msg.error   { background: rgba(217,107,124,0.10); color: var(--rose); }
     .msg.success { background: rgba(217,107,124,0.10); color: var(--rose); font-weight: 700; }
 
+    /* ── Payment loading feedback ── */
+    @keyframes ks-payment-fade-in {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes ks-dot-pulse {
+      0%, 80%, 100% { transform: translateY(0); opacity: 0.3; }
+      40%            { transform: translateY(-4px); opacity: 1; }
+    }
+    .payment-feedback {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 12px;
+      border-radius: 12px;
+      background: var(--cream);
+      border: 1.5px solid rgba(58,36,24,0.08);
+      animation: ks-payment-fade-in 0.3s ease both;
+    }
+    .payment-feedback-icon {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: var(--butter);
+      border: 1.5px solid rgba(58,36,24,0.10);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .payment-feedback-icon svg {
+      width: 18px; height: 18px;
+      stroke: var(--rose); fill: none;
+      stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round;
+    }
+    .payment-feedback-icon.success-icon { background: rgba(217,107,124,0.10); }
+    .payment-feedback-icon.error-icon   { background: rgba(217,107,124,0.08); }
+    .payment-feedback-label {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--ink-mid);
+    }
+    .payment-feedback-label.error  { color: var(--rose); }
+    .payment-feedback-label.success { color: var(--rose); }
+    .payment-feedback-sub {
+      font-family: 'Spectral', Georgia, serif;
+      font-style: italic;
+      font-size: 12px;
+      color: var(--ink-lt);
+      text-align: center;
+      line-height: 1.5;
+    }
+    .payment-dots {
+      display: flex; gap: 4px; align-items: center;
+    }
+    .payment-dots span {
+      width: 4px; height: 4px; border-radius: 50%;
+      background: var(--rose); opacity: 0.3;
+      animation: ks-dot-pulse 1.2s ease-in-out infinite;
+    }
+    .payment-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .payment-dots span:nth-child(3) { animation-delay: 0.4s; }
+
     /* ── Loading state ── */
     @keyframes ks-breathe {
       0%, 100% { opacity: 1; }
@@ -678,7 +739,14 @@
 
   async function openRazorpay(amountPaise, numCredits, isLifetime, description) {
     const msg = document.getElementById("paymentMsg");
-    msg.innerHTML = `<div class="msg">Preparing payment…</div>`;
+    msg.innerHTML = `
+      <div class="payment-feedback">
+        <div class="payment-feedback-icon">
+          <svg viewBox="0 0 24 24"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        <div class="payment-feedback-label">Preparing your order</div>
+        <div class="payment-dots"><span></span><span></span><span></span></div>
+      </div>`;
 
     // Step 1: Create order server-side
     let order;
@@ -703,7 +771,14 @@
       order = await res.json();
     } catch (err) {
       console.error("Order creation failed:", err);
-      msg.innerHTML = `<div class="msg error">Could not initiate payment. Please try again.</div>`;
+      msg.innerHTML = `
+        <div class="payment-feedback">
+          <div class="payment-feedback-icon error-icon">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+          <div class="payment-feedback-label error">Could not initiate payment</div>
+          <div class="payment-feedback-sub">Please try again in a moment.</div>
+        </div>`;
       return;
     }
 
@@ -722,7 +797,14 @@
 
       // Step 3: On success, verify signature server-side before adding credits
       handler: async function (response) {
-        msg.innerHTML = `<div class="msg">Verifying payment…</div>`;
+        msg.innerHTML = `
+          <div class="payment-feedback">
+            <div class="payment-feedback-icon">
+              <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div class="payment-feedback-label">Verifying payment</div>
+            <div class="payment-dots"><span></span><span></span><span></span></div>
+          </div>`;
         try {
           const verifyRes = await fetch(
             `${SUPABASE_URL}/functions/v1/verify-razorpay-payment`,
@@ -747,14 +829,36 @@
           const result = await verifyRes.json();
           if (!verifyRes.ok || !result.success) {
             const payId = escHtml(response.razorpay_payment_id);
-            msg.innerHTML = `<div class="msg error">${result.error || "Verification failed"} — contact support with payment ID: ${payId}</div>`;
+            msg.innerHTML = `
+              <div class="payment-feedback">
+                <div class="payment-feedback-icon error-icon">
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                </div>
+                <div class="payment-feedback-label error">${result.error || "Verification failed"}</div>
+                <div class="payment-feedback-sub">Contact support with payment ID:<br><strong>${payId}</strong></div>
+              </div>`;
           } else {
-            msg.innerHTML = `<div class="msg success">✦ ${isLifetime ? "Lifetime plan activated!" : `${escHtml(String(numCredits))} letter${numCredits > 1 ? "s" : ""} added!`}</div>`;
+            const successText = isLifetime ? "Lifetime plan activated!" : `${escHtml(String(numCredits))} letter${numCredits > 1 ? "s" : ""} added!`;
+            msg.innerHTML = `
+              <div class="payment-feedback">
+                <div class="payment-feedback-icon success-icon">
+                  <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <div class="payment-feedback-label success">✦ ${successText}</div>
+                <div class="payment-feedback-sub">Your credits have been updated.</div>
+              </div>`;
             await loadAndRender();
           }
         } catch (err) {
           console.error("Verification error:", err);
-          msg.innerHTML = `<div class="msg error">Payment may have succeeded but verification failed — contact support with ID: ${escHtml(response.razorpay_payment_id)}</div>`;
+          msg.innerHTML = `
+            <div class="payment-feedback">
+              <div class="payment-feedback-icon error-icon">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              </div>
+              <div class="payment-feedback-label error">Verification error</div>
+              <div class="payment-feedback-sub">Payment may have gone through — contact support with ID:<br><strong>${escHtml(response.razorpay_payment_id)}</strong></div>
+            </div>`;
         }
       },
 
@@ -767,7 +871,14 @@
 
     const rzp = new window.Razorpay(options);
     rzp.on("payment.failed", (resp) => {
-      msg.innerHTML = `<div class="msg error">Payment failed: ${escHtml(resp.error?.description || "Unknown error")}</div>`;
+      msg.innerHTML = `
+        <div class="payment-feedback">
+          <div class="payment-feedback-icon error-icon">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+          <div class="payment-feedback-label error">Payment failed</div>
+          <div class="payment-feedback-sub">${escHtml(resp.error?.description || "Something went wrong. Please try again.")}</div>
+        </div>`;
     });
     rzp.open();
   }
