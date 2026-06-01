@@ -666,15 +666,14 @@
       display: block;
     }
 
-    /* Flower illustration overlay — right half of each stamp */
+    /* Flower illustration overlay — anchored to bottom-right of each stamp */
     .stamp-flower {
       position: absolute;
-      right: -2%;
-      bottom: -4%;
-      width: 46%;
-      height: 108%;
-      object-fit: contain;
-      object-position: bottom right;
+      right: 3%;
+      bottom: 0;
+      height: 92%;
+      width: auto;
+      display: block;
       mix-blend-mode: multiply;
       pointer-events: none;
       z-index: 1;
@@ -1032,7 +1031,7 @@
 
     <div class="stamp-card pink">
       <img src="stamp-pink.png" alt="Pin a note to any moment" />
-      <img class="stamp-flower" src="rose 2.png" alt="" aria-hidden="true" />
+      <img class="stamp-flower" src="rose%202.png" alt="" aria-hidden="true" />
       <div class="stamp-overlay">
         <div class="stamp-num">01</div>
         <div class="stamp-title">Pin a note to any moment</div>
