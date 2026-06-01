@@ -350,6 +350,7 @@
     /* ── First-screen wrapper — nav + hero + scroll cue fill the viewport ── */
     .first-screen {
       height: 100vh;
+      height: 100svh; /* excludes mobile browser chrome (iOS Safari safe) */
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -820,6 +821,17 @@
       }
     }
 
+    @media (max-width: 768px) {
+      /* iOS Safari: background-attachment:fixed causes repaint jank / blank bg */
+      html, body { background-attachment: scroll; }
+
+      /* Scroll cue is a desktop affordance — unnecessary on touch */
+      .scroll-cue { display: none; }
+
+      /* Breathe room in FAQ on narrower screens */
+      .faq-wrap { padding: 24px 20px 48px; }
+    }
+
     @media (max-width: 520px) {
       nav { padding: 16px 20px; }
       .page-top, .features { padding-left: 16px; padding-right: 16px; }
@@ -830,6 +842,22 @@
         font-size: clamp(4.5px, 1.8vw, 6.5px);
         padding: 2px clamp(4px, 1.5vw, 7px);
       }
+
+      /* Hide nav text links — only logo + CTA needed on small screens */
+      .nav-link { display: none; }
+
+      /* Larger tap target for the CTA pill */
+      .nav-cta {
+        padding: 11px 18px;
+        font-size: 9px;
+        letter-spacing: 0.08em;
+      }
+
+      /* Reduce Montserrat letter-spacing — 0.1em gets cramped at small sizes */
+      .btn-primary { letter-spacing: 0.08em; }
+
+      /* Tighten FAQ padding further */
+      .faq-wrap { padding: 20px 16px 40px; }
     }
 
     /* ── FAQ section ── */
@@ -883,6 +911,7 @@
       align-items: center;
       gap: 16px;
       padding: 17px 22px;
+      min-height: 44px; /* touch target floor */
       background: none;
       border: none;
       cursor: pointer;
