@@ -655,10 +655,10 @@
       align-items: stretch;
     }
 
-    /* No card container — stamp image IS the card.
-       No overflow:hidden — flowers intentionally bleed past the stamp edge. */
+    /* No card container — stamp image IS the card */
     .stamp-card {
       position: relative;
+      overflow: hidden;
     }
     .stamp-card > img:first-child {
       width: 100%;
@@ -667,16 +667,17 @@
     }
 
     /*
-      Flower overlay — anchored bottom-right, bleeding past the stamp edge
-      intentionally (matching the reference). Width ~32% of stamp width;
-      since stamps are 2:1 and flowers are portrait, the illustration
-      naturally extends above the stamp top for a layered editorial look.
+      Flower overlay — anchored top-right, clipped by stamp boundary.
+      Width 36%: at 2:1 stamp ratio the portrait illustrations (~0.37–0.53)
+      are ~130–190% of stamp height, so the blooms (top of each image)
+      show in roughly the upper third and stems trail down and get cut off.
+      right:4% keeps the illustration clear of the perforated edge.
     */
     .stamp-flower {
       position: absolute;
-      right: -4%;
-      bottom: -4%;
-      width: 32%;
+      right: 4%;
+      top: 0;
+      width: 36%;
       height: auto;
       display: block;
       pointer-events: none;
