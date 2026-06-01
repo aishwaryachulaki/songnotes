@@ -666,29 +666,35 @@
       display: block;
     }
 
-    /* Flower illustration overlay — anchored top-right, overflow clipped by stamp.
-       Images are transparent PNGs so no blend mode needed — just tint the lines. */
+    /* Flower illustration overlay — anchored top-right, overflow clipped by stamp. */
     .stamp-flower {
       position: absolute;
       right: 2%;
       top: -3%;
-      width: 42%;
+      width: 28%;
       height: auto;
       display: block;
       pointer-events: none;
     }
 
-    /* Tint black lines to a darker shade of each stamp's colour family.
-       sepia converts black to warm dark brown; hue-rotate steers the hue;
-       saturate adds richness; brightness keeps lines darker than the stamp. */
-    .stamp-card.pink   .stamp-flower {
-      filter: sepia(1) hue-rotate(318deg) saturate(2.8) brightness(0.55);
+    /*
+      Tinting technique: sepia/hue-rotate can't tint pure black (0,0,0) because
+      all colour-matrix operations on 0 return 0. Fix: invert(0.5) first shifts
+      black → mid-gray, giving the subsequent sepia+hue-rotate actual colour to
+      shift. Final invert(1) flips back so lines are dark, not washed out.
+      brightness at the end controls how dark vs the stamp background.
+    */
+    .stamp-card.pink .stamp-flower {
+      /* mid-gray → sepia tan → hue-rotate into rose/mauve range → darken */
+      filter: invert(0.5) sepia(1) hue-rotate(300deg) saturate(4) brightness(0.6);
     }
     .stamp-card.yellow .stamp-flower {
-      filter: sepia(1) saturate(2.2) brightness(0.55);
+      /* sepia is naturally warm amber — good match for the golden yellow stamp */
+      filter: invert(0.5) sepia(1) saturate(3.5) brightness(0.58);
     }
-    .stamp-card.olive  .stamp-flower {
-      filter: sepia(1) hue-rotate(12deg) saturate(2.4) brightness(0.52);
+    .stamp-card.olive .stamp-flower {
+      /* hue-rotate(90deg) pushes sepia tan into olive-green territory */
+      filter: invert(0.5) sepia(1) hue-rotate(90deg) saturate(3.5) brightness(0.52);
     }
 
     /* Ensure text overlay sits above flower */
