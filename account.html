@@ -475,6 +475,19 @@
     if (!session) { window.location.href = "auth.html"; return; }
     currentUser = session.user;
     currentAccessToken = session.access_token;
+
+    // Warm up the Edge Function in the background so it's ready when user clicks buy
+    fetch(`${SUPABASE_URL}/functions/v1/create-razorpay-order`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": SUPABASE_KEY,
+        "Authorization": `Bearer ${currentAccessToken}`,
+        "x-warmup": "1",
+      },
+      body: JSON.stringify({ warmup: true }),
+    }).catch(() => {}); // silently ignore — this is best-effort only
+
     await loadAndRender();
   })();
 

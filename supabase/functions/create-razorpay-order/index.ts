@@ -17,7 +17,17 @@ serve(async (req) => {
   }
 
   try {
-    const { amount, currency = "INR", receipt } = await req.json();
+    const body = await req.json();
+
+    // Warmup ping — just wake the function, no Razorpay call needed
+    if (body.warmup) {
+      return new Response(JSON.stringify({ ok: true }), {
+        status: 200,
+        headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
+      });
+    }
+
+    const { amount, currency = body.currency ?? "INR", receipt } = body;
 
     if (!amount || amount < 100) {
       return new Response(
