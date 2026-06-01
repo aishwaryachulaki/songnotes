@@ -666,17 +666,16 @@
       display: block;
     }
 
-    /* Flower illustration overlay — anchored to bottom-right of each stamp */
+    /* Flower illustration overlay — anchored top-right, overflow clipped by stamp */
     .stamp-flower {
       position: absolute;
-      right: 3%;
-      bottom: 0;
-      height: 92%;
-      width: auto;
+      right: 2%;
+      top: -3%;
+      width: 42%;
+      height: auto;
       display: block;
       mix-blend-mode: multiply;
       pointer-events: none;
-      z-index: 1;
     }
 
     /* Per-stamp tinting: sepia turns black lines warm,
@@ -693,7 +692,7 @@
     }
 
     /* Ensure text overlay sits above flower */
-    .stamp-overlay { z-index: 2; }
+    .stamp-overlay { position: relative; z-index: 1; }
 
     /* Text sits over the left ~55% of the stamp (florals live bottom-right) */
     .stamp-overlay {
