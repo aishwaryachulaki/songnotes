@@ -666,35 +666,43 @@
       display: block;
     }
 
-    /* Flower illustration overlay — anchored top-right, overflow clipped by stamp. */
+    /*
+      Flower overlay — constrained to fit inside the stamp.
+      Stamps are 2:1, flowers are portrait (~0.37–0.53:1).
+      max-width:26% + max-height:88% together guarantee the tallest flower
+      (flower.png, ratio 0.37) resolves to ≤88% of stamp height.
+      width/height both auto so the browser preserves aspect ratio.
+    */
     .stamp-flower {
       position: absolute;
-      right: 2%;
-      top: -3%;
-      width: 28%;
+      right: 3%;
+      top: 5%;
+      width: auto;
       height: auto;
+      max-width: 26%;
+      max-height: 88%;
       display: block;
       pointer-events: none;
     }
 
     /*
-      Tinting technique: sepia/hue-rotate can't tint pure black (0,0,0) because
-      all colour-matrix operations on 0 return 0. Fix: invert(0.5) first shifts
-      black → mid-gray, giving the subsequent sepia+hue-rotate actual colour to
-      shift. Final invert(1) flips back so lines are dark, not washed out.
-      brightness at the end controls how dark vs the stamp background.
+      Colour: invert(0.38) converts pure-black lines to ~38% gray so the
+      sepia/hue-rotate chain has non-zero values to shift. Then we steer
+      each stamp's hue with a small rotation and keep saturation low +
+      brightness high so the result stays muted/pastel — just a notch
+      darker than the stamp rather than a vivid contrasting colour.
     */
     .stamp-card.pink .stamp-flower {
-      /* mid-gray → sepia tan → hue-rotate into rose/mauve range → darken */
-      filter: invert(0.5) sepia(1) hue-rotate(300deg) saturate(4) brightness(0.6);
+      /* sepia tan → hue-rotate 308° → dusty rose; keep saturation low */
+      filter: invert(0.38) sepia(1) hue-rotate(308deg) saturate(1.1) brightness(1.4);
     }
     .stamp-card.yellow .stamp-flower {
-      /* sepia is naturally warm amber — good match for the golden yellow stamp */
-      filter: invert(0.5) sepia(1) saturate(3.5) brightness(0.58);
+      /* sepia is naturally warm amber — no rotation needed */
+      filter: invert(0.38) sepia(1) saturate(1.1) brightness(1.35);
     }
     .stamp-card.olive .stamp-flower {
-      /* hue-rotate(90deg) pushes sepia tan into olive-green territory */
-      filter: invert(0.5) sepia(1) hue-rotate(90deg) saturate(3.5) brightness(0.52);
+      /* small 32° rotation shifts sepia tan (34°) to ~66° = olive, not green */
+      filter: invert(0.38) sepia(1) hue-rotate(32deg) saturate(0.8) brightness(1.15);
     }
 
     /* Ensure text overlay sits above flower */
