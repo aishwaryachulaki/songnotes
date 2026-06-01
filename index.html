@@ -658,12 +658,43 @@
     /* No card container — stamp image IS the card */
     .stamp-card {
       position: relative;
+      overflow: hidden;
     }
-    .stamp-card img {
+    .stamp-card > img:first-child {
       width: 100%;
       height: auto;
       display: block;
     }
+
+    /* Flower illustration overlay — right half of each stamp */
+    .stamp-flower {
+      position: absolute;
+      right: -2%;
+      bottom: -4%;
+      width: 46%;
+      height: 108%;
+      object-fit: contain;
+      object-position: bottom right;
+      mix-blend-mode: multiply;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Per-stamp tinting: sepia turns black lines warm,
+       hue-rotate shifts towards each stamp's hue,
+       saturate adds richness, brightness darkens below stamp level */
+    .stamp-card.pink   .stamp-flower {
+      filter: sepia(1) hue-rotate(318deg) saturate(2.8) brightness(0.42);
+    }
+    .stamp-card.yellow .stamp-flower {
+      filter: sepia(1) saturate(2.2) brightness(0.44);
+    }
+    .stamp-card.olive  .stamp-flower {
+      filter: sepia(1) hue-rotate(12deg) saturate(2.4) brightness(0.44);
+    }
+
+    /* Ensure text overlay sits above flower */
+    .stamp-overlay { z-index: 2; }
 
     /* Text sits over the left ~55% of the stamp (florals live bottom-right) */
     .stamp-overlay {
@@ -1001,6 +1032,7 @@
 
     <div class="stamp-card pink">
       <img src="stamp-pink.png" alt="Pin a note to any moment" />
+      <img class="stamp-flower" src="rose 2.png" alt="" aria-hidden="true" />
       <div class="stamp-overlay">
         <div class="stamp-num">01</div>
         <div class="stamp-title">Pin a note to any moment</div>
@@ -1010,6 +1042,7 @@
 
     <div class="stamp-card yellow">
       <img src="stamp-yellow.png" alt="Send one small link" />
+      <img class="stamp-flower" src="sunflower.png" alt="" aria-hidden="true" />
       <div class="stamp-overlay">
         <div class="stamp-num">02</div>
         <div class="stamp-title">Send one small link</div>
@@ -1019,6 +1052,7 @@
 
     <div class="stamp-card olive">
       <img src="stamp-olive.png" alt="It appears, right on cue" />
+      <img class="stamp-flower" src="flower.png" alt="" aria-hidden="true" />
       <div class="stamp-overlay">
         <div class="stamp-num">03</div>
         <div class="stamp-title">It appears, right on cue</div>
