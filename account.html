@@ -467,12 +467,14 @@
 
   let activeTier = 4; // resolved in loadAndRender after DB fetch
   let currentUser = null;
+  let currentAccessToken = null;
   let creditsData = null;
 
   (async () => {
     const { data: { session } } = await sb.auth.getSession();
     if (!session) { window.location.href = "auth.html"; return; }
     currentUser = session.user;
+    currentAccessToken = session.access_token;
     await loadAndRender();
   })();
 
@@ -672,7 +674,11 @@
         `${SUPABASE_URL}/functions/v1/create-razorpay-order`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json", "apikey": SUPABASE_KEY },
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": SUPABASE_KEY,
+            "Authorization": `Bearer ${currentAccessToken}`,
+          },
           body: JSON.stringify({
             amount: amountPaise,
             currency: "INR",
@@ -709,7 +715,11 @@
             `${SUPABASE_URL}/functions/v1/verify-razorpay-payment`,
             {
               method: "POST",
-              headers: { "Content-Type": "application/json", "apikey": SUPABASE_KEY },
+              headers: {
+                "Content-Type": "application/json",
+                "apikey": SUPABASE_KEY,
+                "Authorization": `Bearer ${currentAccessToken}`,
+              },
               body: JSON.stringify({
                 razorpay_order_id:   response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
