@@ -260,6 +260,107 @@
       font-style: italic; font-size: 12.5px; color: var(--ink-mid); margin-top: 2px;
     }
 
+    /* ── Danger zone ── */
+    .danger-zone {
+      border: 1.5px solid rgba(217,107,124,0.20);
+      border-radius: 14px;
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .danger-zone-label {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9.5px; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--rose); opacity: 0.6;
+    }
+    .danger-zone-title {
+      font-size: 14px; font-weight: 700; color: var(--ink);
+    }
+    .danger-zone-sub {
+      font-family: 'Spectral', Georgia, serif;
+      font-style: italic; font-size: 12.5px;
+      color: var(--ink-mid); line-height: 1.5;
+    }
+    .btn-delete {
+      align-self: flex-start;
+      margin-top: 4px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10.5px; font-weight: 600;
+      letter-spacing: 0.06em;
+      padding: 8px 16px; border-radius: 8px;
+      border: 1.5px solid rgba(217,107,124,0.35);
+      background: transparent; color: var(--rose);
+      cursor: pointer; transition: background 0.15s, border-color 0.15s;
+    }
+    .btn-delete:hover {
+      background: rgba(217,107,124,0.08);
+      border-color: var(--rose);
+    }
+
+    /* ── Delete confirmation modal ── */
+    .delete-modal-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(58,36,24,0.45);
+      backdrop-filter: blur(3px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 999;
+      animation: ks-payment-fade-in 0.2s ease both;
+    }
+    .delete-modal {
+      background: var(--cream);
+      border: 1.5px solid rgba(58,36,24,0.10);
+      border-radius: 18px;
+      padding: 32px 28px 28px;
+      max-width: 360px; width: 90%;
+      display: flex; flex-direction: column; gap: 14px;
+      box-shadow: 0 8px 48px rgba(58,36,24,0.15);
+    }
+    .delete-modal-icon {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: rgba(217,107,124,0.10);
+      border: 1.5px solid rgba(217,107,124,0.20);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 2px;
+    }
+    .delete-modal-icon svg {
+      width: 20px; height: 20px;
+      stroke: var(--rose); fill: none;
+      stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round;
+    }
+    .delete-modal h3 {
+      font-size: 18px; font-weight: 700; color: var(--ink); line-height: 1.2;
+    }
+    .delete-modal p {
+      font-family: 'Spectral', Georgia, serif;
+      font-style: italic; font-size: 13px;
+      color: var(--ink-mid); line-height: 1.6;
+    }
+    .delete-modal-actions {
+      display: flex; gap: 10px; margin-top: 4px;
+    }
+    .btn-cancel {
+      flex: 1;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
+      padding: 10px; border-radius: 8px;
+      border: 1.5px solid rgba(58,36,24,0.12);
+      background: transparent; color: var(--ink-mid);
+      cursor: pointer; transition: background 0.15s;
+    }
+    .btn-cancel:hover { background: rgba(58,36,24,0.05); }
+    .btn-confirm-delete {
+      flex: 1;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+      padding: 10px; border-radius: 8px;
+      border: none; background: var(--rose); color: white;
+      cursor: pointer; transition: opacity 0.15s;
+    }
+    .btn-confirm-delete:hover { opacity: 0.85; }
+    .btn-confirm-delete:disabled { opacity: 0.5; cursor: not-allowed; }
+
     /* ── Footer links ── */
     .footer-links {
       text-align: center;
@@ -695,6 +796,13 @@
       <div class="section-header"><span>Purchase history</span></div>
       <div class="history-card">${purchaseRows}</div>
 
+      <div class="danger-zone">
+        <div class="danger-zone-label">Danger zone</div>
+        <div class="danger-zone-title">Delete account</div>
+        <div class="danger-zone-sub">Permanently deletes your account, all your notes, sent letters, and credits. This cannot be undone.</div>
+        <button class="btn-delete" id="deleteAccountBtn">Delete my account</button>
+      </div>
+
       <div class="footer-links">
         <a href="privacy.html" target="_blank">Privacy Policy</a>
         &nbsp;·&nbsp;
@@ -725,6 +833,66 @@
     document.getElementById("lifetimeCard").addEventListener("click", () => {
       const lt = TIERS[activeTier].lifetime;
       handlePurchase(lt.price_units, 0, true, "Lifetime Plan");
+    });
+
+    // ── Account deletion ──
+    document.getElementById("deleteAccountBtn").addEventListener("click", () => {
+      const backdrop = document.createElement("div");
+      backdrop.className = "delete-modal-backdrop";
+      backdrop.innerHTML = `
+        <div class="delete-modal">
+          <div class="delete-modal-icon">
+            <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          </div>
+          <h3>Delete your account?</h3>
+          <p>This will permanently delete your account, all your notes, sent letters, and any remaining credits. This cannot be undone.</p>
+          <div class="delete-modal-actions">
+            <button class="btn-cancel" id="cancelDelete">Cancel</button>
+            <button class="btn-confirm-delete" id="confirmDelete">Yes, delete</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(backdrop);
+
+      document.getElementById("cancelDelete").addEventListener("click", () => {
+        backdrop.remove();
+      });
+
+      backdrop.addEventListener("click", (e) => {
+        if (e.target === backdrop) backdrop.remove();
+      });
+
+      document.getElementById("confirmDelete").addEventListener("click", async () => {
+        const btn = document.getElementById("confirmDelete");
+        btn.disabled = true;
+        btn.textContent = "Deleting…";
+
+        try {
+          // Delete all user data via RPC, then delete the auth user
+          const { error: rpcError } = await sb.rpc("delete_user_account", {
+            p_user_id: currentUser.id,
+          });
+          if (rpcError) throw rpcError;
+
+          // Sign out and clear extension session
+          await sb.auth.signOut();
+          window.dispatchEvent(new CustomEvent("keepsake:signout"));
+          await new Promise(r => setTimeout(r, 600));
+          window.location.href = "index.html";
+        } catch (err) {
+          console.error("Account deletion failed:", err);
+          btn.disabled = false;
+          btn.textContent = "Yes, delete";
+          const modal = backdrop.querySelector(".delete-modal");
+          const existing = modal.querySelector(".delete-error");
+          if (existing) existing.remove();
+          const errDiv = document.createElement("div");
+          errDiv.className = "delete-error";
+          errDiv.style.cssText = "font-family:'Montserrat',sans-serif;font-size:11px;color:var(--rose);text-align:center;";
+          errDiv.textContent = "Something went wrong. Please contact hello@dropakeepsake.com";
+          modal.appendChild(errDiv);
+        }
+      });
     });
   }
 
