@@ -666,7 +666,8 @@
       display: block;
     }
 
-    /* Flower illustration overlay — anchored top-right, overflow clipped by stamp */
+    /* Flower illustration overlay — anchored top-right, overflow clipped by stamp.
+       Images are transparent PNGs so no blend mode needed — just tint the lines. */
     .stamp-flower {
       position: absolute;
       right: 2%;
@@ -674,21 +675,20 @@
       width: 42%;
       height: auto;
       display: block;
-      mix-blend-mode: multiply;
       pointer-events: none;
     }
 
-    /* Per-stamp tinting: sepia turns black lines warm,
-       hue-rotate shifts towards each stamp's hue,
-       saturate adds richness, brightness darkens below stamp level */
+    /* Tint black lines to a darker shade of each stamp's colour family.
+       sepia converts black to warm dark brown; hue-rotate steers the hue;
+       saturate adds richness; brightness keeps lines darker than the stamp. */
     .stamp-card.pink   .stamp-flower {
-      filter: sepia(1) hue-rotate(318deg) saturate(2.8) brightness(0.42);
+      filter: sepia(1) hue-rotate(318deg) saturate(2.8) brightness(0.55);
     }
     .stamp-card.yellow .stamp-flower {
-      filter: sepia(1) saturate(2.2) brightness(0.44);
+      filter: sepia(1) saturate(2.2) brightness(0.55);
     }
     .stamp-card.olive  .stamp-flower {
-      filter: sepia(1) hue-rotate(12deg) saturate(2.4) brightness(0.44);
+      filter: sepia(1) hue-rotate(12deg) saturate(2.4) brightness(0.52);
     }
 
     /* Ensure text overlay sits above flower */
@@ -1030,7 +1030,7 @@
 
     <div class="stamp-card pink">
       <img src="stamp-pink.png" alt="Pin a note to any moment" />
-      <img class="stamp-flower" src="rose%202.png" alt="" aria-hidden="true" />
+      <img class="stamp-flower" src="rose2.png" alt="" aria-hidden="true" />
       <div class="stamp-overlay">
         <div class="stamp-num">01</div>
         <div class="stamp-title">Pin a note to any moment</div>
