@@ -706,7 +706,7 @@
       /* 32° rotation: sepia tan (34°) → olive (66°), darker at ~L43 vs stamp L63 */
       filter: invert(0.45) sepia(1) hue-rotate(32deg) saturate(0.9) brightness(0.85);
       /* crop bottom ~30% — cuts off the leafy stem base */
-      clip-path: inset(0 0 30% 0);
+      clip-path: inset(0 0 calc(30% - 15px) 0);
     }
 
     /* Ensure text overlay sits above flower */
