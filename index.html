@@ -825,6 +825,10 @@
       /* iOS Safari: background-attachment:fixed causes repaint jank / blank bg */
       html, body { background-attachment: scroll; }
 
+      /* Without the illustration and scroll cue, the fixed viewport height
+         leaves a large empty gap — let content determine height instead */
+      .first-screen { height: auto; }
+
       /* Scroll cue is a desktop affordance — unnecessary on touch */
       .scroll-cue { display: none; }
 
