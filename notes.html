@@ -129,14 +129,38 @@
     .share-card:hover { filter: brightness(0.97); }
 
     /* Sent tab colours */
-    .sent-list .share-card:nth-child(3n+1) { background: url('faq-bg-yellow.png') top / cover no-repeat; color: #4a3800; }
-    .sent-list .share-card:nth-child(3n+2) { background: url('faq-bg-pink.png') top / cover no-repeat; color: #5c2d2d; }
+    .sent-list .share-card:nth-child(3n+1) { background: url('faq-bg-yellow.png') center / cover no-repeat; color: #4a3800; }
+    .sent-list .share-card:nth-child(3n+2) { background: url('faq-bg-pink.png') center / cover no-repeat; color: #5c2d2d; }
     .sent-list .share-card:nth-child(3n+3) { background: url('faq-bg-olive.png')  center / cover no-repeat; color: #363614; }
 
     /* Received tab colours */
-    .received-list .share-card:nth-child(3n+1) { background: url('faq-bg-pink.png') top / cover no-repeat; color: #5c2d2d; }
+    .received-list .share-card:nth-child(3n+1) { background: url('faq-bg-pink.png') center / cover no-repeat; color: #5c2d2d; }
     .received-list .share-card:nth-child(3n+2) { background: url('faq-bg-olive.png')  center / cover no-repeat; color: #363614; }
-    .received-list .share-card:nth-child(3n+3) { background: url('faq-bg-yellow.png') top / cover no-repeat; color: #4a3800; }
+    .received-list .share-card:nth-child(3n+3) { background: url('faq-bg-yellow.png') center / cover no-repeat; color: #4a3800; }
+
+    /* Floral watermark — bottom-right, very faint */
+    .share-card::before {
+      content: '';
+      position: absolute;
+      bottom: -4%;
+      right: -4%;
+      width: 58%;
+      height: 88%;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: bottom right;
+      opacity: 0.12;
+      pointer-events: none;
+    }
+    /* Yellow cards → sunflower */
+    .sent-list .share-card:nth-child(3n+1)::before,
+    .received-list .share-card:nth-child(3n+3)::before { background-image: url('sunflower.png'); }
+    /* Pink cards → rose */
+    .sent-list .share-card:nth-child(3n+2)::before,
+    .received-list .share-card:nth-child(3n+1)::before { background-image: url('rose2.png'); }
+    /* Olive cards → marigold */
+    .sent-list .share-card:nth-child(3n+3)::before,
+    .received-list .share-card:nth-child(3n+2)::before { background-image: url('marigold.png'); }
 
     /* ✦ top-right */
     .share-card::after {
