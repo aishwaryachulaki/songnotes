@@ -138,17 +138,18 @@
     .received-list .share-card:nth-child(3n+2) { background: url('faq-bg-olive.png')  center / cover no-repeat; color: #363614; }
     .received-list .share-card:nth-child(3n+3) { background: url('faq-bg-yellow.png') center / cover no-repeat; color: #4a3800; }
 
-    /* Floral watermark — bottom-right, very faint */
+    /* Floral watermark — centred, sized to stay clear of text and buttons */
     .share-card::before {
       content: '';
       position: absolute;
-      bottom: -4%;
-      right: -4%;
-      width: 58%;
-      height: 88%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 46%;
+      height: 68%;
       background-size: contain;
       background-repeat: no-repeat;
-      background-position: bottom right;
+      background-position: center;
       opacity: 0.12;
       pointer-events: none;
     }
