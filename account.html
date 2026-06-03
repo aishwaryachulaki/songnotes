@@ -92,6 +92,18 @@
       color: #4a3800;
       box-shadow: inset 0 0 0 1px rgba(240,223,160,0.6);
     }
+    .hero-card::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 40%;
+      height: 80%;
+      background: url('poppy.png') center / contain no-repeat;
+      opacity: 0.10;
+      pointer-events: none;
+    }
     .hero-content { position: relative; z-index: 1; }
     .hero-eyebrow {
       font-family: 'Montserrat', sans-serif;
