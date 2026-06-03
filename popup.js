@@ -358,19 +358,17 @@ async function deleteNoteRemote(id, accessToken) {
   } catch {}
 }
 
-async function fetchShareNotes(id) {
-  const url = `${SUPABASE_URL}/rest/v1/annotations?share_id=eq.${encodeURIComponent(id)}&select=*`;
+// Reads go through the get_share() RPC: it returns ONE letter by its id and
+// bypasses RLS safely, so direct table reads can stay locked to owners/recipients.
+async function fetchShareBundle(id) {
+  const url = `${SUPABASE_URL}/rest/v1/rpc/get_share?p_share_id=${encodeURIComponent(id)}`;
   const res = await fetch(url, { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } });
-  if (!res.ok) return [];
-  return await res.json();
+  if (!res.ok) return { meta: null, notes: [] };
+  const b = await res.json().catch(() => null);
+  return { meta: b && b.meta ? b.meta : null, notes: b && Array.isArray(b.notes) ? b.notes : [] };
 }
-async function fetchShareMeta(id) {
-  const url = `${SUPABASE_URL}/rest/v1/shares?id=eq.${encodeURIComponent(id)}&select=*`;
-  const res = await fetch(url, { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } });
-  if (!res.ok) return null;
-  const arr = await res.json();
-  return arr[0] || null;
-}
+async function fetchShareNotes(id) { return (await fetchShareBundle(id)).notes; }
+async function fetchShareMeta(id)  { return (await fetchShareBundle(id)).meta; }
 
 function shareUrl(id) {
   if (!shareOrigin) return id; // no host yet — just show the ID

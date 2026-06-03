@@ -476,12 +476,12 @@
     }
 
     try {
-      const [rawMeta, rawNotes] = await Promise.all([
-        fetchJson(`${SUPABASE_URL}/rest/v1/shares?id=eq.${encodeURIComponent(shareId)}&select=*`)
-          .then(r => (Array.isArray(r) ? r[0] : null)),
-        fetchJson(`${SUPABASE_URL}/rest/v1/annotations?share_id=eq.${encodeURIComponent(shareId)}&select=*`)
-          .then(r => Array.isArray(r) ? r : []),
-      ]);
+      // One letter by its id via the get_share() RPC (bypasses RLS safely);
+      // direct table reads are locked to owners/recipients, so this is the
+      // only public read path — and it can't enumerate other letters.
+      const bundle = await fetchJson(`${SUPABASE_URL}/rest/v1/rpc/get_share?p_share_id=${encodeURIComponent(shareId)}`);
+      const rawMeta = bundle && bundle.meta ? bundle.meta : null;
+      const rawNotes = bundle && Array.isArray(bundle.notes) ? bundle.notes : [];
 
       if (!rawNotes.length && !rawMeta) {
         showHeroError(`<strong>Letter not found</strong>This link may be invalid or the notes were removed.`);
