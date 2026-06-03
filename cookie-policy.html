@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cookie Policy — Keepsake</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@1,400&family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@500;600;700&display=swap" />
+  <style>
+    :root {
+      --butter:   #F4D9A6;
+      --cream:    #FFFBF4;
+      --blush:    #E36888;
+      --tangerine:#F08C21;
+      --ink:      #3a2418;
+      --ink-mid:  #8a5a48;
+      --ink-lt:   #c4977a;
+      --border:   rgba(58,36,24,0.10);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      background: var(--butter) url('background.png') center / cover no-repeat fixed;
+      font-family: 'Lora', Georgia, serif;
+      color: var(--ink);
+      min-height: 100vh;
+      padding: 48px 40px 80px;
+      line-height: 1.75;
+      overscroll-behavior: none;
+    }
+
+    .page {
+      max-width: 760px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    /* ── Header ── */
+    .site-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 48px;
+    }
+    .nav-logo {
+      font-family: 'Spectral', Georgia, serif;
+      font-style: italic; font-weight: 400; font-size: 26px;
+      color: var(--blush); text-decoration: none; letter-spacing: -0.01em;
+      display: flex; align-items: center; gap: 5px;
+      text-shadow: 0 1px 12px rgba(140,50,60,0.13);
+    }
+    .nav-logo .logo-spark {
+      font-style: normal; font-family: sans-serif;
+      font-size: 11px; color: var(--tangerine); font-weight: 400;
+      vertical-align: super; line-height: 0;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      background: var(--cream);
+      border-radius: 16px;
+      padding: 36px 36px 32px;
+      margin-bottom: 32px;
+      border: 1.5px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::after {
+      content: '✦';
+      position: absolute;
+      right: 28px; top: 28px;
+      font-size: 32px;
+      color: var(--blush);
+      opacity: 0.18;
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--blush); margin-bottom: 10px;
+    }
+    .hero h1 {
+      font-size: 26px; font-weight: 700; line-height: 1.25;
+      color: var(--ink); margin-bottom: 14px;
+    }
+    .hero-meta { font-size: 13px; color: var(--ink-mid); }
+
+    /* ── Policy content wrapper ── */
+    .policy-body {
+      background: var(--cream);
+      border-radius: 14px;
+      padding: 40px 44px;
+      margin-bottom: 12px;
+      border: 1.5px solid var(--border);
+    }
+
+    /* ── Footer ── */
+    .footer {
+      text-align: center; margin-top: 32px;
+      font-size: 12.5px; color: var(--ink-lt);
+    }
+    .footer a { color: var(--ink-lt); }
+
+    /* ── Termly overrides: apply Keepsake typography ── */
+    [data-custom-class='body'], [data-custom-class='body'] * {
+      background: transparent !important;
+    }
+    [data-custom-class='title'], [data-custom-class='title'] * {
+      font-family: 'Lora', Georgia, serif !important;
+      font-size: 22px !important; color: var(--ink) !important;
+    }
+    [data-custom-class='subtitle'], [data-custom-class='subtitle'] * {
+      font-family: 'Lora', Georgia, serif !important;
+      color: var(--ink-mid) !important; font-size: 13px !important;
+    }
+    [data-custom-class='heading_1'], [data-custom-class='heading_1'] * {
+      font-family: 'Lora', Georgia, serif !important;
+      font-size: 17px !important; color: var(--ink) !important;
+    }
+    [data-custom-class='heading_2'], [data-custom-class='heading_2'] * {
+      font-family: 'Lora', Georgia, serif !important;
+      font-size: 15px !important; color: var(--ink) !important;
+    }
+    [data-custom-class='body_text'], [data-custom-class='body_text'] * {
+      color: var(--ink) !important; font-size: 14px !important;
+      font-family: 'Lora', Georgia, serif !important;
+    }
+    [data-custom-class='link'], [data-custom-class='link'] * {
+      color: var(--tangerine) !important; font-size: 14px !important;
+      font-family: 'Lora', Georgia, serif !important;
+      word-break: break-word !important;
+    }
+
+    /* Termly content typography cleanup */
+    .policy-body h1 { display: none; }
+    .policy-body h2 {
+      font-size: 17px; font-weight: 700; color: var(--ink);
+      margin-top: 28px; margin-bottom: 10px; line-height: 1.35;
+    }
+    .policy-body h3 {
+      font-size: 15px; font-weight: 700; color: var(--ink);
+      margin-top: 22px; margin-bottom: 8px;
+    }
+    .policy-body p,
+    .policy-body div[style] {
+      font-size: 14px; color: var(--ink);
+      line-height: 1.75; margin-bottom: 8px;
+    }
+    .policy-body a { color: var(--tangerine); text-decoration: none; }
+    .policy-body a:hover { text-decoration: underline; }
+    .policy-body ul { margin: 8px 0 12px 20px; padding: 0; }
+    .policy-body li {
+      font-size: 14px; color: var(--ink);
+      margin-bottom: 5px; line-height: 1.65;
+    }
+    ul { list-style-type: square; }
+    ul > li > ul { list-style-type: circle; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <header class="site-header">
+    <a href="index.html" class="nav-logo">keepsake.<span class="logo-spark">✦</span></a>
+    <a href="index.html" style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-lt);text-decoration:none;opacity:0.7;">← Home</a>
+  </header>
+
+  <div class="hero">
+    <div class="hero-eyebrow">Legal</div>
+    <h1>Cookie Policy</h1>
+    <p class="hero-meta">Last updated: June 03, 2026 &nbsp;·&nbsp; How Keepsake uses cookies and similar technologies.</p>
+  </div>
+
+  <div class="policy-body">
+    <div data-custom-class="body">
+
+<div style="line-height: 1.5;"><span data-custom-class="body_text">This Cookie Policy explains how <strong>Aishwarya Prabhudev Chulaki</strong> ("<strong>Company</strong>," "<strong>we</strong>," "<strong>us</strong>," and "<strong>our</strong>") uses cookies and similar technologies to recognize you when you visit our website at <a target="_blank" data-custom-class="link" href="https://dropakeepsake.com">https://dropakeepsake.com</a> ("<strong>Website</strong>"). It explains what these technologies are and why we use them, as well as your rights to control our use of them.</span></div>
+<div style="line-height: 1.5;"><br></div>
+<div style="line-height: 1.5;"><span data-custom-class="body_text">In some cases we may use cookies to collect personal information, or that becomes personal information if we combine it with other information.</span></div>
+<div style="line-height: 1.5;"><br></div>
+
+<div style="line-height: 1.5;"><strong><span data-custom-class="heading_1"><h2>What are cookies?</h2></span></strong></div>
+<div style="line-height: 1.5;"><span data-custom-class="body_text">Cookies are small data files that are placed on your computer or mobile device when you visit a website. Cookies are widely used by website owners in order to make their websites work, or to work more efficiently, as well as to provide reporting information.</span></div>
+<div style="line-height: 1.5;"><br></div>
+<div style="line-height: 1.5;"><span data-custom-class="body_text">Cookies set by the website owner (in this case, Aishwarya Prabhudev Chulaki) are called "first-party cookies." Cookies set by parties other than the website owner are called "third-party cookies." Third-party cookies enable third-party features or functionality to be provided on or through the website (e.g., advertising, interactive content, and analytics). The parties that set these third-party cookies can recognize your computer both when it visits the website in question and also when it visits certain other websites.</span></div>
+<div style="line-height: 1.5;"><br></div>
+
+<div style="line-height: 1.5;"><strong><span data-custom-class="heading_1"><h2>Why do we use cookies?</h2></span></strong></div>
+<div style="line-height: 1.5;"><span data-custom-class="body_text">We use first- and third-party cookies for several reasons. Some cookies are required for technical reasons in order for our Website to operate, and we refer to these as "essential" or "strictly necessary" cookies. Other cookies also enable us to track and target the interests of our users to enhance the experience on our Online Properties. Third parties serve cookies through our Website for advertising, analytics, and other purposes.</span></div>
+<div style="line-height: 1.5;"><br></div>
+
+<div style="line-height: 1.5;"><strong><span data-custom-class="heading_1"><h2>How can I control cookies?</h2></span></strong></div>
+<div style="line-height: 1.5;"><span data-custom-class="body_text">You have the right to decide whether to accept or reject cookies. You can exercise your cookie rights by setting your preferences in the Cookie Preference Center. The Cookie Preference Center allows you to select which categories of cookies you accept or reject. Essential cookies cannot be rejected as they are strictly necessary to provide you with services.</span></div>
+<div style="line-height: 1.5;"><br></div>
+<div style="line-height: 1.5;"><span data-custom-class="body_text">The Cookie Preference Center can be found in the notification banner and on our Website. If you choose to reject cookies, you may still use our Website though your access to some functionality and areas of our Website may be restricted. You may also set or amend your web browser controls to accept or refuse cookies.</span></div>
+<div style="line-height: 1.5;"><br></div>
+<div style="line-height: 1.5;"><span data-custom-class="body_text">The specific types of first- and third-party cookies served through our Website and the purposes they perform are described in the table below (please note that the specific cookies served may vary depending on the specific Online Properties you visit):</span></div>
+<div style="line-height: 1.5;"><br></div>
+
+<div style="line-height: 1.5;"><strong><span data-custom-class="heading_1"><h2>How can I control cookies on my browser?</h2></span></strong></div>
+<div style="line-height: 1.5;"><span data-custom-class="body_text">As the means by which you can refuse cookies through your web browser controls vary from browser to browser, you should visit your browser's help menu for more information. The following is information about how to manage cookies on the most popular browsers:</span></div>
+<ul>
+  <li style="line-height: 1.5;"><a data-custom-class="link" href="https://support.google.com/chrome/answer/95647#zippy=%2Callow-or-block-cookies" rel="noopener noreferrer" target="_blank">Chrome</a></li>
+  <li style="line-height: 1.5;"><a data-custom-class="link" href="https://support.microsoft.com/en-us/windows/delete-and-manage-cookies-168dab11-0753-043d-7c16-ede5947fc64d" rel="noopener noreferrer" target="_blank">Internet Explorer</a></li>
+  <li style="line-height: 1.5;"><a data-custom-class="link" href="https://support.mozilla.org/en-US/kb/enhanced-tracking-protection-firefox-desktop?redirectslug=enable-and-disable-cookies-website-preferences&redirectlocale=en-US" rel="noopener noreferrer" target="_blank">Firefox</a></li>
+  <li style="line-height: 1.5;"><a data-custom-class="link" href="https://support.apple.com/en-ie/guide/safari/sfri11471/mac" rel="noopener noreferrer" target="_blank">Safari</a></li>
+  <li style="line-height: 1.5;"><a data-custom-class="link" href="https://support.microsoft.com/en-us/windows/microsoft-edge-browsing-data-and-privacy-bb8174ba-9d73-dcf2-9b4a-c582b4e640dd" rel="noopener noreferrer" target="_blank">Edge</a></li>
+  <li style="line-height: 1.5;"><a data-custom-class="link" href="https://help.opera.com/en/latest/web-preferences/" rel="noopener noreferrer" target="_blank">Opera</a></li>
+</ul>
+<div style="line-height: 1.5;"><span data-custom-class="body_text">In addition, most advertising networks offer you a way to opt out of targeted advertising. If you would like to find out more information, please visit:</span></div>
+<ul>
+  <li style="line-height: 1.5;"><a data-custom-class="link" href="http://www.aboutads.info/choices/" rel="noopener noreferrer" target="_blank">Digital Advertising Alliance</a></li>
+  <li style="line-height: 1.5;"><a data-custom-class="link" href="https://youradchoices.ca/" rel="noopener noreferrer" target="_blank">Digital Advertising Alliance of Canada</a></li>
+  <li style="line-height: 1.5;"><a data-custom-class="link" href="http://www.youronlinechoices.com/" rel="noopener noreferrer" target="_blank">European Interactive Digital Advertising Alliance</a></li>
+</ul>
+<div style="line-height: 1.5;"><br></div>
+
+<div style="line-height: 1.5;"><strong><span data-custom-class="heading_1"><h2>What about other tracking technologies, like web beacons?</h2></span></strong></div>
+<div style="line-height: 1.5;"><span data-custom-class="body_text">Cookies are not the only way to recognize or track visitors to a website. We may use other, similar technologies from time to time, like web beacons (sometimes called "tracking pixels" or "clear gifs"). These are tiny graphics files that contain a unique identifier that enables us to recognize when someone has visited our Website or opened an email including them. This allows us, for example, to monitor the traffic patterns of users from one page within a website to another, to deliver or communicate with cookies, to understand whether you have come to the website from an online advertisement displayed on a third-party website, to improve site performance, and to measure the success of email marketing campaigns. In many instances, these technologies are reliant on cookies to function properly, and so declining cookies will impair their functioning.</span></div>
+<div style="line-height: 1.5;"><br></div>
+
+<div style="line-height: 1.5;"><strong><span data-custom-class="heading_1"><h2>Do you use Flash cookies or Local Shared Objects?</h2></span></strong></div>
+<div style="line-height: 1.5;"><span data-custom-class="body_text">Websites may also use so-called "Flash Cookies" (also known as Local Shared Objects or "LSOs") to, among other things, collect and store information about your use of our services, fraud prevention, and for other site operations.</span></div>
+<div style="line-height: 1.5;"><br></div>
+<div style="line-height: 1.5;"><span data-custom-class="body_text">If you do not want Flash Cookies stored on your computer, you can adjust the settings of your Flash player to block Flash Cookies storage using the tools contained in the <a data-custom-class="link" href="http://www.macromedia.com/support/documentation/en/flashplayer/help/settings_manager07.html" rel="noopener noreferrer" target="_blank">Website Storage Settings Panel</a>. You can also control Flash Cookies by going to the <a data-custom-class="link" href="http://www.macromedia.com/support/documentation/en/flashplayer/help/settings_manager03.html" rel="noopener noreferrer" target="_blank">Global Storage Settings Panel</a> and following the instructions (which may include instructions that explain, for example, how to delete existing Flash Cookies, how to prevent Flash LSOs from being placed on your computer without your being asked, and how to block Flash Cookies that are not being delivered by the operator of the page you are on at the time).</span></div>
+<div style="line-height: 1.5;"><br></div>
+<div style="line-height: 1.5;"><span data-custom-class="body_text">Please note that setting the Flash Player to restrict or limit acceptance of Flash Cookies may reduce or impede the functionality of some Flash applications, including, potentially, Flash applications used in connection with our services or online content.</span></div>
+<div style="line-height: 1.5;"><br></div>
+
+<div style="line-height: 1.5;"><strong><span data-custom-class="heading_1"><h2>Do you serve targeted advertising?</h2></span></strong></div>
+<div style="line-height: 1.5;"><span data-custom-class="body_text">Third parties may serve cookies on your computer or mobile device to serve advertising through our Website. These companies may use information about your visits to this and other websites in order to provide relevant advertisements about goods and services that you may be interested in. They may also employ technology that is used to measure the effectiveness of advertisements. The information collected through this process does not enable us or them to identify your name, contact details, or other details that directly identify you unless you choose to provide these.</span></div>
+<div style="line-height: 1.5;"><br></div>
+
+<div style="line-height: 1.5;"><strong><span data-custom-class="heading_1"><h2>How often will you update this Cookie Policy?</h2></span></strong></div>
+<div style="line-height: 1.5;"><span data-custom-class="body_text">We may update this Cookie Policy from time to time in order to reflect, for example, changes to the cookies we use or for other operational, legal, or regulatory reasons. Please therefore revisit this Cookie Policy regularly to stay informed about our use of cookies and related technologies.</span></div>
+<div style="line-height: 1.5;"><br></div>
+<div style="line-height: 1.5;"><span data-custom-class="body_text">The date at the top of this Cookie Policy indicates when it was last updated.</span></div>
+<div style="line-height: 1.5;"><br></div>
+
+<div style="line-height: 1.5;"><strong><span data-custom-class="heading_1"><h2>Where can I get further information?</h2></span></strong></div>
+<div style="line-height: 1.5;"><span data-custom-class="body_text">If you have any questions about our use of cookies or other technologies, please contact us at <a href="mailto:hello@dropakeepsake.com" data-custom-class="link">hello@dropakeepsake.com</a>.</span></div>
+
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>Keepsake &nbsp;·&nbsp; <a href="privacy.html">Privacy Policy</a> &nbsp;·&nbsp; <a href="terms.html">Terms</a> &nbsp;·&nbsp; <a href="eula.html">EULA</a></p>
+  </footer>
+
+</div>
+</body>
+</html>
