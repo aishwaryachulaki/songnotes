@@ -281,6 +281,21 @@ async function fetchVaultKeys(accessToken) {
   if (!res.ok) return [];
   return res.json();
 }
+// The set of share ids this account legitimately owns or has received — used to
+// avoid wrapping keys that belong to a different account on the same device.
+async function fetchOwnedOrReceivedShareIds(accessToken, userId) {
+  const ids = new Set();
+  const hdrs = { apikey: SUPABASE_KEY, Authorization: `Bearer ${accessToken}` };
+  try {
+    const r1 = await fetch(`${SUPABASE_URL}/rest/v1/shares?user_id=eq.${encodeURIComponent(userId)}&select=id`, { headers: hdrs });
+    if (r1.ok) (await r1.json()).forEach((r) => ids.add(r.id));
+  } catch {}
+  try {
+    const r2 = await fetch(`${SUPABASE_URL}/rest/v1/received_shares?user_id=eq.${encodeURIComponent(userId)}&select=share_id`, { headers: hdrs });
+    if (r2.ok) (await r2.json()).forEach((r) => ids.add(r.share_id));
+  } catch {}
+  return ids;
+}
 
 // Set up (or re-set) the vault from THIS device, wrapping every local key.
 async function vaultSetup(passphrase) {
@@ -294,10 +309,13 @@ async function vaultSetup(passphrase) {
     { user_id: session.user.id, salt: saltB64, iterations, verifier, updated_at: new Date().toISOString() },
     session.access_token
   );
+  // Only wrap keys for letters this account actually owns or has received —
+  // never keys left in local storage from a different account on this device.
+  const allowed = await fetchOwnedOrReceivedShareIds(session.access_token, session.user.id);
   const { store } = await loadStore();
   const rows = [];
   for (const s of Object.values(store.shares || {})) {
-    if (s && s.id && s.enc_key) {
+    if (s && s.id && s.enc_key && allowed.has(s.id)) {
       rows.push({ user_id: session.user.id, share_id: s.id, wrapped_key: await encryptField(s.enc_key, masterKey) });
     }
   }
