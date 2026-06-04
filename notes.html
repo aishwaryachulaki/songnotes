@@ -394,6 +394,40 @@
     });
   }
 
+  // Ask the extension to enter experience mode ("relive") for one of the user's
+  // letters. Resolves { ok, error }. Mirrors getKeyFromExtension's event pattern.
+  function reliveInExtension(shareId) {
+    return new Promise((resolve) => {
+      const handler = (e) => {
+        if (e.detail?.shareId === shareId) {
+          window.removeEventListener("keepsake:relive_response", handler);
+          resolve({ ok: !!e.detail.ok, error: e.detail.error || null });
+        }
+      };
+      window.addEventListener("keepsake:relive_response", handler);
+      window.dispatchEvent(new CustomEvent("keepsake:relive", { detail: { shareId } }));
+      setTimeout(() => {
+        window.removeEventListener("keepsake:relive_response", handler);
+        resolve({ ok: false, error: "no_extension" });
+      }, 3000);
+    });
+  }
+
+  // Relive a letter (drive the extension into experience mode), then open Spotify.
+  async function doRelive(reliveBtn) {
+    const shareId = reliveBtn.dataset.relive;
+    const spotify = reliveBtn.dataset.spotify;
+    const res = await reliveInExtension(shareId);
+    if (!res.ok) {
+      if (res.error === "not_on_device") {
+        showToast("This letter's key isn't on this device — relive it from where you sent it.");
+      } else {
+        showToast("Open the Keepsake extension, then try Relive ✦");
+      }
+    }
+    if (spotify) window.open(spotify, "_blank");
+  }
+
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   function esc(s) {
@@ -530,7 +564,7 @@
       receivedList.addEventListener("click", (e) => {
         const reliveBtn = e.target.closest("[data-relive]");
         if (!reliveBtn) return;
-        window.open(reliveBtn.dataset.spotify, "_blank");
+        doRelive(reliveBtn);
       });
     }
 
@@ -564,7 +598,7 @@
         // Relive button — open the song/playlist on Spotify
         const reliveBtn = e.target.closest("[data-relive]");
         if (!reliveBtn) return;
-        window.open(reliveBtn.dataset.spotify, "_blank");
+        doRelive(reliveBtn);
       });
     }
   }

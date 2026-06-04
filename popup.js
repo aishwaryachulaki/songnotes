@@ -739,7 +739,7 @@ async function renderPrevious() {
       </div>
       <div class="prev-actions">
         ${s.enc_key ? `<button class="prev-copy" data-id="${id}" title="Copy share link">Copy link</button>` : ""}
-        <button class="prev-activate" data-id="${id}">Reactivate</button>
+        <button class="prev-activate" data-id="${id}">Relive</button>
       </div>
     `;
     list.appendChild(row);
@@ -767,9 +767,9 @@ async function renderPrevious() {
       const btn = e.currentTarget;
       btn.disabled = true;
       btn.textContent = "Loading…";
-      await activateShare(btn.dataset.id);
+      await reliveShare(btn.dataset.id);
       btn.disabled = false;
-      btn.textContent = "Reactivate";
+      btn.textContent = "Relive";
     }),
   );
 
@@ -834,7 +834,7 @@ async function archiveActive(store) {
   }
   store.previous = [store.active, ...(store.previous || []).filter((x) => x !== store.active)];
 }
-async function activateShare(id) {
+async function reliveShare(id) {
   const { store } = await loadStore();
   if (!store.shares[id]) return;
 
@@ -1347,7 +1347,7 @@ $("importBtn").addEventListener("click", async () => {
     return;
   }
   if (store.shares[v]) {
-    await activateShare(v);
+    await reliveShare(v);
     $("importStatus").textContent = "Reactivated.";
     return;
   }
