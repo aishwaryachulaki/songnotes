@@ -193,6 +193,179 @@ function parsePlaylistId(input) {
   return null;
 }
 
+// ---------- vault: zero-knowledge cross-device key recovery (opt-in) ----------
+// A passphrase derives a master key (PBKDF2) that never leaves the device. Each
+// per-share key is stored on the server WRAPPED with the master key, so the
+// server only ever holds wrapped blobs + a salt. On a new device, the passphrase
+// re-derives the master key and unwraps the keys into local storage.
+const VAULT_VERIFIER = "keepsake-vault-v1";
+
+// Strict AES-GCM decrypt that THROWS on failure (unlike decryptField which
+// returns the input). Used for the verifier + unwrapping, where we must detect
+// a wrong passphrase.
+async function decryptStrict(b64, key) {
+  const buf = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+  const dec = await crypto.subtle.decrypt({ name: "AES-GCM", iv: buf.slice(0, 12) }, key, buf.slice(12));
+  return new TextDecoder().decode(dec);
+}
+async function deriveVaultMasterKey(passphrase, saltB64, iterations) {
+  const salt = Uint8Array.from(atob(saltB64), (c) => c.charCodeAt(0));
+  const base = await crypto.subtle.importKey(
+    "raw", new TextEncoder().encode(passphrase), { name: "PBKDF2" }, false, ["deriveKey"]
+  );
+  return crypto.subtle.deriveKey(
+    { name: "PBKDF2", salt, iterations, hash: "SHA-256" },
+    base,
+    { name: "AES-GCM", length: 256 },
+    true,
+    ["encrypt", "decrypt"]
+  );
+}
+async function exportMasterKey(key) {
+  const raw = await crypto.subtle.exportKey("raw", key);
+  return btoa(String.fromCharCode(...new Uint8Array(raw)));
+}
+async function importMasterKey(b64) {
+  const raw = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+  return crypto.subtle.importKey("raw", raw, { name: "AES-GCM" }, true, ["encrypt", "decrypt"]);
+}
+
+async function loadVaultState() {
+  const data = await chrome.storage.local.get("ks_vault");
+  return data.ks_vault || { user_id: null, enabled: false, masterKeyB64: null };
+}
+async function saveVaultState(v) {
+  await chrome.storage.local.set({ ks_vault: v });
+}
+// In-memory master key for the current session (imported from the cached b64).
+async function getVaultMasterKey() {
+  const v = await loadVaultState();
+  if (!v.enabled || !v.masterKeyB64) return null;
+  try { return await importMasterKey(v.masterKeyB64); } catch { return null; }
+}
+
+// --- vault REST (owner-scoped via RLS) ---
+async function fetchVaultMeta(accessToken, userId) {
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/user_vault?user_id=eq.${encodeURIComponent(userId)}&select=*`,
+    { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${accessToken}` } }
+  );
+  if (!res.ok) return null;
+  const rows = await res.json();
+  return rows[0] || null;
+}
+async function putVaultMeta(row, accessToken) {
+  return fetch(`${SUPABASE_URL}/rest/v1/user_vault`, {
+    method: "POST",
+    headers: {
+      apikey: SUPABASE_KEY, Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json", Prefer: "resolution=merge-duplicates,return=minimal",
+    },
+    body: JSON.stringify(row),
+  });
+}
+async function upsertVaultKeys(rows, accessToken) {
+  if (!rows || !rows.length) return;
+  return fetch(`${SUPABASE_URL}/rest/v1/vault_keys`, {
+    method: "POST",
+    headers: {
+      apikey: SUPABASE_KEY, Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json", Prefer: "resolution=merge-duplicates,return=minimal",
+    },
+    body: JSON.stringify(rows),
+  });
+}
+async function fetchVaultKeys(accessToken) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/vault_keys?select=share_id,wrapped_key`,
+    { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${accessToken}` } });
+  if (!res.ok) return [];
+  return res.json();
+}
+
+// Set up (or re-set) the vault from THIS device, wrapping every local key.
+async function vaultSetup(passphrase) {
+  const session = await getSession();
+  if (!session) throw new Error("not signed in");
+  const saltB64 = btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(16))));
+  const iterations = 600000;
+  const masterKey = await deriveVaultMasterKey(passphrase, saltB64, iterations);
+  const verifier = await encryptField(VAULT_VERIFIER, masterKey);
+  await putVaultMeta(
+    { user_id: session.user.id, salt: saltB64, iterations, verifier, updated_at: new Date().toISOString() },
+    session.access_token
+  );
+  const { store } = await loadStore();
+  const rows = [];
+  for (const s of Object.values(store.shares || {})) {
+    if (s && s.id && s.enc_key) {
+      rows.push({ user_id: session.user.id, share_id: s.id, wrapped_key: await encryptField(s.enc_key, masterKey) });
+    }
+  }
+  await upsertVaultKeys(rows, session.access_token);
+  await saveVaultState({ user_id: session.user.id, enabled: true, masterKeyB64: await exportMasterKey(masterKey) });
+}
+
+// Unlock on this device: verify passphrase, then unwrap all keys into local store.
+async function vaultUnlock(passphrase) {
+  const session = await getSession();
+  if (!session) throw new Error("not signed in");
+  const meta = await fetchVaultMeta(session.access_token, session.user.id);
+  if (!meta) throw new Error("no vault");
+  const masterKey = await deriveVaultMasterKey(passphrase, meta.salt, meta.iterations);
+  let ok = false;
+  try { ok = (await decryptStrict(meta.verifier, masterKey)) === VAULT_VERIFIER; } catch { ok = false; }
+  if (!ok) throw new Error("wrong passphrase");
+  // Unwrap every key into a share_id -> rawKey map.
+  const wrapped = await fetchVaultKeys(session.access_token);
+  const keyMap = {};
+  for (const row of wrapped) {
+    try { keyMap[row.share_id] = await decryptStrict(row.wrapped_key, masterKey); } catch {}
+  }
+  const { store } = await loadStore();
+  // Pull metadata for the user's own letters so they show up in "Previous
+  // Experiences" on this device (recipient name, note/song counts, date).
+  let metaShares = [];
+  try {
+    const r = await fetch(
+      `${SUPABASE_URL}/rest/v1/shares?user_id=eq.${encodeURIComponent(session.user.id)}` +
+      `&select=id,share_type,playlist_id,playlist_url,playlist_name,sender_name,recipient_name,created_at,annotations(track_id)` +
+      `&order=created_at.desc`,
+      { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${session.access_token}` } }
+    );
+    if (r.ok) metaShares = await r.json();
+  } catch {}
+  const prevIds = [];
+  for (const m of metaShares) {
+    const key = keyMap[m.id];
+    if (!key) continue; // only letters we can actually decrypt
+    const anns = Array.isArray(m.annotations) ? m.annotations : [];
+    store.shares[m.id] = {
+      id: m.id,
+      enc_key: key,
+      mode: "inactive",
+      type: m.share_type || "single",
+      playlist_id: m.playlist_id || null,
+      playlist_url: m.playlist_url || null,
+      playlist_name: m.playlist_name || null,
+      sender_name: m.sender_name || senderName || "someone",
+      recipient_name: (m.recipient_name && !looksEncrypted(m.recipient_name)) ? m.recipient_name : null,
+      note_count: anns.length,
+      song_count: new Set(anns.map((a) => a.track_id).filter(Boolean)).size,
+      created_at: m.created_at ? new Date(m.created_at).getTime() : Date.now(),
+      notes: [],
+    };
+    prevIds.push(m.id);
+  }
+  // Keep keys for any other letters (e.g. received) as stubs so website relive works.
+  for (const sid in keyMap) {
+    if (!store.shares[sid]) store.shares[sid] = { id: sid, enc_key: keyMap[sid] };
+    else if (!store.shares[sid].enc_key) store.shares[sid].enc_key = keyMap[sid];
+  }
+  store.previous = [...prevIds, ...(store.previous || []).filter((id) => !prevIds.includes(id))];
+  await saveStore(store);
+  await saveVaultState({ user_id: session.user.id, enabled: true, masterKeyB64: await exportMasterKey(masterKey) });
+}
+
 // ---------- share-scoped storage model ----------
 // ks_shares = {
 //   active: "<id>",
@@ -947,13 +1120,65 @@ async function refreshAuthUI() {
     } else {
       badge.classList.remove("empty");
     }
+    // Vault (cross-device) status
+    try {
+      const meta = await fetchVaultMeta(session.access_token, session.user.id);
+      const vstate = await loadVaultState();
+      const unlocked = !!(vstate.masterKeyB64 && vstate.user_id === session.user.id);
+      renderVaultUI(!!meta, unlocked);
+    } catch { renderVaultUI(false, false); }
   } else {
     $("authGate").classList.remove("hidden");
     $("authBar").classList.add("hidden");
+    const vb = $("vaultBlock"); if (vb) vb.style.display = "none";
     if (_sessionExpired) {
       $("authGate").querySelector(".auth-gate-text").textContent =
         "Your session expired — please sign in again.";
     }
+  }
+}
+
+// Drives the cross-device vault UI based on whether a vault exists server-side
+// and whether it's unlocked on this device.
+let _vaultMode = "off"; // 'off' (no vault) | 'unlock' | 'on'
+function renderVaultUI(hasVault, unlocked) {
+  const block = $("vaultBlock");
+  if (!block) return;
+  block.style.display = "";
+  const summary = $("vaultSummary");
+  const body = $("vaultBody");
+  const disc = $("vaultDisclaimer");
+  const pass2 = $("vaultPass2");
+  const btn = $("vaultBtn");
+  const change = $("vaultChange");
+  const status = $("vaultStatus");
+  status.textContent = "";
+  $("vaultPass").value = ""; pass2.value = "";
+  if (hasVault && unlocked) {
+    _vaultMode = "on";
+    summary.textContent = "Cross-device relive · On";
+    disc.style.display = "none";
+    $("vaultRow").style.display = "none";
+    pass2.style.display = "none";
+    change.style.display = "";
+    status.textContent = "On — your letters relive on any device you sign into. (Sign out to lock this device.)";
+  } else if (hasVault && !unlocked) {
+    _vaultMode = "unlock";
+    summary.textContent = "Cross-device relive · Locked";
+    disc.style.display = "none";
+    $("vaultRow").style.display = "";
+    pass2.style.display = "none";
+    change.style.display = "none";
+    btn.textContent = "Unlock";
+  } else {
+    _vaultMode = "off";
+    summary.textContent = "Cross-device relive · Off";
+    disc.style.display = "";
+    disc.textContent = "Set a passphrase to relive your letters on any device you sign into. It never leaves your device — we can't see it or reset it. If you forget it, re-set it from a device you're already on. Write it down.";
+    $("vaultRow").style.display = "";
+    pass2.style.display = "";
+    change.style.display = "none";
+    btn.textContent = "Enable";
   }
 }
 
@@ -965,15 +1190,62 @@ $("accountLink").addEventListener("click", (e) => { e.preventDefault(); openAcco
 $("signOutLink").addEventListener("click", async (e) => {
   e.preventDefault();
   await chrome.storage.local.remove("ks_session");
+  // Lock the vault on this device (clears the cached master key). The vault
+  // itself stays on the server; the user re-unlocks with their passphrase.
+  await chrome.storage.local.remove("ks_vault");
   _session = null;
   _sessionExpired = false;
   $("authGate").classList.remove("hidden");
   $("authBar").classList.add("hidden");
+  const vb = $("vaultBlock"); if (vb) vb.style.display = "none";
   // Clear previous shares from view immediately
   const list = $("previousList");
   const header = $("prevHeader");
   if (list) list.innerHTML = "";
   if (header) header.style.display = "none";
+});
+
+// Vault: enable / unlock / change passphrase (guarded — element may be absent)
+$("vaultBtn")?.addEventListener("click", async () => {
+  const btn = $("vaultBtn");
+  const status = $("vaultStatus");
+  const pass = $("vaultPass").value.trim();
+  if (!pass) { status.textContent = "Enter a passphrase."; return; }
+  if (_vaultMode === "unlock") {
+    btn.disabled = true; status.textContent = "Unlocking…";
+    try {
+      await vaultUnlock(pass);
+      status.textContent = "Unlocked ✦ — your letters are now on this device.";
+      await refreshAuthUI();
+      renderPrevious().catch(() => {});
+    } catch (err) {
+      status.textContent = err.message === "wrong passphrase" ? "Wrong passphrase." : "Couldn't unlock — check your connection.";
+    }
+    btn.disabled = false;
+  } else {
+    // setup / change
+    const pass2 = $("vaultPass2").value.trim();
+    if (pass.length < 8) { status.textContent = "Use at least 8 characters."; return; }
+    if (pass !== pass2) { status.textContent = "Passphrases don't match."; return; }
+    btn.disabled = true; status.textContent = "Setting up…";
+    try { await vaultSetup(pass); status.textContent = "Cross-device on ✦"; await refreshAuthUI(); }
+    catch (err) { status.textContent = "Couldn't set up — check your connection."; }
+    btn.disabled = false;
+  }
+});
+
+// "Change passphrase" from the On state → re-show the setup form (re-keys the vault
+// from this device, which is also the "forgot passphrase, re-set it" path).
+$("vaultChange")?.addEventListener("click", (e) => {
+  e.preventDefault();
+  _vaultMode = "off";
+  $("vaultDisclaimer").style.display = "";
+  $("vaultDisclaimer").textContent = "Pick a new passphrase. This re-keys your vault from this device.";
+  $("vaultRow").style.display = "";
+  $("vaultPass2").style.display = "";
+  $("vaultChange").style.display = "none";
+  $("vaultBtn").textContent = "Save new passphrase";
+  $("vaultStatus").textContent = "";
 });
 
 $("saveName").addEventListener("click", async () => {
@@ -1201,6 +1473,20 @@ $("copyShare").addEventListener("click", async () => {
     shareBtn.disabled = false;
     return;
   }
+
+  // If the vault is set up + unlocked on this device, also store this letter's
+  // key wrapped, so it can be relived on other devices the user signs into.
+  (async () => {
+    try {
+      const mk = await getVaultMasterKey();
+      if (mk) {
+        await upsertVaultKeys(
+          [{ user_id: session.user.id, share_id: activeShare.id, wrapped_key: await encryptField(keyB64, mk) }],
+          session.access_token
+        );
+      }
+    } catch (err) { console.warn("Keepsake: vault wrap on send failed", err); }
+  })();
 
   const noteResults = await Promise.all(
     notesToPush.map(note => pushNote(activeShare, note, session.access_token))
@@ -1438,6 +1724,18 @@ $("importBtn").addEventListener("click", async () => {
       },
       body: JSON.stringify({ user_id: session.user.id, share_id: v }),
     }).catch(console.warn);
+
+    // Vault: if set up + unlocked, store the imported key wrapped too, so the
+    // recipient can relive this received letter on their other devices.
+    getVaultMasterKey().then(async (mk) => {
+      if (!mk || !importKeyB64) return;
+      try {
+        await upsertVaultKeys(
+          [{ user_id: session.user.id, share_id: v, wrapped_key: await encryptField(importKeyB64, mk) }],
+          session.access_token
+        );
+      } catch (err) { console.warn("Keepsake: vault wrap on import failed", err); }
+    });
   });
 });
 

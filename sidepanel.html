@@ -199,6 +199,23 @@
         </details>
       </div>
 
+      <!-- Cross-device vault (opt-in, passphrase-locked) -->
+      <div class="import-block" id="vaultBlock" style="display:none">
+        <details>
+          <summary id="vaultSummary">Cross-device relive</summary>
+          <div id="vaultBody" style="margin-top:8px">
+            <div id="vaultDisclaimer" class="status" style="margin-bottom:6px"></div>
+            <div id="vaultRow" class="row">
+              <input id="vaultPass" type="password" placeholder="Vault passphrase" autocomplete="off" />
+              <button id="vaultBtn" class="btn">Enable</button>
+            </div>
+            <input id="vaultPass2" type="password" placeholder="Confirm passphrase" autocomplete="off" style="margin-top:6px" />
+            <a href="#" id="vaultChange" class="auth-link" style="display:none">Change passphrase</a>
+            <div id="vaultStatus" class="status"></div>
+          </div>
+        </details>
+      </div>
+
     </div>
     <script src="config.js"></script>
     <script src="popup.js"></script>
