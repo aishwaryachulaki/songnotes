@@ -580,7 +580,7 @@
           copyBtn.disabled = true;
           const keyB64 = await getKeyFromExtension(shareId);
           if (keyB64) {
-            const url = `https://aishwaryachulaki.github.io/songnotes/share.html?id=${shareId}&e=1#k=${keyB64}`;
+            const url = `https://dropakeepsake.com/share.html?id=${shareId}&e=1#k=${keyB64}`;
             try {
               await navigator.clipboard.writeText(url);
               showToast("Link copied ✦");
