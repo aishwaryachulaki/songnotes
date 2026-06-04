@@ -1,25 +1,45 @@
 -- RPC: delete_user_account
--- Deletes all user data and the auth account for the given user.
--- Called from account.html when a user requests account deletion.
+-- Permanently deletes the CALLER's account and all their data.
+-- Called from account.html.
+--
+-- Security: identity comes from auth.uid() (the verified login token), NOT the
+-- p_user_id parameter — so a logged-in user can only ever delete their OWN
+-- account, never someone else's. The parameter is kept only so the existing
+-- client call (sb.rpc("delete_user_account", { p_user_id })) keeps working.
+--
+-- Run this in the Supabase SQL editor to replace the old (broken) version.
 
-CREATE OR REPLACE FUNCTION delete_user_account(p_user_id UUID)
+CREATE OR REPLACE FUNCTION public.delete_user_account(p_user_id uuid)
 RETURNS void
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = public
 AS $$
+DECLARE
+  v_uid uuid := auth.uid();
 BEGIN
-  -- Delete user data in dependency order
-  DELETE FROM user_notes       WHERE user_id = p_user_id;
-  DELETE FROM shared_notes     WHERE user_id = p_user_id;
-  DELETE FROM received_shares  WHERE recipient_id = p_user_id;
-  DELETE FROM purchases        WHERE user_id = p_user_id;
-  DELETE FROM user_credits     WHERE user_id = p_user_id;
+  IF v_uid IS NULL THEN
+    RAISE EXCEPTION 'not authenticated';
+  END IF;
 
-  -- Delete the auth user (cascades any remaining auth data)
-  DELETE FROM auth.users WHERE id = p_user_id;
+  -- Notes on the user's own letters (annotations has no user_id — scope via shares).
+  DELETE FROM annotations WHERE share_id IN (SELECT id FROM shares WHERE user_id = v_uid);
+
+  -- The user's own rows in the per-user tables.
+  DELETE FROM received_shares WHERE user_id = v_uid;
+  DELETE FROM vault_keys      WHERE user_id = v_uid;
+  DELETE FROM user_vault      WHERE user_id = v_uid;
+  DELETE FROM purchases       WHERE user_id = v_uid;
+  DELETE FROM user_credits    WHERE user_id = v_uid;
+
+  -- The user's letters. FKs from received_shares / vault_keys / annotations to
+  -- shares (on delete cascade) clean up any rows other users hold for these shares.
+  DELETE FROM shares WHERE user_id = v_uid;
+
+  -- Finally, the auth account itself.
+  DELETE FROM auth.users WHERE id = v_uid;
 END;
 $$;
 
--- Only the user themselves (or service role) can call this
-REVOKE ALL ON FUNCTION delete_user_account(UUID) FROM PUBLIC;
-GRANT EXECUTE ON FUNCTION delete_user_account(UUID) TO authenticated;
+REVOKE ALL ON FUNCTION public.delete_user_account(uuid) FROM public, anon;
+GRANT EXECUTE ON FUNCTION public.delete_user_account(uuid) TO authenticated;
