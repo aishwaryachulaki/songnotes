@@ -206,9 +206,14 @@
 
     /* Block 4 — CTA button — sits just above the envelope fold (~57%) */
     .env-cta-block {
+      position: absolute;
+      /* fold (front-flap apex) is at 72.4% of the image; sit 10px above it on the cream */
+      bottom: calc(27.6% + 10px);
+      left: 50%;
+      transform: translateX(-50%);
       display: flex;
       justify-content: center;
-      margin-top: 20px;
+      z-index: 2;
     }
 
     /* Pill label — scales with viewport so it never overflows the envelope */
