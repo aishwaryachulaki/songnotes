@@ -157,7 +157,7 @@
     .env-wrap {
       position: relative;
       width: 100%;
-      max-width: 660px;
+      max-width: 600px;
       margin: 0 auto;
       overflow: visible;
       z-index: 1;   /* sit above the ::before / ::after glows */
@@ -207,8 +207,8 @@
     /* Block 4 — CTA button — sits just above the envelope fold (~57%) */
     .env-cta-block {
       position: absolute;
-      /* fold (front-flap apex) is at 72.6% of the trimmed image; sit 10px above it on the cream */
-      bottom: calc(27.4% + 10px);
+      /* fold (front-flap apex) is at 72.4% of the image; sit 10px above it on the cream */
+      bottom: calc(27.6% + 10px);
       left: 50%;
       transform: translateX(-50%);
       display: flex;
@@ -790,7 +790,7 @@
       .env-col { display: flex; justify-content: center; }
       /* Fix height so card area is always fully visible */
       .env-wrap {
-        width: min(620px, 94vw);
+        width: min(560px, 92vw);
         margin: 0 auto;
       }
 
