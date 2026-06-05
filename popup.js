@@ -1192,7 +1192,7 @@ function renderVaultUI(hasVault, unlocked) {
     _vaultMode = "off";
     summary.textContent = "Cross-device relive · Off";
     disc.style.display = "";
-    disc.textContent = "Set a passphrase to relive your letters on any device you sign into. It never leaves your device — we can't see it or reset it. If you forget it, re-set it from a device you're already on. Write it down.";
+    disc.textContent = "Set a passphrase to relive your letters on any device you sign into. Make it long — a few random words you'll remember (12+ characters). It never leaves your device, so we can't see it or reset it; if you forget it, re-set it from a device you're already on. Write it down.";
     $("vaultRow").style.display = "";
     pass2.style.display = "";
     change.style.display = "none";
@@ -1243,7 +1243,7 @@ $("vaultBtn")?.addEventListener("click", async () => {
   } else {
     // setup / change
     const pass2 = $("vaultPass2").value.trim();
-    if (pass.length < 8) { status.textContent = "Use at least 8 characters."; return; }
+    if (pass.length < 12) { status.textContent = "Use at least 12 characters — a few random words is ideal."; return; }
     if (pass !== pass2) { status.textContent = "Passphrases don't match."; return; }
     btn.disabled = true; status.textContent = "Setting up…";
     try { await vaultSetup(pass); status.textContent = "Cross-device on ✦"; await refreshAuthUI(); }
