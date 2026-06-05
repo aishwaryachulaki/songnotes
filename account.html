@@ -937,10 +937,10 @@
             "apikey": SUPABASE_KEY,
             "Authorization": `Bearer ${currentAccessToken}`,
           },
+          // Server decides price + credits from this package id; the client
+          // can no longer set the amount or the number of credits.
           body: JSON.stringify({
-            amount: amountPaise,
-            currency: "INR",
-            receipt: `${currentUser.id.slice(0, 8)}_${Date.now()}`,
+            package_id: isLifetime ? "lifetime" : `letters_${numCredits}`,
           }),
         }
       );
@@ -992,14 +992,12 @@
                 "apikey": SUPABASE_KEY,
                 "Authorization": `Bearer ${currentAccessToken}`,
               },
+              // Only the proof of payment — credits are derived server-side from
+              // the stored order, never from anything we send here.
               body: JSON.stringify({
                 razorpay_order_id:   response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_signature:  response.razorpay_signature,
-                user_id:      currentUser.id,
-                credits:      numCredits,
-                is_lifetime:  isLifetime,
-                amount_paise: amountPaise,
               }),
             }
           );
