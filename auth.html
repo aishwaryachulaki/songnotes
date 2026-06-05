@@ -374,16 +374,51 @@
 
   </div>
 
+  <div id="turnstile-box" style="display:flex;justify-content:center;margin:14px 0 0;"></div>
+
   <p class="privacy-note">
     By signing in you agree to our <a href="privacy.html" target="_blank">Privacy Policy</a>
   </p>
 </div>
 
+<script>
+  // Turnstile bootstrap — define the onload callback before the widget script loads.
+  window._turnstileReady = false;
+  window.onloadTurnstileCallback = function () {
+    window._turnstileReady = true;
+    if (typeof window._initTurnstile === "function") window._initTurnstile();
+  };
+</script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback" async defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
   const SUPABASE_URL = "https://kkasgbkgwjxiutdalbbm.supabase.co";
   const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtrYXNnYmtnd2p4aXV0ZGFsYmJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyNjU3OTQsImV4cCI6MjA5Mjg0MTc5NH0.z1JLMTzz3X_swbWHdt2z4UDKyUwjEfNYys5kdDMq3R4";
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // ── Cloudflare Turnstile (bot protection on signup / login / magic link) ──
+  // 1) Paste your Turnstile SITE key below.  2) Enable CAPTCHA (Turnstile) in
+  // Supabase Auth and paste the SECRET key there.  Until BOTH are done this stays
+  // dormant (CAPTCHA_ON = false) and auth works exactly as before.
+  const TURNSTILE_SITE_KEY = "0x4AAAAAADfEc-bCQxMk-joS";
+  const CAPTCHA_ON = !!TURNSTILE_SITE_KEY && TURNSTILE_SITE_KEY.indexOf("PASTE_") === -1;
+  let _turnstileId = null;
+  window._initTurnstile = function () {
+    if (!CAPTCHA_ON || !window.turnstile || _turnstileId !== null) return;
+    const box = document.getElementById("turnstile-box");
+    if (!box) return;
+    try { _turnstileId = window.turnstile.render(box, { sitekey: TURNSTILE_SITE_KEY }); } catch (_) {}
+  };
+  if (CAPTCHA_ON && window._turnstileReady) window._initTurnstile();
+  function getCaptcha() {
+    if (!CAPTCHA_ON || !window.turnstile || _turnstileId === null) return undefined;
+    return window.turnstile.getResponse(_turnstileId) || "";
+  }
+  function resetCaptcha() {
+    if (CAPTCHA_ON && window.turnstile && _turnstileId !== null) {
+      try { window.turnstile.reset(_turnstileId); } catch (_) {}
+    }
+  }
 
   let redirecting = false;
 
@@ -469,10 +504,16 @@
       showMsg("emailMsg", "Please enter your email and password.", "error");
       e.target.disabled = false; return;
     }
+    const captchaToken = getCaptcha();
+    if (CAPTCHA_ON && !captchaToken) {
+      showMsg("emailMsg", "Please complete the human check below.", "error");
+      e.target.disabled = false; return;
+    }
     const fn = emailMode === "signin"
-      ? sb.auth.signInWithPassword({ email, password })
-      : sb.auth.signUp({ email, password });
+      ? sb.auth.signInWithPassword({ email, password, options: { captchaToken } })
+      : sb.auth.signUp({ email, password, options: { captchaToken } });
     const { error } = await fn;
+    resetCaptcha();
     if (error) { showMsg("emailMsg", error.message, "error"); e.target.disabled = false; return; }
     // Only show the "check your email" message if onAuthStateChange hasn't
     // already taken over (which happens when Supabase auto-confirms the signup).
@@ -486,7 +527,13 @@
     const email = document.getElementById("magicInput").value.trim();
     document.getElementById("magicMsg").innerHTML = "";
     if (!email) { showMsg("magicMsg", "Please enter your email.", "error"); e.target.disabled = false; return; }
-    const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.href } });
+    const captchaToken = getCaptcha();
+    if (CAPTCHA_ON && !captchaToken) {
+      showMsg("magicMsg", "Please complete the human check below.", "error");
+      e.target.disabled = false; return;
+    }
+    const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.href, captchaToken } });
+    resetCaptcha();
     if (error) { showMsg("magicMsg", error.message, "error"); e.target.disabled = false; return; }
     showMsg("magicMsg", `Magic link sent to ${email} — check your inbox.`, "success");
     e.target.disabled = false;
