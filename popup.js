@@ -1179,7 +1179,7 @@ function renderVaultUI(hasVault, unlocked) {
   $("vaultPass").value = ""; pass2.value = "";
   if (hasVault && unlocked) {
     _vaultMode = "on";
-    summary.textContent = "Cross-device relive · On";
+    summary.textContent = "▸ Cross-device relive · On";
     disc.style.display = "none";
     $("vaultRow").style.display = "none";
     pass2.style.display = "none";
@@ -1187,7 +1187,7 @@ function renderVaultUI(hasVault, unlocked) {
     status.textContent = "On. Your letters relive on any device you sign into. (Sign out to lock this device.)";
   } else if (hasVault && !unlocked) {
     _vaultMode = "unlock";
-    summary.textContent = "Cross-device relive · Locked";
+    summary.textContent = "▸ Cross-device relive · Locked";
     disc.style.display = "none";
     $("vaultRow").style.display = "";
     pass2.style.display = "none";
@@ -1195,7 +1195,7 @@ function renderVaultUI(hasVault, unlocked) {
     btn.textContent = "Unlock";
   } else {
     _vaultMode = "off";
-    summary.textContent = "Cross-device relive · Off";
+    summary.textContent = "▸ Cross-device relive · Off";
     disc.style.display = "";
     disc.textContent = "Set a passphrase to relive your letters on any device you sign into. Make it long: a few random words you'll remember (12+ characters). It never leaves your device, so we can't see it or reset it; if you forget it, re-set it from a device you're already on. Write it down.";
     $("vaultRow").style.display = "";
