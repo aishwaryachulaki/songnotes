@@ -403,20 +403,40 @@
   const TURNSTILE_SITE_KEY = "0x4AAAAAADfEc-bCQxMk-joS";
   const CAPTCHA_ON = !!TURNSTILE_SITE_KEY && TURNSTILE_SITE_KEY.indexOf("PASTE_") === -1;
   let _turnstileId = null;
+  let _captchaToken = null;
+  let _captchaResolve = null;
+  let _captchaWait = new Promise((r) => { _captchaResolve = r; });
   window._initTurnstile = function () {
     if (!CAPTCHA_ON || !window.turnstile || _turnstileId !== null) return;
     const box = document.getElementById("turnstile-box");
     if (!box) return;
-    try { _turnstileId = window.turnstile.render(box, { sitekey: TURNSTILE_SITE_KEY }); } catch (_) {}
+    try {
+      _turnstileId = window.turnstile.render(box, {
+        sitekey: TURNSTILE_SITE_KEY,
+        appearance: "interaction-only", // stays invisible unless a real challenge is needed
+        theme: "light",
+        callback: (t) => { _captchaToken = t; if (_captchaResolve) _captchaResolve(t); },
+        "expired-callback": () => { _captchaToken = null; _captchaWait = new Promise((r) => { _captchaResolve = r; }); },
+        "error-callback": () => { _captchaToken = null; },
+      });
+    } catch (_) {}
   };
   if (CAPTCHA_ON && window._turnstileReady) window._initTurnstile();
-  function getCaptcha() {
-    if (!CAPTCHA_ON || !window.turnstile || _turnstileId === null) return undefined;
-    return window.turnstile.getResponse(_turnstileId) || "";
+  // Resolve the silently-issued token, waiting briefly if it isn't ready yet
+  // (the widget is invisible, so there's nothing for the user to click).
+  async function getCaptchaToken(timeoutMs = 8000) {
+    if (!CAPTCHA_ON) return undefined;
+    if (_captchaToken) return _captchaToken;
+    return Promise.race([
+      _captchaWait,
+      new Promise((r) => setTimeout(() => r(null), timeoutMs)),
+    ]);
   }
   function resetCaptcha() {
     if (CAPTCHA_ON && window.turnstile && _turnstileId !== null) {
       try { window.turnstile.reset(_turnstileId); } catch (_) {}
+      _captchaToken = null;
+      _captchaWait = new Promise((r) => { _captchaResolve = r; });
     }
   }
 
@@ -504,9 +524,9 @@
       showMsg("emailMsg", "Please enter your email and password.", "error");
       e.target.disabled = false; return;
     }
-    const captchaToken = getCaptcha();
+    const captchaToken = await getCaptchaToken();
     if (CAPTCHA_ON && !captchaToken) {
-      showMsg("emailMsg", "Please complete the human check below.", "error");
+      showMsg("emailMsg", "Couldn't verify you're human — please refresh and try again.", "error");
       e.target.disabled = false; return;
     }
     const fn = emailMode === "signin"
@@ -527,9 +547,9 @@
     const email = document.getElementById("magicInput").value.trim();
     document.getElementById("magicMsg").innerHTML = "";
     if (!email) { showMsg("magicMsg", "Please enter your email.", "error"); e.target.disabled = false; return; }
-    const captchaToken = getCaptcha();
+    const captchaToken = await getCaptchaToken();
     if (CAPTCHA_ON && !captchaToken) {
-      showMsg("magicMsg", "Please complete the human check below.", "error");
+      showMsg("magicMsg", "Couldn't verify you're human — please refresh and try again.", "error");
       e.target.disabled = false; return;
     }
     const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.href, captchaToken } });
