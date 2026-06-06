@@ -204,36 +204,42 @@
       outline: none;
     }
 
-    /* Stamps are landscape frames rotated to portrait; rotation stays constant
-       (rest↔hover) so they slide out rather than spin. */
-    .ks-stamp {
+    /* Stamps + tickets tuck behind the card and slide out on hover/focus.
+       Rotation stays constant (rest↔hover) so they slide rather than spin. */
+    .ks-pop {
       position: absolute;
-      z-index: 1;
-      width: clamp(104px, 14vw, 140px);   /* rotated → ~portrait height */
-      filter: drop-shadow(0 6px 16px rgba(58,36,24,0.18));
-      transition: transform 0.42s cubic-bezier(.22,.61,.36,1), opacity 0.42s ease;
+      filter: drop-shadow(0 7px 18px rgba(58,36,24,0.20));
+      transition: transform 0.45s cubic-bezier(.22,.61,.36,1), opacity 0.45s ease;
       pointer-events: none;
       will-change: transform;
+      opacity: 0.92;
     }
-    /* Rest state: tucked behind the card edges, slightly faded */
-    .ks-stamp--l  { left: 0;  top: 52%; transform: translate(58%, -50%)  rotate(-84deg); opacity: 0.85; }
-    .ks-stamp--r1 { right: 0; top: 36%; transform: translate(-60%, -50%) rotate(84deg);  opacity: 0.85; }
-    .ks-stamp--r2 { right: 0; top: 66%; transform: translate(-48%, -50%) rotate(78deg);  opacity: 0.70; }
+    .ks-stamp-l, .ks-stamp-r { z-index: 1; width: clamp(120px, 15vw, 156px); }  /* portrait stamps, on top */
+    .ks-ticket-l, .ks-ticket-r { z-index: 0; width: clamp(150px, 19vw, 205px); } /* landscape tickets, behind */
 
-    /* Hover / focus: card lifts, stamps slide outward */
+    /* ── Rest state: tucked behind the card edges ── */
+    .ks-stamp-l  { left: 0;  top: 50%; transform: translate(34%, -50%)  rotate(-8deg); }
+    .ks-stamp-r  { right: 0; top: 50%; transform: translate(-34%, -50%) rotate(8deg); }
+    .ks-ticket-l { left: 0;  top: 50%; transform: translate(40%, -34%)  rotate(-70deg); }
+    .ks-ticket-r { right: 0; top: 50%; transform: translate(-40%, -34%) rotate(70deg); }
+
+    /* ── Hover / focus: card lifts, pieces slide outward ── */
     .keepsake-stage:hover  .keepsake-card,
     .keepsake-stage:focus-within .keepsake-card,
     .keepsake-stage:focus  .keepsake-card { transform: translateY(-4px); }
 
-    .keepsake-stage:hover  .ks-stamp--l,
-    .keepsake-stage:focus-within .ks-stamp--l,
-    .keepsake-stage:focus  .ks-stamp--l  { transform: translate(-82%, -50%) rotate(-84deg); opacity: 1; }
-    .keepsake-stage:hover  .ks-stamp--r1,
-    .keepsake-stage:focus-within .ks-stamp--r1,
-    .keepsake-stage:focus  .ks-stamp--r1 { transform: translate(84%, -50%)  rotate(84deg);  opacity: 1; }
-    .keepsake-stage:hover  .ks-stamp--r2,
-    .keepsake-stage:focus-within .ks-stamp--r2,
-    .keepsake-stage:focus  .ks-stamp--r2 { transform: translate(100%, -50%) rotate(78deg);  opacity: 1; }
+    .keepsake-stage:hover  .ks-stamp-l,
+    .keepsake-stage:focus-within .ks-stamp-l,
+    .keepsake-stage:focus  .ks-stamp-l  { transform: translate(-66%, -50%) rotate(-8deg); opacity: 1; }
+    .keepsake-stage:hover  .ks-stamp-r,
+    .keepsake-stage:focus-within .ks-stamp-r,
+    .keepsake-stage:focus  .ks-stamp-r  { transform: translate(66%, -50%)  rotate(8deg);  opacity: 1; }
+    .keepsake-stage:hover  .ks-ticket-l,
+    .keepsake-stage:focus-within .ks-ticket-l,
+    .keepsake-stage:focus  .ks-ticket-l { transform: translate(-72%, -28%) rotate(-70deg); opacity: 1; }
+    .keepsake-stage:hover  .ks-ticket-r,
+    .keepsake-stage:focus-within .ks-ticket-r,
+    .keepsake-stage:focus  .ks-ticket-r { transform: translate(72%, -28%)  rotate(70deg);  opacity: 1; }
 
     .keepsake-card {
       position: relative;
@@ -343,24 +349,29 @@
     .kc-stat-v--accent { color: var(--blush); }
 
     @media (prefers-reduced-motion: reduce) {
-      .ks-stamp { transition: none; }
-      .ks-stamp--l  { transform: translate(-82%, -50%) rotate(-84deg); opacity: 1; }
-      .ks-stamp--r1 { transform: translate(84%, -50%)  rotate(84deg);  opacity: 1; }
-      .ks-stamp--r2 { transform: translate(100%, -50%) rotate(78deg);  opacity: 1; }
+      .ks-pop { transition: none; opacity: 1; }
+      .ks-stamp-l  { transform: translate(-66%, -50%) rotate(-8deg); }
+      .ks-stamp-r  { transform: translate(66%, -50%)  rotate(8deg); }
+      .ks-ticket-l { transform: translate(-72%, -28%) rotate(-70deg); }
+      .ks-ticket-r { transform: translate(72%, -28%)  rotate(70deg); }
       .keepsake-card { transition: none; }
     }
 
     @media (max-width: 560px) {
       .keepsake-card { padding: 22px 20px; }
-      .kc-title, .kc-by, .kc-divider, .kc-desc, .kc-stats { max-width: 80%; }
+      .kc-title, .kc-divider, .kc-desc, .kc-stats { max-width: 80%; }
       .kc-floral { width: 28.5%; opacity: 0.09; }
-      .ks-stamp { width: clamp(82px, 22vw, 104px); }
-      .ks-stamp--r2 { display: none; }
+      .ks-stamp-l, .ks-stamp-r { width: clamp(86px, 22vw, 112px); }
+      .ks-ticket-l, .ks-ticket-r { width: clamp(108px, 27vw, 150px); }
       /* gentler travel on small screens */
-      .keepsake-stage:hover  .ks-stamp--l,
-      .keepsake-stage:focus-within .ks-stamp--l { transform: translate(-58%, -50%) rotate(-84deg); }
-      .keepsake-stage:hover  .ks-stamp--r1,
-      .keepsake-stage:focus-within .ks-stamp--r1 { transform: translate(60%, -50%) rotate(84deg); }
+      .keepsake-stage:hover  .ks-stamp-l,
+      .keepsake-stage:focus-within .ks-stamp-l { transform: translate(-52%, -50%) rotate(-8deg); }
+      .keepsake-stage:hover  .ks-stamp-r,
+      .keepsake-stage:focus-within .ks-stamp-r { transform: translate(52%, -50%) rotate(8deg); }
+      .keepsake-stage:hover  .ks-ticket-l,
+      .keepsake-stage:focus-within .ks-ticket-l { transform: translate(-56%, -28%) rotate(-70deg); }
+      .keepsake-stage:hover  .ks-ticket-r,
+      .keepsake-stage:focus-within .ks-ticket-r { transform: translate(56%, -28%) rotate(70deg); }
     }
 
     /* ── Discover link ── */
@@ -414,9 +425,10 @@
     <div class="state loading"><span class="loading-dot">✦</span> opening your letter…</div>
   </div>
   <div class="keepsake-stage" id="keepsakeStage" tabindex="0" aria-label="Your keepsake">
-    <img class="ks-stamp ks-stamp--l"  src="stamp-olive.png"  alt="" aria-hidden="true" />
-    <img class="ks-stamp ks-stamp--r1" src="stamp-yellow.png" alt="" aria-hidden="true" />
-    <img class="ks-stamp ks-stamp--r2" src="stamp-pink.png"   alt="" aria-hidden="true" />
+    <img class="ks-pop ks-ticket-l" src="ticket-green.webp"    alt="" aria-hidden="true" />
+    <img class="ks-pop ks-ticket-r" src="ticket-pink.webp"     alt="" aria-hidden="true" />
+    <img class="ks-pop ks-stamp-l"  src="stamp-lavender.webp"  alt="" aria-hidden="true" />
+    <img class="ks-pop ks-stamp-r"  src="stamp-rose.webp"      alt="" aria-hidden="true" />
     <article class="keepsake-card">
       <img class="kc-floral" src="rose2.png" alt="" aria-hidden="true" />
       <div class="kc-eyebrow">A keepsake for you</div>
