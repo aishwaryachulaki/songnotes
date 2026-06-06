@@ -561,43 +561,48 @@ body::before {
 
 /* Share-level description textarea */
 .sp-desc-block { position: relative; margin-bottom: 10px; }
-/* folded corner via clip-path + ::after triangle */
+/* folded corner triangle — sits on top of the textarea */
 .sp-desc-block::after {
   content: '';
   position: absolute;
   top: 0; right: 0;
-  width: 22px; height: 22px;
+  width: 26px; height: 26px;
+  /* bottom-left half = background colour of parent card to create the "shadow" of the fold */
   background: linear-gradient(
     225deg,
-    var(--cream-dark, #e8d5c0) 0%, var(--cream-dark, #e8d5c0) 50%,
-    rgba(249,237,220,0.0) 50%
+    #d6c4b4 0%, #d6c4b4 50%,
+    transparent 50%
   );
-  border-bottom-left-radius: 4px;
+  border-bottom-left-radius: 3px;
   pointer-events: none;
-  z-index: 1;
+  z-index: 2;
 }
 .sp-desc-input {
+  display: block;
   width: 100%;
   resize: vertical;
-  min-height: 72px;
-  background: #fdf7f0 url('faq-bg-yellow.png') center / cover no-repeat;
+  min-height: 80px;
+  /* plain warm cream — no texture */
+  background: #faf5ef;
   border: none;
   border-radius: 10px;
-  padding: 12px 28px 10px 12px; /* right pad for fold corner */
+  padding: 12px 32px 12px 14px; /* right pad clears the fold */
   font-family: 'Lora', Georgia, serif;
-  font-size: 12px;
-  font-style: italic;
-  line-height: 1.55;
+  font-size: 12.5px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.6;
   color: var(--ink-2);
   outline: none;
-  box-shadow: 0 2px 8px rgba(58,36,24,0.10), inset 0 0 0 1px rgba(58,36,24,0.07);
+  box-shadow: 0 2px 10px rgba(58,36,24,0.09), inset 0 0 0 1px rgba(58,36,24,0.06);
   transition: box-shadow 0.15s;
-  clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 0 100%);
+  /* clip top-right corner to match fold */
+  clip-path: polygon(0 0, calc(100% - 26px) 0, 100% 26px, 100% 100%, 0 100%);
 }
 .sp-desc-input:focus {
-  box-shadow: 0 2px 12px rgba(58,36,24,0.14), inset 0 0 0 1px rgba(227,104,136,0.35);
+  box-shadow: 0 2px 14px rgba(58,36,24,0.13), inset 0 0 0 1px rgba(227,104,136,0.30);
 }
-.sp-desc-input::placeholder { color: var(--ink-5); font-style: italic; }
+.sp-desc-input::placeholder { color: var(--ink-4, #b09080); font-style: normal; }
 .sp-attach-btn {
   background: rgba(227,104,136,0.07); border: 1.5px solid rgba(227,104,136,0.40);
   color: var(--blush);
