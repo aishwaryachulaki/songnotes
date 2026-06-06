@@ -560,49 +560,16 @@ body::before {
 .sp-url-input::placeholder { color: var(--ink-5); }
 
 /* Share-level description textarea */
-.sp-desc-block { position: relative; margin-bottom: 10px; }
-/* folded corner triangle — sits on top of the textarea */
-.sp-desc-block::after {
-  content: '';
-  position: absolute;
-  top: 0; right: 0;
-  width: 26px; height: 26px;
-  /* bottom-left half = background colour of parent card to create the "shadow" of the fold */
-  background: linear-gradient(
-    225deg,
-    #d6c4b4 0%, #d6c4b4 50%,
-    transparent 50%
-  );
-  border-bottom-left-radius: 3px;
-  pointer-events: none;
-  z-index: 2;
-}
+.sp-desc-block { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
 .sp-desc-input {
-  display: block;
-  width: 100%;
-  resize: vertical;
-  min-height: 80px;
-  /* plain warm cream — no texture */
-  background: #faf5ef;
-  border: none;
-  border-radius: 10px;
-  padding: 12px 32px 12px 14px; /* right pad clears the fold */
-  font-family: 'Lora', Georgia, serif;
-  font-size: 12.5px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 1.6;
-  color: var(--ink-2);
-  outline: none;
-  box-shadow: 0 2px 10px rgba(58,36,24,0.09), inset 0 0 0 1px rgba(58,36,24,0.06);
-  transition: box-shadow 0.15s;
-  /* clip top-right corner to match fold */
-  clip-path: polygon(0 0, calc(100% - 26px) 0, 100% 26px, 100% 100%, 0 100%);
+  width: 100%; resize: vertical; min-height: 44px;
+  background: rgba(255,255,255,0.65); border: 1.5px solid rgba(58,36,24,0.15);
+  border-radius: 8px; padding: 8px 10px;
+  font: inherit; font-size: 11px; line-height: 1.45; color: var(--ink-2); outline: none;
+  transition: border-color 0.15s;
 }
-.sp-desc-input:focus {
-  box-shadow: 0 2px 14px rgba(58,36,24,0.13), inset 0 0 0 1px rgba(227,104,136,0.30);
-}
-.sp-desc-input::placeholder { color: var(--ink-4, #b09080); font-style: normal; }
+.sp-desc-input:focus { border-color: var(--blush); }
+.sp-desc-input::placeholder { color: var(--ink-5); }
 .sp-attach-btn {
   background: rgba(227,104,136,0.07); border: 1.5px solid rgba(227,104,136,0.40);
   color: var(--blush);
