@@ -220,8 +220,8 @@
     /* ── Rest state: tucked behind the card edges ── */
     .ks-stamp-l  { left: 0;  top: 50%; transform: translate(34%, -50%)  rotate(-8deg); }
     .ks-stamp-r  { right: 0; top: 50%; transform: translate(-34%, -50%) rotate(8deg); }
-    .ks-ticket-l { left: 0;  top: 50%; transform: translate(40%, -34%)  rotate(75deg); }
-    .ks-ticket-r { right: 0; top: 50%; transform: translate(-40%, -34%) rotate(-75deg); }
+    .ks-ticket-l { left: 0;  top: 50%; transform: translate(40%, -34%)  rotate(60deg); }
+    .ks-ticket-r { right: 0; top: 50%; transform: translate(-40%, -34%) rotate(-60deg); }
 
     /* ── Hover / focus: card lifts, pieces slide outward ── */
     .keepsake-stage:hover  .keepsake-card,
@@ -236,10 +236,10 @@
     .keepsake-stage:focus  .ks-stamp-r  { transform: translate(66%, -50%)  rotate(8deg);  opacity: 1; }
     .keepsake-stage:hover  .ks-ticket-l,
     .keepsake-stage:focus-within .ks-ticket-l,
-    .keepsake-stage:focus  .ks-ticket-l { transform: translate(-72%, -28%) rotate(75deg); opacity: 1; }
+    .keepsake-stage:focus  .ks-ticket-l { transform: translate(calc(-72% - 10px), -28%) rotate(60deg); opacity: 1; }
     .keepsake-stage:hover  .ks-ticket-r,
     .keepsake-stage:focus-within .ks-ticket-r,
-    .keepsake-stage:focus  .ks-ticket-r { transform: translate(72%, -28%)  rotate(-75deg);  opacity: 1; }
+    .keepsake-stage:focus  .ks-ticket-r { transform: translate(calc(72% + 10px), -28%)  rotate(-60deg);  opacity: 1; }
 
     .keepsake-card {
       position: relative;
@@ -352,8 +352,8 @@
       .ks-pop { transition: none; opacity: 1; }
       .ks-stamp-l  { transform: translate(-66%, -50%) rotate(-8deg); }
       .ks-stamp-r  { transform: translate(66%, -50%)  rotate(8deg); }
-      .ks-ticket-l { transform: translate(-72%, -28%) rotate(75deg); }
-      .ks-ticket-r { transform: translate(72%, -28%)  rotate(-75deg); }
+      .ks-ticket-l { transform: translate(-72%, -28%) rotate(60deg); }
+      .ks-ticket-r { transform: translate(72%, -28%)  rotate(-60deg); }
       .keepsake-card { transition: none; }
     }
 
@@ -369,9 +369,9 @@
       .keepsake-stage:hover  .ks-stamp-r,
       .keepsake-stage:focus-within .ks-stamp-r { transform: translate(52%, -50%) rotate(8deg); }
       .keepsake-stage:hover  .ks-ticket-l,
-      .keepsake-stage:focus-within .ks-ticket-l { transform: translate(-56%, -28%) rotate(75deg); }
+      .keepsake-stage:focus-within .ks-ticket-l { transform: translate(-56%, -28%) rotate(60deg); }
       .keepsake-stage:hover  .ks-ticket-r,
-      .keepsake-stage:focus-within .ks-ticket-r { transform: translate(56%, -28%) rotate(-75deg); }
+      .keepsake-stage:focus-within .ks-ticket-r { transform: translate(56%, -28%) rotate(-60deg); }
     }
 
     /* ── Discover link ── */
