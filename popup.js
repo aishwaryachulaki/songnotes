@@ -409,7 +409,7 @@ async function saveStore(store) {
   try {
     await chrome.storage.local.set({ ks_shares: store });
   } catch (err) {
-    console.error("Keepsake: storage write failed —", err);
+    console.error("Keepsake: storage write failed:", err);
     throw new Error("storage_full");
   }
 }
@@ -497,7 +497,7 @@ async function pushShareMeta(share, accessToken, userId) {
     if (!res.ok) {
       const errText = await res.text().catch(() => res.status);
       console.error("Keepsake: pushShareMeta failed", res.status, errText);
-      return { ok: false, error: `${res.status} — ${errText}` };
+      return { ok: false, error: `${res.status}: ${errText}` };
     }
     return { ok: true, error: null };
   } catch (e) {
@@ -613,7 +613,7 @@ async function renderNotes() {
       noteDiv.classList.add("note--editing");
       noteDiv.innerHTML = `
         <textarea class="note-edit-textarea" maxlength="260">${escapeHtml(n.note)}</textarea>
-        <input class="note-edit-ts" type="text" value="${n.timestamp != null ? escapeHtml(formatTs(n.timestamp)) : ""}" placeholder="Timestamp (e.g. 1:24) — optional" />
+        <input class="note-edit-ts" type="text" value="${n.timestamp != null ? escapeHtml(formatTs(n.timestamp)) : ""}" placeholder="Timestamp (e.g. 1:24), optional" />
         <div class="note-edit-actions">
           <button class="note-save-edit" data-id="${noteId}">Save</button>
           <button class="note-cancel-edit">Cancel</button>
@@ -632,7 +632,7 @@ async function renderNotes() {
         try {
           await saveStore(store);
         } catch {
-          $("status").textContent = "Couldn't save — storage is full.";
+          $("status").textContent = "Couldn't save. Storage is full.";
           return;
         }
         activeShare.notes = store.shares[activeShare.id]?.notes ?? [];
@@ -658,7 +658,7 @@ async function renderNotes() {
       try {
         await saveStore(store);
       } catch {
-        $("status").textContent = "Couldn't save — storage is full.";
+        $("status").textContent = "Couldn't save. Storage is full.";
         return;
       }
       // Keep the module-level reference consistent with the saved store.
@@ -1101,7 +1101,7 @@ async function init() {
   } else if (state && !state.notOnSpotify && !state.playerVisible) {
     // On Spotify, but the player widget couldn't be found — likely a Spotify update
     $("trackTitle").textContent = "Player not detected";
-    $("trackArtist").textContent = "Spotify may have updated — check for a Keepsake update";
+    $("trackArtist").textContent = "Spotify may have updated. Check for a Keepsake update";
   } else {
     // On Spotify, player found, but no track loaded yet (paused on home screen etc.)
     $("trackTitle").textContent = "Nothing playing";
@@ -1151,7 +1151,7 @@ async function refreshAuthUI() {
     const vb = $("vaultBlock"); if (vb) vb.style.display = "none";
     if (_sessionExpired) {
       $("authGate").querySelector(".auth-gate-text").textContent =
-        "Your session expired — please sign in again.";
+        "Your session expired. Please sign in again.";
     }
   }
 }
@@ -1179,7 +1179,7 @@ function renderVaultUI(hasVault, unlocked) {
     $("vaultRow").style.display = "none";
     pass2.style.display = "none";
     change.style.display = "";
-    status.textContent = "On — your letters relive on any device you sign into. (Sign out to lock this device.)";
+    status.textContent = "On. Your letters relive on any device you sign into. (Sign out to lock this device.)";
   } else if (hasVault && !unlocked) {
     _vaultMode = "unlock";
     summary.textContent = "Cross-device relive · Locked";
@@ -1192,7 +1192,7 @@ function renderVaultUI(hasVault, unlocked) {
     _vaultMode = "off";
     summary.textContent = "Cross-device relive · Off";
     disc.style.display = "";
-    disc.textContent = "Set a passphrase to relive your letters on any device you sign into. Make it long — a few random words you'll remember (12+ characters). It never leaves your device, so we can't see it or reset it; if you forget it, re-set it from a device you're already on. Write it down.";
+    disc.textContent = "Set a passphrase to relive your letters on any device you sign into. Make it long: a few random words you'll remember (12+ characters). It never leaves your device, so we can't see it or reset it; if you forget it, re-set it from a device you're already on. Write it down.";
     $("vaultRow").style.display = "";
     pass2.style.display = "";
     change.style.display = "none";
@@ -1233,21 +1233,21 @@ $("vaultBtn")?.addEventListener("click", async () => {
     btn.disabled = true; status.textContent = "Unlocking…";
     try {
       await vaultUnlock(pass);
-      status.textContent = "Unlocked ✦ — your letters are now on this device.";
+      status.textContent = "Unlocked ✦ Your letters are now on this device.";
       await refreshAuthUI();
       renderPrevious().catch(() => {});
     } catch (err) {
-      status.textContent = err.message === "wrong passphrase" ? "Wrong passphrase." : "Couldn't unlock — check your connection.";
+      status.textContent = err.message === "wrong passphrase" ? "Wrong passphrase." : "Couldn't unlock. Check your connection.";
     }
     btn.disabled = false;
   } else {
     // setup / change
     const pass2 = $("vaultPass2").value.trim();
-    if (pass.length < 12) { status.textContent = "Use at least 12 characters — a few random words is ideal."; return; }
+    if (pass.length < 12) { status.textContent = "Use at least 12 characters. A few random words is ideal."; return; }
     if (pass !== pass2) { status.textContent = "Passphrases don't match."; return; }
     btn.disabled = true; status.textContent = "Setting up…";
     try { await vaultSetup(pass); status.textContent = "Cross-device on ✦"; await refreshAuthUI(); }
-    catch (err) { status.textContent = "Couldn't set up — check your connection."; }
+    catch (err) { status.textContent = "Couldn't set up. Check your connection."; }
     btn.disabled = false;
   }
 });
@@ -1327,7 +1327,7 @@ $("save").addEventListener("click", async () => {
     // Roll back the in-memory push so the UI stays consistent with storage.
     activeShare.notes.pop();
     btn.disabled = false;
-    $("status").textContent = "Couldn't save — storage is full. Delete some old notes and try again.";
+    $("status").textContent = "Couldn't save. Storage is full. Delete some old notes and try again.";
     return;
   }
   setMode("editing");
@@ -1556,7 +1556,7 @@ $("copyShare").addEventListener("click", async () => {
     // the user can still copy and send it; warn about the storage issue.
     shareBtn.disabled = false;
     const url = `${shareUrl(activeShare.id)}&e=1#k=${encodeURIComponent(keyB64)}`;
-    $("shareInfo").innerHTML = `Share sent! But storage is full — your local notes may be out of sync. Link: <a href="${url}" target="_blank">${url}</a>`;
+    $("shareInfo").innerHTML = `Share sent! But storage is full, so your local notes may be out of sync. Link: <a href="${url}" target="_blank">${url}</a>`;
     return;
   }
   shareBtn.disabled = false;
@@ -1682,7 +1682,7 @@ $("importBtn").addEventListener("click", async () => {
           : null;
       }
     } catch {
-      $("importStatus").textContent = "Couldn't decrypt — paste the full share link, not just the ID.";
+      $("importStatus").textContent = "Couldn't decrypt. Paste the full share link, not just the ID.";
       return;
     }
   }
@@ -1721,7 +1721,7 @@ $("importBtn").addEventListener("click", async () => {
   try {
     await saveStore(store);
   } catch {
-    $("importStatus").textContent = "Couldn't import — storage is full. Delete some old notes and try again.";
+    $("importStatus").textContent = "Couldn't import. Storage is full. Delete some old notes and try again.";
     return;
   }
   activeShare = newShare;
@@ -1815,7 +1815,7 @@ function startLiveTracking() {
       $("trackArtist").textContent = "Open Spotify Web Player to start";
     } else if (!state.playerVisible) {
       $("trackTitle").textContent = "Player not detected";
-      $("trackArtist").textContent = "Spotify may have updated — check for a Keepsake update";
+      $("trackArtist").textContent = "Spotify may have updated. Check for a Keepsake update";
     } else {
       $("trackTitle").textContent = "Nothing playing";
       $("trackArtist").textContent = "Play a song to get started";

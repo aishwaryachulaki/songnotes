@@ -423,7 +423,7 @@
     const res = await reliveInExtension(shareId);
     if (!res.ok) {
       if (res.error === "not_on_device") {
-        showToast("This letter's key isn't on this device — relive it from where you sent it.");
+        showToast("This letter's key isn't on this device. Relive it from where you sent it.");
       } else {
         showToast("Open the Keepsake extension, then try Relive ✦");
       }
@@ -588,10 +588,10 @@
               await navigator.clipboard.writeText(url);
               showToast("Link copied ✦");
             } catch {
-              showToast("Couldn't access clipboard — try from the extension.");
+              showToast("Couldn't access clipboard. Try from the extension.");
             }
           } else {
-            showToast("Extension not detected — open the extension to copy the link.");
+            showToast("Extension not detected. Open the extension to copy the link.");
           }
           copyBtn.textContent = "Link";
           copyBtn.disabled = false;
@@ -732,7 +732,7 @@
         <div class="notice-card">
           <div class="notice-eyebrow">Coming soon</div>
           <div class="notice-title">Your received notes will live here</div>
-          <div class="notice-body">When someone sends you a Keepsake link and you import it in the extension while signed in, it'll be saved here — always accessible, even after the link is gone.</div>
+          <div class="notice-body">When someone sends you a Keepsake link and you import it in the extension while signed in, it'll be saved here, always accessible, even after the link is gone.</div>
           <div class="notice-sub">Needs a one-time setup in Supabase to activate.</div>
         </div>
         <div class="notice-card" style="background: url('faq-bg-olive.png') center/cover no-repeat; color: #363614;">
@@ -740,7 +740,7 @@
           <div class="notice-steps">
             1. Someone sends you a Keepsake link<br>
             2. You open it in the extension while signed in<br>
-            3. It saves here automatically — all your received notes in one place
+            3. It saves here automatically, all your received notes in one place
           </div>
         </div>
       `;

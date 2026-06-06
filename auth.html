@@ -343,7 +343,7 @@
         </svg>
         ✧ Continue with Google
       </button>
-      <p class="hint">Fastest — no password needed</p>
+      <p class="hint">Fastest, no password needed</p>
     </div>
 
     <!-- Email panel -->
@@ -529,7 +529,7 @@
     }
     const captchaToken = await getCaptchaToken();
     if (CAPTCHA_ON && !captchaToken) {
-      showMsg("emailMsg", "Couldn't verify you're human — please refresh and try again.", "error");
+      showMsg("emailMsg", "Couldn't verify you're human. Please refresh and try again.", "error");
       e.target.disabled = false; return;
     }
     const fn = emailMode === "signin"
@@ -552,13 +552,13 @@
     if (!email) { showMsg("magicMsg", "Please enter your email.", "error"); e.target.disabled = false; return; }
     const captchaToken = await getCaptchaToken();
     if (CAPTCHA_ON && !captchaToken) {
-      showMsg("magicMsg", "Couldn't verify you're human — please refresh and try again.", "error");
+      showMsg("magicMsg", "Couldn't verify you're human. Please refresh and try again.", "error");
       e.target.disabled = false; return;
     }
     const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.href, captchaToken } });
     resetCaptcha();
     if (error) { showMsg("magicMsg", error.message, "error"); e.target.disabled = false; return; }
-    showMsg("magicMsg", `Magic link sent to ${email} — check your inbox.`, "success");
+    showMsg("magicMsg", `Magic link sent to ${email}. Check your inbox.`, "success");
     e.target.disabled = false;
   });
 

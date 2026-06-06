@@ -437,7 +437,7 @@
       a.href = EXTENSION_CWS_URL;
       a.target = "_blank";
       a.rel = "noopener";
-      a.textContent = "✧ Get Keepsake — it's free";
+      a.textContent = "✧ Get Keepsake, it's free";
       actions.appendChild(a);
     }
 
@@ -504,7 +504,7 @@
           : null,
       } : rawMeta;
 
-      document.title = `Keepsake — a letter from ${meta?.sender_name || "someone"}`;
+      document.title = `A letter from ${meta?.sender_name || "someone"}`;
       render(shareId, meta, notes);
 
     } catch (err) {

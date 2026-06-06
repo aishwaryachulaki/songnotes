@@ -404,7 +404,7 @@
             .update({ archived: !share.archived })
             .eq("id", shareId);
           if (error) {
-            showToast("Couldn't update — try again.");
+            showToast("Couldn't update. Try again.");
           } else {
             share.archived = !share.archived;
             showToast(share.archived ? "Archived ✦" : "Moved back to active ✦");
