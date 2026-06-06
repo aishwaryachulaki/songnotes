@@ -421,10 +421,7 @@
       <a href="auth.html" class="nav-link nav-link--pill">Sign out</a>
     </div>
   </nav>
-  <div id="heroContent" class="hero-content">
-    <div class="state loading"><span class="loading-dot">✦</span> opening your letter…</div>
-  </div>
-  <div class="keepsake-stage" id="keepsakeStage" tabindex="0" aria-label="Your keepsake">
+  <div class="keepsake-stage" id="keepsakeStage" tabindex="0" aria-label="Your keepsake" style="display:none">
     <img class="ks-pop ks-ticket-l" src="ticket-green.webp"    alt="" aria-hidden="true" />
     <img class="ks-pop ks-ticket-r" src="ticket-pink.webp"     alt="" aria-hidden="true" />
     <img class="ks-pop ks-stamp-l"  src="stamp-lavender.webp"  alt="" aria-hidden="true" />
@@ -441,6 +438,9 @@
         <div class="kc-stat"><span class="kc-stat-k">Sent by</span><span id="kcSentBy" class="kc-stat-v kc-stat-v--accent"></span></div>
       </div>
     </article>
+  </div>
+  <div id="heroContent" class="hero-content">
+    <div class="state loading"><span class="loading-dot">✦</span> opening your letter…</div>
   </div>
 </div>
 
@@ -554,14 +554,12 @@
 
     const spLink = spotifyLink(meta, notes);
 
+    // Reveal the card (hidden during load/error) and put the actions + discover
+    // link below it. The card itself now carries the title/sender/etc.
+    const stageEl = document.getElementById("keepsakeStage");
+    if (stageEl) stageEl.style.display = "";
     const heroEl = document.getElementById("heroContent");
     heroEl.innerHTML = `
-      <div class="hero-eyebrow">You've received</div>
-      <h1 class="hero-title">${escHtml(heroTitle)}</h1>
-      ${heroArtist ? `<div class="hero-artist">by <strong>${escHtml(heroArtist)}</strong></div>` : ""}
-      <div class="hero-divider">✦</div>
-      <div class="hero-count">${totalNotes} note${totalNotes === 1 ? "" : "s"} inside</div>
-      ${recipient ? `<div class="hero-recipient">for <strong>${escHtml(recipient)}</strong></div>` : ""}
       <div class="hero-actions" id="heroActions"></div>
       <a href="index.html" class="discover-link">New to Keepsake? Find out more →</a>
     `;
