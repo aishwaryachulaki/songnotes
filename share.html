@@ -421,7 +421,6 @@
       <img class="kc-floral" src="rose2.png" alt="" aria-hidden="true" />
       <div class="kc-eyebrow">A keepsake for you</div>
       <h2 class="kc-title" id="kcTitle"></h2>
-      <div class="kc-by" id="kcBy"></div>
       <div class="kc-divider"><span></span>✦<span></span></div>
       <p class="kc-desc hidden" id="kcDesc"></p>
       <div class="kc-stats">
@@ -565,8 +564,6 @@
     })();
     const setText = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
     setText("kcTitle", heroTitle);
-    const kcBy = document.getElementById("kcBy");
-    if (kcBy) kcBy.innerHTML = `by <strong>${escHtml(sender)}</strong>`;
     setText("kcNotes", String(totalNotes));
     setText("kcType", typeLabel);
     setText("kcSentBy", sender);
