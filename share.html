@@ -320,6 +320,7 @@
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 12px;
+      max-width: 62%;
       padding-top: 16px;
       border-top: 1px solid rgba(58,36,24,0.10);
       position: relative; z-index: 1;
@@ -351,7 +352,7 @@
 
     @media (max-width: 560px) {
       .keepsake-card { padding: 22px 20px; }
-      .kc-title, .kc-by, .kc-divider, .kc-desc { max-width: 80%; }
+      .kc-title, .kc-by, .kc-divider, .kc-desc, .kc-stats { max-width: 80%; }
       .kc-floral { width: 28.5%; opacity: 0.09; }
       .ks-stamp { width: clamp(82px, 22vw, 104px); }
       .ks-stamp--r2 { display: none; }
