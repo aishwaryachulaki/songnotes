@@ -34,28 +34,28 @@
       "run_at": "document_idle"
     },
     {
-      "matches": ["https://dropakeepsake.com/share.html", "https://dropakeepsake.com/share/*"],
+      "matches": ["https://dropakeepsake.com/share.html*", "https://dropakeepsake.com/share/*"],
       "js": ["share-bridge.js"],
       "run_at": "document_idle"
     },
     {
       "matches": [
-        "https://dropakeepsake.com/auth.html",
+        "https://dropakeepsake.com/auth.html*",
         "https://dropakeepsake.com/auth/*",
-        "https://dropakeepsake.com/account.html",
+        "https://dropakeepsake.com/account.html*",
         "https://dropakeepsake.com/account/*",
-        "https://dropakeepsake.com/sent.html",
+        "https://dropakeepsake.com/sent.html*",
         "https://dropakeepsake.com/sent/*",
-        "https://dropakeepsake.com/received.html",
+        "https://dropakeepsake.com/received.html*",
         "https://dropakeepsake.com/received/*",
-        "https://dropakeepsake.com/notes.html",
+        "https://dropakeepsake.com/notes.html*",
         "https://dropakeepsake.com/notes/*"
       ],
       "js": ["auth-bridge.js"],
       "run_at": "document_idle"
     },
     {
-      "matches": ["https://dropakeepsake.com/notes.html", "https://dropakeepsake.com/notes/*"],
+      "matches": ["https://dropakeepsake.com/notes.html*", "https://dropakeepsake.com/notes/*"],
       "js": ["notes-bridge.js"],
       "run_at": "document_idle"
     }

@@ -1606,11 +1606,17 @@ $("resetShare").addEventListener("click", async () => {
     activeShare = store.shares[store.active];
   }
 
+  // Leaving experience mode: the new/restored share must be editable, otherwise
+  // the experience banner stays up and the composer stays hidden.
+  activeShare.mode = "editing";
+  store.shares[store.active] = activeShare;
+
   await saveStore(store).catch(console.error);
   $("shareInfo").textContent = "";
   $("playlistUrl").value = activeShare.playlist_url || "";
   $("recipientName").value = activeShare.recipient_name || "";
   setMode("editing");
+  renderExperienceBanner(); // hides the experience banner, restores the composer
   renderNotes();
   renderSharePanel().catch(console.error);
   renderPrevious();
