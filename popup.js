@@ -346,7 +346,7 @@ async function vaultUnlock(passphrase) {
   try {
     const r = await fetch(
       `${SUPABASE_URL}/rest/v1/shares?user_id=eq.${encodeURIComponent(session.user.id)}` +
-      `&select=id,share_type,playlist_id,playlist_url,playlist_name,sender_name,recipient_name,created_at,annotations(track_id)` +
+      `&select=id,share_type,playlist_id,playlist_url,playlist_name,sender_name,recipient_name,description,created_at,annotations(track_id)` +
       `&order=created_at.desc`,
       { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${session.access_token}` } }
     );
@@ -367,6 +367,7 @@ async function vaultUnlock(passphrase) {
       playlist_name: m.playlist_name || null,
       sender_name: m.sender_name || senderName || "someone",
       recipient_name: (m.recipient_name && !looksEncrypted(m.recipient_name)) ? m.recipient_name : null,
+      description: m.description ? (looksEncrypted(m.description) ? (await decryptField(m.description, key)) : m.description) : null,
       note_count: anns.length,
       song_count: new Set(anns.map((a) => a.track_id).filter(Boolean)).size,
       created_at: m.created_at ? new Date(m.created_at).getTime() : Date.now(),
@@ -426,6 +427,7 @@ function ensureActive(store, sender) {
       thumbnail_url: null,
       sender_name: sender || "someone",
       recipient_name: null,
+      description: null,
       notes: [],
       imported: false,
       created_at: Date.now(),
@@ -491,6 +493,7 @@ async function pushShareMeta(share, accessToken, userId) {
         playlist_name: share.playlist_name || null,
         sender_name: share.sender_name || senderName || "someone",
         recipient_name: share.recipient_name || null,
+        description: share.description || null,
         sender_content: share.sender_content || null,
       }),
     });
@@ -1066,6 +1069,7 @@ async function reliveShare(id) {
   await saveStore(store).catch(console.error);
   activeShare = store.shares[id];
   $("recipientName").value = activeShare.recipient_name || "";
+  if ($("shareDescription")) $("shareDescription").value = activeShare.description || "";
   renderExperienceBanner();
   renderNotes();
   renderSharePanel().catch(console.error);
@@ -1110,6 +1114,7 @@ async function init() {
 
   $("playlistUrl").value = activeShare.playlist_url || "";
   $("recipientName").value = activeShare.recipient_name || "";
+  if ($("shareDescription")) $("shareDescription").value = activeShare.description || "";
   setMode(activeShare.mode || "editing");
   renderExperienceBanner();
   showComposer(!!senderName);
@@ -1291,6 +1296,13 @@ $("recipientName").addEventListener("input", async () => {
   store.shares[activeShare.id] = activeShare;
   await saveStore(store).catch(console.error);
 });
+$("shareDescription")?.addEventListener("input", async () => {
+  if (!activeShare) return;
+  activeShare.description = $("shareDescription").value.trim() || null;
+  const { store } = await loadStore();
+  store.shares[activeShare.id] = activeShare;
+  await saveStore(store).catch(console.error);
+});
 
 $("useCurrent").addEventListener("click", async () => {
   const state = await fetchTrack();
@@ -1456,11 +1468,14 @@ $("copyShare").addEventListener("click", async () => {
     ...activeShare,
     sender_name:    activeShare.sender_name || senderName,
     recipient_name: activeShare.recipient_name || null,
+    // Description is end-to-end encrypted (zero-knowledge), like note text.
+    description:    activeShare.description ? await encryptField(activeShare.description, encKey) : null,
     // Sender copy — encrypted with the same enc_key as the share.
     // Decrypted client-side on notes.html via the extension or a pasted share link.
     // Server only ever sees the encrypted blob.
     sender_content: await encryptField(JSON.stringify({
       recipient_name: activeShare.recipient_name || null,
+      description: activeShare.description || null,
       notes: activeShare.notes.map(n => ({
         note:         n.note,
         timestamp:    n.timestamp ?? null,
@@ -1615,6 +1630,7 @@ $("resetShare").addEventListener("click", async () => {
   $("shareInfo").textContent = "";
   $("playlistUrl").value = activeShare.playlist_url || "";
   $("recipientName").value = activeShare.recipient_name || "";
+  if ($("shareDescription")) $("shareDescription").value = activeShare.description || "";
   setMode("editing");
   renderExperienceBanner(); // hides the experience banner, restores the composer
   renderNotes();
@@ -1680,6 +1696,9 @@ $("importBtn").addEventListener("click", async () => {
         decryptedMeta.recipient_name = decryptedMeta.recipient_name
           ? await decryptField(decryptedMeta.recipient_name, importKey)
           : null;
+        decryptedMeta.description = decryptedMeta.description
+          ? await decryptField(decryptedMeta.description, importKey)
+          : null;
       }
     } catch {
       $("importStatus").textContent = "Couldn't decrypt. Paste the full share link, not just the ID.";
@@ -1700,6 +1719,9 @@ $("importBtn").addEventListener("click", async () => {
     // null it out rather than storing/displaying garbage in the UI.
     recipient_name: decryptedMeta?.recipient_name && !looksEncrypted(decryptedMeta.recipient_name)
       ? decryptedMeta.recipient_name
+      : null,
+    description: decryptedMeta?.description && !looksEncrypted(decryptedMeta.description)
+      ? decryptedMeta.description
       : null,
     enc_key: importKeyB64 || null, // stored so reactivation can decrypt from Supabase
     imported: true,

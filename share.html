@@ -23,8 +23,9 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     html, body {
-      height: 100%;
-      overflow: hidden;
+      min-height: 100%;
+      overflow-x: hidden;
+      overflow-y: auto;
       overscroll-behavior: none;
     }
 
@@ -34,12 +35,13 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
     }
 
-    /* ── Hero: full viewport, no scroll ── */
+    /* ── Hero: fills the viewport, but allowed to grow + scroll for the card ── */
     .hero {
-      height: 100vh;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
-      overflow: hidden;
+      overflow: visible;
+      padding-bottom: clamp(24px, 5vh, 56px);
     }
 
     /* ── Nav ── */
@@ -88,9 +90,9 @@
       opacity: 1;
     }
 
-    /* ── Hero content (centered middle) ── */
+    /* ── Hero content (the received-summary block) ── */
     .hero-content {
-      flex: 1;
+      flex: 0 0 auto;
       width: 100%;
       display: flex;
       flex-direction: column;
@@ -98,7 +100,7 @@
       justify-content: center;
       text-align: center;
       padding: 0 24px;
-      margin-top: clamp(-60px, -4vh, -20px);
+      margin-top: clamp(14px, 3vh, 40px);
     }
     .hero-eyebrow {
       font-family: 'Montserrat', sans-serif;
@@ -193,20 +195,172 @@
     }
     .hero-btn:disabled { opacity: 0.4; cursor: default; }
 
-    /* ── Envelope — shows top ~55%, cropped at bottom edge ── */
-    .hero-envelope {
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
+    /* ── Keepsake card + pop-out stamps ── */
+    .keepsake-stage {
+      position: relative;
+      width: min(680px, 92vw);
+      margin: clamp(26px, 5vh, 56px) auto 0;
       flex-shrink: 0;
-      height: clamp(160px, 35vh, 400px);
-      overflow: hidden;
-      margin-top: -40px;
+      outline: none;
     }
-    .envelope-img {
-      width: min(720px, 88vw);
-      display: block;
-      filter: drop-shadow(0 -6px 24px rgba(58,36,24,0.10));
+
+    /* Stamps are landscape frames rotated to portrait; rotation stays constant
+       (rest↔hover) so they slide out rather than spin. */
+    .ks-stamp {
+      position: absolute;
+      z-index: 1;
+      width: clamp(104px, 14vw, 140px);   /* rotated → ~portrait height */
+      filter: drop-shadow(0 6px 16px rgba(58,36,24,0.18));
+      transition: transform 0.42s cubic-bezier(.22,.61,.36,1), opacity 0.42s ease;
+      pointer-events: none;
+      will-change: transform;
+    }
+    /* Rest state: tucked behind the card edges, slightly faded */
+    .ks-stamp--l  { left: 0;  top: 52%; transform: translate(58%, -50%)  rotate(-84deg); opacity: 0.85; }
+    .ks-stamp--r1 { right: 0; top: 36%; transform: translate(-60%, -50%) rotate(84deg);  opacity: 0.85; }
+    .ks-stamp--r2 { right: 0; top: 66%; transform: translate(-48%, -50%) rotate(78deg);  opacity: 0.70; }
+
+    /* Hover / focus: card lifts, stamps slide outward */
+    .keepsake-stage:hover  .keepsake-card,
+    .keepsake-stage:focus-within .keepsake-card,
+    .keepsake-stage:focus  .keepsake-card { transform: translateY(-4px); }
+
+    .keepsake-stage:hover  .ks-stamp--l,
+    .keepsake-stage:focus-within .ks-stamp--l,
+    .keepsake-stage:focus  .ks-stamp--l  { transform: translate(-82%, -50%) rotate(-84deg); opacity: 1; }
+    .keepsake-stage:hover  .ks-stamp--r1,
+    .keepsake-stage:focus-within .ks-stamp--r1,
+    .keepsake-stage:focus  .ks-stamp--r1 { transform: translate(84%, -50%)  rotate(84deg);  opacity: 1; }
+    .keepsake-stage:hover  .ks-stamp--r2,
+    .keepsake-stage:focus-within .ks-stamp--r2,
+    .keepsake-stage:focus  .ks-stamp--r2 { transform: translate(100%, -50%) rotate(78deg);  opacity: 1; }
+
+    .keepsake-card {
+      position: relative;
+      z-index: 2;
+      background: var(--cream);
+      border-radius: 18px;
+      padding: 30px 34px;
+      overflow: hidden;
+      border: 1px solid rgba(58,36,24,0.06);
+      box-shadow: 0 18px 50px rgba(58,36,24,0.16);
+      transition: transform 0.42s cubic-bezier(.22,.61,.36,1);
+      text-align: left;
+    }
+
+    .kc-floral {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 34%;
+      max-width: 200px;
+      opacity: 0.12;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .kc-eyebrow {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--blush);
+      margin-bottom: 10px;
+      position: relative; z-index: 1;
+    }
+    .kc-title {
+      font-family: 'Lora', Georgia, serif;
+      font-size: clamp(26px, 3.4vw, 40px);
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.1;
+      max-width: 62%;
+      position: relative; z-index: 1;
+    }
+    .kc-by {
+      font-family: 'Lora', Georgia, serif;
+      font-style: italic;
+      font-size: 15px;
+      color: var(--ink-mid);
+      margin-top: 4px;
+      position: relative; z-index: 1;
+    }
+    .kc-by strong { color: var(--blush); font-weight: 700; font-style: normal; }
+
+    .kc-divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      max-width: 62%;
+      margin: 16px 0;
+      color: var(--tangerine);
+      font-size: 11px;
+      position: relative; z-index: 1;
+    }
+    .kc-divider span {
+      flex: 1;
+      height: 1px;
+      background: rgba(58,36,24,0.16);
+    }
+
+    .kc-desc {
+      font-family: 'Spectral', Georgia, serif;
+      font-style: italic;
+      font-size: clamp(14px, 1.4vw, 16px);
+      line-height: 1.6;
+      color: var(--ink-mid);
+      max-width: 62%;
+      margin-bottom: 22px;
+      position: relative; z-index: 1;
+    }
+    .kc-desc.hidden { display: none; }
+
+    .kc-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(58,36,24,0.10);
+      position: relative; z-index: 1;
+    }
+    .kc-stat { display: flex; flex-direction: column; gap: 4px; }
+    .kc-stat-k {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 8.5px;
+      font-weight: 700;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      color: var(--ink-mid);
+      opacity: 0.6;
+    }
+    .kc-stat-v {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 18px;
+      color: var(--ink);
+    }
+    .kc-stat-v--accent { color: var(--blush); }
+
+    @media (prefers-reduced-motion: reduce) {
+      .ks-stamp { transition: none; }
+      .ks-stamp--l  { transform: translate(-82%, -50%) rotate(-84deg); opacity: 1; }
+      .ks-stamp--r1 { transform: translate(84%, -50%)  rotate(84deg);  opacity: 1; }
+      .ks-stamp--r2 { transform: translate(100%, -50%) rotate(78deg);  opacity: 1; }
+      .keepsake-card { transition: none; }
+    }
+
+    @media (max-width: 560px) {
+      .keepsake-card { padding: 22px 20px; }
+      .kc-title, .kc-by, .kc-divider, .kc-desc { max-width: 80%; }
+      .kc-floral { width: 30%; opacity: 0.09; }
+      .ks-stamp { width: clamp(82px, 22vw, 104px); }
+      .ks-stamp--r2 { display: none; }
+      /* gentler travel on small screens */
+      .keepsake-stage:hover  .ks-stamp--l,
+      .keepsake-stage:focus-within .ks-stamp--l { transform: translate(-58%, -50%) rotate(-84deg); }
+      .keepsake-stage:hover  .ks-stamp--r1,
+      .keepsake-stage:focus-within .ks-stamp--r1 { transform: translate(60%, -50%) rotate(84deg); }
     }
 
     /* ── Discover link ── */
@@ -259,8 +413,23 @@
   <div id="heroContent" class="hero-content">
     <div class="state loading"><span class="loading-dot">✦</span> opening your letter…</div>
   </div>
-  <div class="hero-envelope">
-    <img src="share-envelope.png" alt="" class="envelope-img" />
+  <div class="keepsake-stage" id="keepsakeStage" tabindex="0" aria-label="Your keepsake">
+    <img class="ks-stamp ks-stamp--l"  src="stamp-olive.png"  alt="" aria-hidden="true" />
+    <img class="ks-stamp ks-stamp--r1" src="stamp-yellow.png" alt="" aria-hidden="true" />
+    <img class="ks-stamp ks-stamp--r2" src="stamp-pink.png"   alt="" aria-hidden="true" />
+    <article class="keepsake-card">
+      <img class="kc-floral" src="rose2.png" alt="" aria-hidden="true" />
+      <div class="kc-eyebrow">A keepsake for you</div>
+      <h2 class="kc-title" id="kcTitle"></h2>
+      <div class="kc-by" id="kcBy"></div>
+      <div class="kc-divider"><span></span>✦<span></span></div>
+      <p class="kc-desc hidden" id="kcDesc"></p>
+      <div class="kc-stats">
+        <div class="kc-stat"><span class="kc-stat-k">Notes inside</span><span id="kcNotes" class="kc-stat-v"></span></div>
+        <div class="kc-stat"><span class="kc-stat-k">Type</span><span id="kcType" class="kc-stat-v"></span></div>
+        <div class="kc-stat"><span class="kc-stat-k">Sent by</span><span id="kcSentBy" class="kc-stat-v kc-stat-v--accent"></span></div>
+      </div>
+    </article>
   </div>
 </div>
 
@@ -386,6 +555,28 @@
       <a href="index.html" class="discover-link">New to Keepsake? Find out more →</a>
     `;
 
+    // ── Populate the keepsake card ──
+    const typeLabel = (() => {
+      const t = meta?.share_type;
+      if (t === "playlist") return "Playlist";
+      if (t === "multi")    return "Multi-song";
+      if (t === "single")   return "Single";
+      return isPlaylist ? "Playlist" : (trackCount > 1 ? "Multi-song" : "Single");
+    })();
+    const setText = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
+    setText("kcTitle", heroTitle);
+    const kcBy = document.getElementById("kcBy");
+    if (kcBy) kcBy.innerHTML = `by <strong>${escHtml(sender)}</strong>`;
+    setText("kcNotes", String(totalNotes));
+    setText("kcType", typeLabel);
+    setText("kcSentBy", sender);
+    const kcDesc = document.getElementById("kcDesc");
+    if (kcDesc) {
+      const desc = (meta?.description && !looksEncrypted(meta.description)) ? String(meta.description).trim() : "";
+      if (desc) { kcDesc.textContent = desc; kcDesc.classList.remove("hidden"); }
+      else { kcDesc.classList.add("hidden"); }
+    }
+
     window.__KS_PAYLOAD = { share_id: shareId, share: meta || {}, notes };
 
     let detected = false;
@@ -501,6 +692,11 @@
           ? (looksEncrypted(rawMeta.recipient_name)
               ? await decryptField(rawMeta.recipient_name, encKey)
               : rawMeta.recipient_name)
+          : null,
+        description: rawMeta.description
+          ? (looksEncrypted(rawMeta.description)
+              ? await decryptField(rawMeta.description, encKey)
+              : rawMeta.description)
           : null,
       } : rawMeta;
 
