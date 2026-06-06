@@ -322,6 +322,10 @@
     }
     .kc-desc.hidden { display: none; }
 
+    /* No-description state: hide divider, keep title close to stats */
+    .keepsake-card.kc-no-desc .kc-divider { display: none; }
+    .keepsake-card.kc-no-desc .kc-title   { margin-bottom: 24px; }
+
     .kc-stats {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -379,7 +383,9 @@
     /* ── Discover link ── */
     .discover-link {
       display: block;
-      margin-top: 16px;
+      margin-top: auto;
+      padding-top: 28px;
+      text-align: center;
       font-family: 'Montserrat', sans-serif;
       font-size: 10px;
       font-weight: 600;
@@ -444,6 +450,7 @@
   <div id="heroContent" class="hero-content">
     <div class="state loading"><span class="loading-dot">✦</span> opening your letter…</div>
   </div>
+  <a href="index.html" class="discover-link" id="discoverLink" style="display:none">New to Keepsake? Find out more →</a>
 </div>
 
 <script>
@@ -563,8 +570,9 @@
     const heroEl = document.getElementById("heroContent");
     heroEl.innerHTML = `
       <div class="hero-actions" id="heroActions"></div>
-      <a href="index.html" class="discover-link">New to Keepsake? Find out more →</a>
     `;
+    const discover = document.getElementById("discoverLink");
+    if (discover) discover.style.display = "";
 
     // ── Populate the keepsake card ──
     const typeLabel = (() => {
@@ -580,10 +588,17 @@
     setText("kcType", typeLabel);
     setText("kcSentBy", sender);
     const kcDesc = document.getElementById("kcDesc");
+    const card = document.querySelector(".keepsake-card");
     if (kcDesc) {
       const desc = (meta?.description && !looksEncrypted(meta.description)) ? String(meta.description).trim() : "";
-      if (desc) { kcDesc.textContent = desc; kcDesc.classList.remove("hidden"); }
-      else { kcDesc.classList.add("hidden"); }
+      if (desc) {
+        kcDesc.textContent = desc;
+        kcDesc.classList.remove("hidden");
+        card?.classList.remove("kc-no-desc");
+      } else {
+        kcDesc.classList.add("hidden");
+        card?.classList.add("kc-no-desc");
+      }
     }
 
     window.__KS_PAYLOAD = { share_id: shareId, share: meta || {}, notes };
