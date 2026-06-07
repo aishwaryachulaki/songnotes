@@ -1121,9 +1121,18 @@ async function init() {
   renderNotes();
   renderSharePanel().catch(console.error);
   renderPrevious();
+  renderTutorialUI(store);
 
   // ── Auth UI ──
   await refreshAuthUI();
+}
+
+function renderTutorialUI(store) {
+  const isTutorial = store.active === "ks-tutorial";
+  const banner = $("tutorialBanner");
+  const replayBlock = $("replayTutorialBlock");
+  if (banner) banner.classList.toggle("hidden", !isTutorial);
+  if (replayBlock) replayBlock.style.display = isTutorial ? "none" : "";
 }
 
 // Extracted so it can be called both from init() and from the
@@ -1847,6 +1856,24 @@ function startLiveTracking() {
     renderSharePanel().catch(console.error);
   }, 2000);
 }
+
+// Replay tutorial
+$("replayTutorialBtn")?.addEventListener("click", async () => {
+  await chrome.runtime.sendMessage({ type: "KS_START_TUTORIAL" }).catch(() => {});
+  // Give background.js a moment to write storage, then re-init
+  setTimeout(async () => {
+    const { store, sender } = await loadStore();
+    senderName = sender;
+    activeShare = store.shares["ks-tutorial"] || ensureActive(store, senderName);
+    $("playlistUrl").value = activeShare.playlist_url || "";
+    $("recipientName").value = activeShare.recipient_name || "";
+    if ($("shareDescription")) $("shareDescription").value = "";
+    renderNotes();
+    renderSharePanel().catch(console.error);
+    renderPrevious();
+    renderTutorialUI(store);
+  }, 300);
+});
 
 // Auto-refresh auth UI when ks_session is written by auth-bridge.js
 // (fires when the user logs in via auth.html without needing to restart the extension)

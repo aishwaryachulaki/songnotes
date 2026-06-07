@@ -142,9 +142,14 @@
   }
 
   function showOverlay(note) {
+    const isTutorial = !!note.is_tutorial;
     const sender = note.sender_name || "someone";
     const raw    = note.note || "";
     const text   = raw.length > 260 ? raw.slice(0, 257) + "…" : raw;
+
+    // Parse step number from text for tutorial badge (e.g. "Step 2: …" → 2)
+    const stepMatch = isTutorial && text.match(/^Step\s+(\d+)/i);
+    const stepNum   = stepMatch ? parseInt(stepMatch[1], 10) : null;
 
     // Inject Playfair Display once — falls back to Georgia if Spotify's CSP blocks it
     if (!document.getElementById("sn-playfair")) {
@@ -158,18 +163,24 @@
     const wrap = document.createElement("div");
     wrap.className = "ks-overlay";
     wrap.innerHTML = `
-      <div class="ks-card">
+      <div class="ks-card${isTutorial ? " ks-card--tutorial" : ""}">
         <button class="ks-close" aria-label="Dismiss">&#x00D7;</button>
-        <div class="ks-label"></div>
+        ${isTutorial && stepNum ? `<div class="ks-step-badge">✦ STEP ${stepNum} OF 4</div>` : `<div class="ks-label"></div>`}
         <div class="ks-text ${textSizeClass(text.length)}"></div>
       </div>
     `;
 
     // Set background image via extension URL (required for content scripts in MV3)
-    wrap.querySelector(".ks-card").style.backgroundImage =
-      `url('${chrome.runtime.getURL("floater.png")}')`;
+    const card = wrap.querySelector(".ks-card");
+    if (isTutorial) {
+      card.style.backgroundImage = `url('${chrome.runtime.getURL("faq-bg-yellow.png")}')`;
+    } else {
+      card.style.backgroundImage = `url('${chrome.runtime.getURL("floater.png")}')`;
+    }
 
-    wrap.querySelector(".ks-label").textContent = `✦  ${sender.toLowerCase()} sent you a note`;
+    if (!isTutorial) {
+      wrap.querySelector(".ks-label").textContent = `✦  ${sender.toLowerCase()} sent you a note`;
+    }
     wrap.querySelector(".ks-text").textContent  = text;
     document.body.appendChild(wrap);
     requestAnimationFrame(() => wrap.classList.add("visible"));
@@ -227,9 +238,9 @@
         title:   info.title,
         artist:  info.artist,
       }).catch(() => {}); // panel may not be open — that's fine
-      // Fire "song start" notes (timestamp == null) for matching tracks
+      // Fire "song start" notes (timestamp == null or t=0 for tutorials) for matching tracks
       share.notes
-        .filter((n) => n.track_id === info.trackId && n.timestamp == null)
+        .filter((n) => (n.is_tutorial ? n.timestamp === 0 : (n.track_id === info.trackId && n.timestamp == null)))
         .forEach((n) => {
           const k = `${share.id}::${n.id}`;
           if (!firedNotes.has(k)) { firedNotes.add(k); showOverlay(n); }
@@ -250,10 +261,10 @@
     lastPosition = pos;
 
     share.notes.forEach((n) => {
-      // STRICT: track_id must match the currently playing track
-      if (n.track_id !== info.trackId) return;
+      // Tutorial notes fire on any track; regular notes require track_id match.
+      if (!n.is_tutorial && n.track_id !== info.trackId) return;
       const k = `${share.id}::${n.id}`;
-      if (n.timestamp != null && !firedNotes.has(k)) {
+      if (n.timestamp != null && n.timestamp > 0 && !firedNotes.has(k)) {
         if (pos >= n.timestamp && pos <= n.timestamp + 2) {
           firedNotes.add(k);
           showOverlay(n);

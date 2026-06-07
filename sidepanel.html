@@ -39,6 +39,16 @@
         <span id="creditsBadge" class="credits-badge"></span>
       </div>
 
+      <!-- Tutorial welcome banner — shown only when tutorial share is active -->
+      <div id="tutorialBanner" class="tutorial-banner hidden">
+        <div class="tutorial-banner-icon">✦</div>
+        <div class="tutorial-banner-body">
+          <div class="tutorial-banner-title">Welcome to Keepsake!</div>
+          <div class="tutorial-banner-text">Open the demo playlist on Spotify and play any song — pop-ups will guide you through the features.</div>
+          <a id="tutorialPlaylistLink" href="https://open.spotify.com/playlist/5gWV5f3x7IQQRspEkgla3p" target="_blank" class="tutorial-open-btn">Open demo playlist →</a>
+        </div>
+      </div>
+
       <!-- Now Playing -->
       <div class="stamp-track">
         <div class="stamp-eyebrow">✧ NOW PLAYING</div>
@@ -221,6 +231,11 @@
             <div id="vaultStatus" class="status"></div>
           </div>
         </details>
+      </div>
+
+      <!-- Replay tutorial -->
+      <div class="import-block" id="replayTutorialBlock" style="display:none">
+        <button id="replayTutorialBtn" class="tutorial-replay-link">✦ Replay tutorial</button>
       </div>
 
     </div>
