@@ -1082,10 +1082,11 @@ async function init() {
   senderName = sender;
   shareOrigin = CONFIGURED_ORIGIN || "";
 
-  // If the tutorial share is active but stale (fewer notes than current version),
-  // silently update it in-place so users always get the latest steps.
+  // If the tutorial share is active but stale (older copy version or wrong
+  // note count), silently rebuild it in-place so users get the latest steps.
   if (store.active === "ks-tutorial") {
-    if (!store.shares["ks-tutorial"] || (store.shares["ks-tutorial"].notes || []).length < TUTORIAL_TOTAL) {
+    const t = store.shares["ks-tutorial"];
+    if (!t || (t.notes || []).length !== TUTORIAL_TOTAL || t.tutorial_version !== TUTORIAL_VERSION) {
       store.shares["ks-tutorial"] = buildTutorialShare();
     }
   }
@@ -1867,28 +1868,31 @@ function startLiveTracking() {
 // Replay tutorial
 // ── Tutorial helpers ──────────────────────────────────────────────────────
 const TUTORIAL_TOTAL = 10;
+const TUTORIAL_VERSION = 3; // bump when copy changes so existing installs self-heal
 function makeTutorialNote(id, step, ts, text) {
   return { id, track_id: null, timestamp: ts, is_tutorial: true,
-           tutorial_total: TUTORIAL_TOTAL, sender_name: "Keepsake",
-           created_at: Date.now(), note: `Step ${step}: ${text}` };
+           tutorial_step: step, tutorial_total: TUTORIAL_TOTAL,
+           tutorial_version: TUTORIAL_VERSION, sender_name: "Keepsake",
+           created_at: Date.now(), note: text };
 }
 function buildTutorialShare() {
   return {
     id: "ks-tutorial", mode: "editing", type: "single",
     playlist_id: null, playlist_url: null, playlist_name: null,
     sender_name: "Keepsake", recipient_name: null, description: null,
-    is_tutorial: true, imported: false, created_at: Date.now(),
+    is_tutorial: true, tutorial_version: TUTORIAL_VERSION,
+    imported: false, created_at: Date.now(),
     notes: [
-      makeTutorialNote("t01", 1,  0,  "Welcome to Keepsake! Play any song on Spotify and the side panel will guide you. Click the Keepsake icon in Chrome's toolbar to open it now."),
-      makeTutorialNote("t02", 2,  7,  "Enter your name in the panel — friends see this when they receive your keepsake. You only need to set it once."),
-      makeTutorialNote("t03", 3,  14, "Write a note in the text box. Say something meaningful about this exact moment in the song — a memory, a feeling, anything."),
-      makeTutorialNote("t04", 4,  21, "Hit the Now button to stamp the current second, then Save. Your note is now pinned to this moment. It will pop up for anyone who listens here."),
-      makeTutorialNote("t05", 5,  28, "You can add notes across as many songs as you want. Each note fires at its own pinned second when your friend listens."),
-      makeTutorialNote("t06", 6,  35, "Scroll down to the SHARE WITH panel. Add your friend's name in the recipient box so the keepsake feels personal."),
-      makeTutorialNote("t07", 7,  42, "See the description box? Write what this keepsake is about. It shows on the share page your friend sees before they listen."),
-      makeTutorialNote("t08", 8,  49, "Hit SHARE to generate your link. If you have notes on multiple songs, you'll be asked to add the Spotify playlist link first."),
-      makeTutorialNote("t09", 9,  56, "Send the link to your friend. They see a beautiful card with your notes — no app needed to view it."),
-      makeTutorialNote("t10", 10, 63, "If they install Keepsake and import the link, your notes pop up live as they listen. That's it — go make someone's day ✦"),
+      makeTutorialNote("t01", 1,  0,  "Welcome to Keepsake. These little notes will show you the way. Open the side panel to follow along: tap the Keepsake icon up in your toolbar."),
+      makeTutorialNote("t02", 2,  7,  "Start with your name. It's the signature on everything you send, so whoever opens this knows it came from you."),
+      makeTutorialNote("t03", 3,  14, "Who is this one for? Add their name in the panel. A parent, a partner, a fan, someone you adore. Anyone at all."),
+      makeTutorialNote("t04", 4,  21, "Now the good part: write your note. Whatever this moment in the song stirs in you, say it here."),
+      makeTutorialNote("t05", 5,  28, "Pin it to the second. Tap Now to catch the current time, or type the timestamp in yourself if a moment is calling you."),
+      makeTutorialNote("t06", 6,  35, "Hit Save and it's sealed. Add as many notes as you like, across as many songs. Each one waits quietly for its cue."),
+      makeTutorialNote("t07", 7,  42, "Scroll to the share panel and leave a little description. It's the first thing they read, before a single note plays."),
+      makeTutorialNote("t08", 8,  49, "Ready? Hit SHARE for your link. Wrote across a few songs? You'll drop in the playlist link first."),
+      makeTutorialNote("t09", 9,  56, "Now send it off, to anyone, anywhere. It opens as a quiet little card holding every note you left."),
+      makeTutorialNote("t10", 10, 63, "And if they add Keepsake, your notes come alive as they listen. That's everything. Go make someone's day. ✦"),
     ],
   };
 }

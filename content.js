@@ -147,10 +147,10 @@
     const raw    = note.note || "";
     const text   = raw.length > 260 ? raw.slice(0, 257) + "…" : raw;
 
-    // Parse step number from text for tutorial badge (e.g. "Step 2: …" → 2)
-    const stepMatch  = isTutorial && text.match(/^Step\s+(\d+)/i);
-    const stepNum    = stepMatch ? parseInt(stepMatch[1], 10) : null;
-    const stepTotal  = note.tutorial_total || 4;
+    // Step number for the tutorial badge (from note field, or legacy "Step N:" prefix)
+    const legacyMatch = isTutorial && text.match(/^Step\s+(\d+)/i);
+    const stepNum     = note.tutorial_step || (legacyMatch ? parseInt(legacyMatch[1], 10) : null);
+    const stepTotal   = note.tutorial_total || 10;
 
     // Inject Playfair Display once — falls back to Georgia if Spotify's CSP blocks it
     if (!document.getElementById("sn-playfair")) {
