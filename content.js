@@ -148,8 +148,9 @@
     const text   = raw.length > 260 ? raw.slice(0, 257) + "…" : raw;
 
     // Parse step number from text for tutorial badge (e.g. "Step 2: …" → 2)
-    const stepMatch = isTutorial && text.match(/^Step\s+(\d+)/i);
-    const stepNum   = stepMatch ? parseInt(stepMatch[1], 10) : null;
+    const stepMatch  = isTutorial && text.match(/^Step\s+(\d+)/i);
+    const stepNum    = stepMatch ? parseInt(stepMatch[1], 10) : null;
+    const stepTotal  = note.tutorial_total || 4;
 
     // Inject Playfair Display once — falls back to Georgia if Spotify's CSP blocks it
     if (!document.getElementById("sn-playfair")) {
@@ -165,7 +166,7 @@
     wrap.innerHTML = `
       <div class="ks-card${isTutorial ? " ks-card--tutorial" : ""}">
         <button class="ks-close" aria-label="Dismiss">&#x00D7;</button>
-        ${isTutorial && stepNum ? `<div class="ks-step-badge">✦ STEP ${stepNum} OF 4</div>` : `<div class="ks-label"></div>`}
+        ${isTutorial && stepNum ? `<div class="ks-step-badge">✦ STEP ${stepNum} OF ${stepTotal}</div>` : `<div class="ks-label"></div>`}
         <div class="ks-text ${textSizeClass(text.length)}"></div>
       </div>
     `;

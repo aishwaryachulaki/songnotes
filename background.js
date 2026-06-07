@@ -6,35 +6,36 @@ chrome.sidePanel
   .catch(console.error);
 
 // ── Tutorial / onboarding ──────────────────────────────────────────────────
-const TUTORIAL_PLAYLIST_ID  = "5gWV5f3x7IQQRspEkgla3p";
-const TUTORIAL_PLAYLIST_URL = `https://open.spotify.com/playlist/${TUTORIAL_PLAYLIST_ID}`;
+// Tutorial notes fire every 7 seconds on ANY currently-playing track.
+// track_id is null so content.js skips the track-id check entirely.
+// tutorial_total is stored on each note so the badge can show "STEP N OF 10".
+const TUTORIAL_TOTAL = 10;
+function mkNote(id, step, ts, text) {
+  return { id, track_id:null, timestamp:ts, is_tutorial:true,
+           tutorial_total: TUTORIAL_TOTAL, sender_name:"Keepsake",
+           created_at: Date.now(), note: `Step ${step}: ${text}` };
+}
 
-// Tutorial notes fire at t=0, 6, 12, 18 on ANY currently-playing track.
-// track_id is set to null so content.js fires them regardless of which song is playing.
 function makeTutorialShare() {
-  const now = Date.now();
   return {
     id: "ks-tutorial",
     mode: "editing",
-    type: "playlist",
-    playlist_id:   TUTORIAL_PLAYLIST_ID,
-    playlist_url:  TUTORIAL_PLAYLIST_URL,
-    playlist_name: "Keepsake Tutorial",
-    sender_name:   "Keepsake",
-    recipient_name: null,
-    description: null,
-    is_tutorial: true,
-    imported: false,
-    created_at: now,
+    type: "single",
+    playlist_id: null, playlist_url: null, playlist_name: null,
+    sender_name: "Keepsake",
+    recipient_name: null, description: null,
+    is_tutorial: true, imported: false, created_at: Date.now(),
     notes: [
-      { id:"t1", track_id:null, timestamp:0,  is_tutorial:true, sender_name:"Keepsake", created_at:now,
-        note:"Step 1: Open the side panel (the Keepsake icon). Write a thought for this moment. Hit Now to stamp the time, then Save." },
-      { id:"t2", track_id:null, timestamp:6,  is_tutorial:true, sender_name:"Keepsake", created_at:now,
-        note:"Step 2: Before sharing, add a description. Find the description box in the SHARE WITH panel. It shows on the page your friend sees." },
-      { id:"t3", track_id:null, timestamp:12, is_tutorial:true, sender_name:"Keepsake", created_at:now,
-        note:"Step 3: Hit SHARE in the panel to get your link. Send it to anyone — they see a beautiful keepsake card, even without the app." },
-      { id:"t4", track_id:null, timestamp:18, is_tutorial:true, sender_name:"Keepsake", created_at:now,
-        note:"Step 4: Received a keepsake? Open the link, click Import into Keepsake, then play the playlist — notes appear at the right moments." },
+      mkNote("t01", 1,  0,  "Welcome to Keepsake! Play any song on Spotify and the side panel will guide you. Click the Keepsake icon in Chrome's toolbar to open it now."),
+      mkNote("t02", 2,  7,  "Enter your name in the panel — friends see this when they receive your keepsake. You only need to set it once."),
+      mkNote("t03", 3,  14, "Write a note in the text box. Say something meaningful about this exact moment in the song — a memory, a feeling, anything."),
+      mkNote("t04", 4,  21, "Hit the Now button to stamp the current second, then Save. Your note is now pinned to this moment. It will pop up for anyone who listens here."),
+      mkNote("t05", 5,  28, "You can add notes across as many songs as you want. Each note fires at its own pinned second when your friend listens."),
+      mkNote("t06", 6,  35, "Scroll down to the SHARE WITH panel. Add your friend's name in the recipient box so the keepsake feels personal."),
+      mkNote("t07", 7,  42, "See the description box? Write what this keepsake is about. It shows on the share page your friend sees before they listen."),
+      mkNote("t08", 8,  49, "Hit SHARE to generate your link. If you have notes on multiple songs, you'll be asked to add the Spotify playlist link first."),
+      mkNote("t09", 9,  56, "Send the link to your friend. They see a beautiful card with your notes — no app needed to view it."),
+      mkNote("t10", 10, 63, "If they install Keepsake and import the link, your notes pop up live as they listen. That's it — go make someone's day ✦"),
     ],
   };
 }
