@@ -562,12 +562,13 @@ body::before {
 /* Share-level description textarea */
 /* ── Tutorial UI ── */
 .tutorial-banner {
+  position: relative;
   display: flex;
   gap: 12px;
   align-items: flex-start;
   background: url('faq-bg-yellow.png') center / cover no-repeat;
   border-radius: 14px;
-  padding: 14px 16px;
+  padding: 14px 32px 14px 16px; /* right pad for close btn */
   box-shadow: 0 2px 10px rgba(58,36,24,0.10);
 }
 .tutorial-banner.hidden { display: none; }
@@ -590,6 +591,14 @@ body::before {
   text-decoration: none; margin-top: 4px; display: inline-block;
 }
 .tutorial-open-btn:hover { color: rgba(74,56,0,0.9); }
+.tutorial-close-btn {
+  position: absolute; top: 10px; right: 10px;
+  background: none; border: none; cursor: pointer;
+  font-size: 13px; color: rgba(74,56,0,0.40);
+  line-height: 1; padding: 2px 4px; border-radius: 4px;
+  transition: color 0.15s;
+}
+.tutorial-close-btn:hover { color: rgba(74,56,0,0.75); }
 .tutorial-replay-link {
   font-family: 'Montserrat', sans-serif;
   font-size: 9px; font-weight: 600; letter-spacing: 0.08em;

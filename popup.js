@@ -1082,6 +1082,13 @@ async function init() {
   senderName = sender;
   shareOrigin = CONFIGURED_ORIGIN || "";
 
+  // If the tutorial share is active but stale (fewer notes than current version),
+  // silently update it in-place so users always get the latest steps.
+  if (store.active === "ks-tutorial") {
+    if (!store.shares["ks-tutorial"] || (store.shares["ks-tutorial"].notes || []).length < TUTORIAL_TOTAL) {
+      store.shares["ks-tutorial"] = buildTutorialShare();
+    }
+  }
   activeShare = ensureActive(store, senderName);
   await saveStore(store).catch(console.error);
 
@@ -1858,22 +1865,78 @@ function startLiveTracking() {
 }
 
 // Replay tutorial
-$("replayTutorialBtn")?.addEventListener("click", async () => {
-  await chrome.runtime.sendMessage({ type: "KS_START_TUTORIAL" }).catch(() => {});
-  // Give background.js a moment to write storage, then re-init
-  setTimeout(async () => {
-    const { store, sender } = await loadStore();
-    senderName = sender;
-    activeShare = store.shares["ks-tutorial"] || ensureActive(store, senderName);
-    $("playlistUrl").value = activeShare.playlist_url || "";
-    $("recipientName").value = activeShare.recipient_name || "";
-    if ($("shareDescription")) $("shareDescription").value = "";
-    renderNotes();
-    renderSharePanel().catch(console.error);
-    renderPrevious();
-    renderTutorialUI(store);
-  }, 300);
-});
+// ── Tutorial helpers ──────────────────────────────────────────────────────
+const TUTORIAL_TOTAL = 10;
+function makeTutorialNote(id, step, ts, text) {
+  return { id, track_id: null, timestamp: ts, is_tutorial: true,
+           tutorial_total: TUTORIAL_TOTAL, sender_name: "Keepsake",
+           created_at: Date.now(), note: `Step ${step}: ${text}` };
+}
+function buildTutorialShare() {
+  return {
+    id: "ks-tutorial", mode: "editing", type: "single",
+    playlist_id: null, playlist_url: null, playlist_name: null,
+    sender_name: "Keepsake", recipient_name: null, description: null,
+    is_tutorial: true, imported: false, created_at: Date.now(),
+    notes: [
+      makeTutorialNote("t01", 1,  0,  "Welcome to Keepsake! Play any song on Spotify and the side panel will guide you. Click the Keepsake icon in Chrome's toolbar to open it now."),
+      makeTutorialNote("t02", 2,  7,  "Enter your name in the panel — friends see this when they receive your keepsake. You only need to set it once."),
+      makeTutorialNote("t03", 3,  14, "Write a note in the text box. Say something meaningful about this exact moment in the song — a memory, a feeling, anything."),
+      makeTutorialNote("t04", 4,  21, "Hit the Now button to stamp the current second, then Save. Your note is now pinned to this moment. It will pop up for anyone who listens here."),
+      makeTutorialNote("t05", 5,  28, "You can add notes across as many songs as you want. Each note fires at its own pinned second when your friend listens."),
+      makeTutorialNote("t06", 6,  35, "Scroll down to the SHARE WITH panel. Add your friend's name in the recipient box so the keepsake feels personal."),
+      makeTutorialNote("t07", 7,  42, "See the description box? Write what this keepsake is about. It shows on the share page your friend sees before they listen."),
+      makeTutorialNote("t08", 8,  49, "Hit SHARE to generate your link. If you have notes on multiple songs, you'll be asked to add the Spotify playlist link first."),
+      makeTutorialNote("t09", 9,  56, "Send the link to your friend. They see a beautiful card with your notes — no app needed to view it."),
+      makeTutorialNote("t10", 10, 63, "If they install Keepsake and import the link, your notes pop up live as they listen. That's it — go make someone's day ✦"),
+    ],
+  };
+}
+
+async function activateTutorial() {
+  const { store } = await loadStore();
+  // Preserve any real active share
+  if (store.active && store.active !== "ks-tutorial" && store.shares[store.active]) {
+    store.previous = [store.active, ...(store.previous || []).filter(x => x !== store.active)];
+  }
+  store.shares["ks-tutorial"] = buildTutorialShare();
+  store.active = "ks-tutorial";
+  await saveStore(store);
+  await chrome.storage.local.set({ ks_onboarding: { started: true, seen: false } });
+  activeShare = store.shares["ks-tutorial"];
+  $("playlistUrl").value = "";
+  $("recipientName").value = "";
+  if ($("shareDescription")) $("shareDescription").value = "";
+  renderNotes();
+  renderSharePanel().catch(console.error);
+  renderPrevious();
+  renderTutorialUI(store);
+}
+
+async function dismissTutorial() {
+  const { store } = await loadStore();
+  // Archive the tutorial share into previous so user can still replay
+  if (store.shares["ks-tutorial"]) {
+    store.previous = ["ks-tutorial", ...(store.previous || []).filter(x => x !== "ks-tutorial")];
+  }
+  store.active = null;
+  ensureActive(store, senderName); // creates a fresh blank share
+  await saveStore(store);
+  await chrome.storage.local.set({ ks_onboarding: { started: true, seen: true } });
+  activeShare = store.shares[store.active];
+  $("playlistUrl").value = "";
+  $("recipientName").value = "";
+  if ($("shareDescription")) $("shareDescription").value = "";
+  renderExperienceBanner();
+  showComposer(!!senderName);
+  renderNotes();
+  renderSharePanel().catch(console.error);
+  renderPrevious();
+  renderTutorialUI(store);
+}
+
+$("replayTutorialBtn")?.addEventListener("click", () => activateTutorial());
+$("tutorialCloseBtn")?.addEventListener("click", () => dismissTutorial());
 
 // Auto-refresh auth UI when ks_session is written by auth-bridge.js
 // (fires when the user logs in via auth.html without needing to restart the extension)
