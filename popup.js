@@ -436,6 +436,19 @@ function ensureActive(store, sender) {
   }
   return store.shares[store.active];
 }
+// A share with no real user content — used to detect throwaway "ghost" cards.
+function isBlankShare(share) {
+  return !!share && !share.enc_key && !(share.notes && share.notes.length)
+    && !share.recipient_name && !share.description;
+}
+function makeBlankShare(sender, extra = {}) {
+  return {
+    id: shortId(), mode: "editing", type: "single",
+    playlist_id: null, playlist_url: null, playlist_name: null, thumbnail_url: null,
+    sender_name: sender || "someone", recipient_name: null, description: null,
+    notes: [], imported: false, created_at: Date.now(), ...extra,
+  };
+}
 function deriveType(share) {
   if (share.playlist_id || share.playlist_url) return "playlist";
   const trackIds = new Set(share.notes.map((n) => n.track_id));
@@ -1012,6 +1025,11 @@ async function archiveActive(store) {
   if (!store.active) return;
   const share = store.shares[store.active];
   if (!share) return;
+  // Trial shares (tutorial practice) are never saved — discard outright.
+  if (share.is_trial) {
+    delete store.shares[store.active];
+    return;
+  }
   // Blank unsent shares (no notes, no recipient, never sent) are ghost cards —
   // silently delete rather than push into Previous Experiences.
   const isBlank = !share.enc_key && !share.notes?.length && !share.recipient_name;
@@ -1093,12 +1111,31 @@ async function init() {
     if (!ks_tutorial) await chrome.storage.local.set({ ks_tutorial: buildTutorialOverlay(true) });
   }
 
-  // Self-heal: if the tutorial overlay is active but on an older copy version,
-  // rebuild its notes in place so existing installs get the latest steps.
+  // Tutorial overlay: self-heal stale copy + manage the trial sandbox.
   {
     const { ks_tutorial } = await chrome.storage.local.get("ks_tutorial");
-    if (ks_tutorial && ks_tutorial.active && ks_tutorial.version !== TUTORIAL_VERSION) {
+    const tutorialActive = !!(ks_tutorial && ks_tutorial.active);
+    if (tutorialActive && ks_tutorial.version !== TUTORIAL_VERSION) {
       await chrome.storage.local.set({ ks_tutorial: buildTutorialOverlay(true) });
+    }
+    if (tutorialActive) {
+      // Ensure the active slot is a trial sandbox so practice isn't saved.
+      const cur = store.active ? store.shares[store.active] : null;
+      if (!cur) {
+        const trial = makeBlankShare(senderName, { is_trial: true });
+        store.shares[trial.id] = trial; store.active = trial.id;
+      } else if (!cur.is_trial) {
+        if (isBlankShare(cur)) {
+          cur.is_trial = true;
+        } else {
+          store.previous = [store.active, ...(store.previous || []).filter((x) => x !== store.active)];
+          const trial = makeBlankShare(senderName, { is_trial: true });
+          store.shares[trial.id] = trial; store.active = trial.id;
+        }
+      }
+    } else {
+      // Tutorial not active: clean up any leftover practice shares.
+      purgeTrialShares(store);
     }
   }
 
@@ -1592,6 +1629,9 @@ $("copyShare").addEventListener("click", async () => {
   }).catch(() => {});
 
   // ── Step 8: Finalise local state and show the link ──
+  // A genuinely sent share is no longer a trial — keep it so it isn't
+  // discarded when the tutorial ends.
+  if (activeShare) { activeShare.is_trial = false; store.shares[activeShare.id] = activeShare; }
   // Key lives only in the URL fragment — never stored anywhere server-side.
   try {
     await saveStore(store);
@@ -1909,21 +1949,68 @@ function buildTutorialOverlay(active) {
   return { active: !!active, version: TUTORIAL_VERSION, notes: buildTutorialNotes() };
 }
 
+// Discards every trial (tutorial-practice) share. Practice is never saved.
+function purgeTrialShares(store) {
+  for (const id of Object.keys(store.shares || {})) {
+    if (store.shares[id].is_trial) {
+      delete store.shares[id];
+      store.previous = (store.previous || []).filter((x) => x !== id);
+      if (store.active === id) store.active = null;
+    }
+  }
+}
+
 async function activateTutorial() {
+  const { store } = await loadStore();
+  // Preserve real work; drop any blank/trial currently open.
+  const cur = store.active ? store.shares[store.active] : null;
+  if (cur && !cur.is_trial && !isBlankShare(cur)) {
+    store.previous = [store.active, ...(store.previous || []).filter((x) => x !== store.active)];
+  }
+  purgeTrialShares(store);
+  // Start a fresh trial sandbox — anything written here is discarded later.
+  const trial = makeBlankShare(senderName, { is_trial: true });
+  store.shares[trial.id] = trial;
+  store.active = trial.id;
+  await saveStore(store);
   await chrome.storage.local.set({
     ks_tutorial: buildTutorialOverlay(true),
     ks_onboarding: { started: true, seen: false },
   });
+  activeShare = trial;
+  $("playlistUrl").value = "";
+  $("recipientName").value = "";
+  if ($("shareDescription")) $("shareDescription").value = "";
+  setMode("editing");
+  renderExperienceBanner();
+  showComposer(!!senderName);
+  renderNotes();
+  renderSharePanel().catch(console.error);
+  renderPrevious();
   await renderTutorialUI();
   notifyContentRefresh();
 }
 
 async function dismissTutorial() {
+  const { store } = await loadStore();
+  purgeTrialShares(store);          // throw away all practice
+  ensureActive(store, senderName);  // fresh blank real share
+  await saveStore(store);
   const { ks_tutorial } = await chrome.storage.local.get("ks_tutorial");
   await chrome.storage.local.set({
     ks_tutorial: { ...(ks_tutorial || buildTutorialOverlay(false)), active: false },
     ks_onboarding: { started: true, seen: true },
   });
+  activeShare = store.shares[store.active];
+  $("playlistUrl").value = "";
+  $("recipientName").value = "";
+  if ($("shareDescription")) $("shareDescription").value = "";
+  setMode("editing");
+  renderExperienceBanner();
+  showComposer(!!senderName);
+  renderNotes();
+  renderSharePanel().catch(console.error);
+  renderPrevious();
   await renderTutorialUI();
   notifyContentRefresh();
 }
