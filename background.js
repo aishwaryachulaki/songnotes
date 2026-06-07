@@ -6,29 +6,22 @@ chrome.sidePanel
   .catch(console.error);
 
 // ── Tutorial / onboarding ──────────────────────────────────────────────────
-// Tutorial notes fire every 7 seconds on ANY currently-playing track.
-// track_id is null so content.js skips the track-id check entirely.
-// IMPORTANT: keep this copy + TUTORIAL_VERSION in sync with popup.js
-// (buildTutorialShare). popup.js self-heals stale installs on version bump.
+// The tutorial is a decoupled overlay stored under its own key (ks_tutorial),
+// NOT a share — the user's real shares stay separate and auto-saved.
+// Tutorial notes fire every 7 seconds on ANY currently-playing track
+// (no track_id). IMPORTANT: keep this copy + TUTORIAL_VERSION in sync with
+// popup.js (buildTutorialNotes). popup.js self-heals stale installs on bump.
 const TUTORIAL_TOTAL = 10;
-const TUTORIAL_VERSION = 3;
+const TUTORIAL_VERSION = 4;
 function mkNote(id, step, ts, text) {
-  return { id, track_id:null, timestamp:ts, is_tutorial:true,
+  return { id, timestamp: ts, is_tutorial: true,
            tutorial_step: step, tutorial_total: TUTORIAL_TOTAL,
-           tutorial_version: TUTORIAL_VERSION, sender_name:"Keepsake",
-           created_at: Date.now(), note: text };
+           sender_name: "Keepsake", note: text };
 }
-
-function makeTutorialShare() {
+function makeTutorialOverlay(active) {
   return {
-    id: "ks-tutorial",
-    mode: "editing",
-    type: "single",
-    playlist_id: null, playlist_url: null, playlist_name: null,
-    sender_name: "Keepsake",
-    recipient_name: null, description: null,
-    is_tutorial: true, tutorial_version: TUTORIAL_VERSION,
-    imported: false, created_at: Date.now(),
+    active: !!active,
+    version: TUTORIAL_VERSION,
     notes: [
       mkNote("t01", 1,  0,  "Welcome to Keepsake. These little notes will show you the way. Open the side panel to follow along: tap the Keepsake icon up in your toolbar."),
       mkNote("t02", 2,  7,  "Start with your name. It's the signature on everything you send, so whoever opens this knows it came from you."),
@@ -45,22 +38,11 @@ function makeTutorialShare() {
 }
 
 function createDemoShare(force = false) {
-  chrome.storage.local.get(["ks_onboarding", "ks_shares"], (data) => {
+  chrome.storage.local.get(["ks_onboarding"], (data) => {
     const onboarding = data.ks_onboarding || {};
     if (!force && onboarding.started) return; // already set up
-
-    const store = data.ks_shares || { active: null, shares: {}, previous: [] };
-
-    // Preserve any existing real active share in previous
-    if (store.active && store.active !== "ks-tutorial" && store.shares[store.active]) {
-      store.previous = [store.active, ...(store.previous || []).filter(x => x !== store.active)];
-    }
-
-    store.shares["ks-tutorial"] = makeTutorialShare();
-    store.active = "ks-tutorial";
-
     chrome.storage.local.set({
-      ks_shares: store,
+      ks_tutorial: makeTutorialOverlay(true),
       ks_onboarding: { started: true, seen: false },
     });
   });

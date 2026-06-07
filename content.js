@@ -118,12 +118,19 @@
   // firedNotes is keyed per share so multiple shares can each fire independently.
   let firedNotes = new Set(); // entries like "<shareId>::<noteId>"
 
-  async function loadActiveShare() {
+  // Loads both the user's active share AND the (decoupled) tutorial overlay.
+  // The tutorial lives in its own key so it never mixes with — or pollutes —
+  // the user's real keepsakes.
+  async function loadState() {
     return new Promise((resolve) => {
-      chrome.storage.local.get(["ks_shares"], (data) => {
+      chrome.storage.local.get(["ks_shares", "ks_tutorial"], (data) => {
         const store = data.ks_shares || {};
         const active = store.active && store.shares ? store.shares[store.active] : null;
-        resolve(active || null);
+        const tut = data.ks_tutorial;
+        resolve({
+          share: active || null,
+          tutorial: (tut && tut.active && Array.isArray(tut.notes)) ? tut : null,
+        });
       });
     });
   }
@@ -217,43 +224,56 @@
     const info = getTrackInfo();
     if (!info.trackId) return;
 
-    const share = await loadActiveShare();
-    // Inactive mode (or no active share) = never show popups.
-    if (!share || share.mode === "inactive") {
+    const { share, tutorial } = await loadState();
+    const shareActive = share && share.mode !== "inactive";
+
+    // Nothing to show from either source.
+    if (!shareActive && !tutorial) {
       lastTrackId = info.trackId;
       lastPosition = getPosition() ?? -1;
       return;
     }
 
-    // Track change: reset fired set scoped to current share
+    // Track change: reset fired set; fire song-start notes for both sources.
     if (info.trackId !== lastTrackId) {
       lastTrackId = info.trackId;
       lastPosition = -1;
       firedNotes = new Set();
-      // Push track change directly to the side panel — more reliable than
-      // the panel polling via sendMessage, which can be blocked by the
-      // side panel's document.hidden state or currentWindow resolution.
       chrome.runtime.sendMessage({
         type: "KS_TRACK_CHANGED",
         trackId: info.trackId,
         title:   info.title,
         artist:  info.artist,
       }).catch(() => {}); // panel may not be open — that's fine
-      // Fire "song start" notes (timestamp == null or t=0 for tutorials) for matching tracks
-      share.notes
-        .filter((n) => (n.is_tutorial ? n.timestamp === 0 : (n.track_id === info.trackId && n.timestamp == null)))
-        .forEach((n) => {
-          const k = `${share.id}::${n.id}`;
+
+      // Tutorial: fires on ANY track. Song-start = timestamp 0.
+      if (tutorial) {
+        tutorial.notes.forEach((n) => {
+          if (n.timestamp !== 0) return;
+          const k = `tutorial::${n.id}`;
           if (!firedNotes.has(k)) { firedNotes.add(k); showOverlay(n); }
         });
+      }
+      // Real notes: only for the matching track, song-start = timestamp null.
+      if (shareActive) {
+        share.notes
+          .filter((n) => n.track_id === info.trackId && n.timestamp == null)
+          .forEach((n) => {
+            const k = `${share.id}::${n.id}`;
+            if (!firedNotes.has(k)) { firedNotes.add(k); showOverlay(n); }
+          });
+      }
     }
 
     const pos = getPosition();
     if (pos == null) return;
-    // If user scrubbed back, allow re-firing notes that come after current position
+    // Scrub-back: re-arm notes that come after the new position.
     if (pos < lastPosition - 2) {
       const stillFired = new Set();
-      share.notes.forEach((n) => {
+      if (tutorial) tutorial.notes.forEach((n) => {
+        if (n.timestamp != null && n.timestamp < pos - 1) stillFired.add(`tutorial::${n.id}`);
+      });
+      if (shareActive) share.notes.forEach((n) => {
         if (n.track_id !== info.trackId) return;
         if (n.timestamp != null && n.timestamp < pos - 1) stillFired.add(`${share.id}::${n.id}`);
       });
@@ -261,17 +281,24 @@
     }
     lastPosition = pos;
 
-    share.notes.forEach((n) => {
-      // Tutorial notes fire on any track; regular notes require track_id match.
-      if (!n.is_tutorial && n.track_id !== info.trackId) return;
-      const k = `${share.id}::${n.id}`;
-      if (n.timestamp != null && n.timestamp > 0 && !firedNotes.has(k)) {
-        if (pos >= n.timestamp && pos <= n.timestamp + 2) {
-          firedNotes.add(k);
-          showOverlay(n);
+    // Timestamp-based firing.
+    if (tutorial) {
+      tutorial.notes.forEach((n) => {
+        const k = `tutorial::${n.id}`;
+        if (n.timestamp != null && n.timestamp > 0 && !firedNotes.has(k)) {
+          if (pos >= n.timestamp && pos <= n.timestamp + 2) { firedNotes.add(k); showOverlay(n); }
         }
-      }
-    });
+      });
+    }
+    if (shareActive) {
+      share.notes.forEach((n) => {
+        if (n.track_id !== info.trackId) return;
+        const k = `${share.id}::${n.id}`;
+        if (n.timestamp != null && !firedNotes.has(k)) {
+          if (pos >= n.timestamp && pos <= n.timestamp + 2) { firedNotes.add(k); showOverlay(n); }
+        }
+      });
+    }
   }
 
   setInterval(tick, 800);
@@ -284,7 +311,7 @@
       return true;
     }
     if (msg && msg.type === "KS_REFRESH") {
-      // No state reset needed — tick() calls loadActiveShare() every 800ms so
+      // No state reset needed — tick() calls loadState() every 800ms so
       // new notes are picked up automatically. Resetting lastTrackId/firedNotes
       // here would cause all already-passed notes to re-fire as duplicate toasts.
       sendResponse({ ok: true });
