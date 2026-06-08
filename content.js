@@ -174,6 +174,7 @@
       <div class="ks-card${isTutorial ? " ks-card--tutorial" : ""}">
         <button class="ks-close" aria-label="Dismiss">&#x00D7;</button>
         ${isTutorial && stepNum ? `<div class="ks-step-badge">✦ STEP ${stepNum} OF ${stepTotal}</div>` : `<div class="ks-label"></div>`}
+        ${isTutorial && note.title ? `<div class="ks-tut-title"></div>` : ""}
         <div class="ks-text ${textSizeClass(text.length)}"></div>
       </div>
     `;
@@ -188,6 +189,8 @@
 
     if (!isTutorial) {
       wrap.querySelector(".ks-label").textContent = `✦  ${sender.toLowerCase()} sent you a note`;
+    } else if (note.title) {
+      wrap.querySelector(".ks-tut-title").textContent = note.title;
     }
     wrap.querySelector(".ks-text").textContent  = text;
     document.body.appendChild(wrap);
