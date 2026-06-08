@@ -61,14 +61,16 @@
   text-overflow: ellipsis;
 }
 
-/* ── Note text — Baskerville italic; font-size auto-fit in JS to the card ── */
+/* ── Note text — soft vintage Baskerville italic; size auto-fit in JS ── */
 .ks-text {
-  font-family: 'Libre Baskerville', Baskerville, 'Baskerville Old Face', Georgia, 'Times New Roman', serif;
+  /* Native Baskerville (light/elegant on Apple) → EB Garamond web fallback
+     (soft & vintage) → Georgia. Deliberately NOT Libre Baskerville (too heavy). */
+  font-family: 'Baskerville', 'Baskerville Old Face', 'EB Garamond', Georgia, 'Times New Roman', serif;
   font-style: italic;
   font-weight: 400;
   font-size: 24px;       /* starting size; JS shrinks it until it fits */
-  line-height: 1.3;
-  color: #3a1f10;
+  line-height: 1.35;
+  color: #4a2c1a;        /* slightly softer, warmer ink than near-black */
   word-break: break-word;
   margin-left: 10px;
 }

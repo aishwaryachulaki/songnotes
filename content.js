@@ -177,12 +177,13 @@
     const stepNum     = note.tutorial_step || (legacyMatch ? parseInt(legacyMatch[1], 10) : null);
     const stepTotal   = note.tutorial_total || 10;
 
-    // Inject Libre Baskerville (italic) once — falls back to Georgia if Spotify's CSP blocks it
-    if (!document.getElementById("sn-baskerville")) {
+    // Inject EB Garamond (italic) once as the soft, vintage web fallback for
+    // platforms without a native Baskerville. Falls back to Georgia if blocked.
+    if (!document.getElementById("sn-notefont")) {
       const link = document.createElement("link");
-      link.id   = "sn-baskerville";
+      link.id   = "sn-notefont";
       link.rel  = "stylesheet";
-      link.href = "https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital@1&display=swap";
+      link.href = "https://fonts.googleapis.com/css2?family=EB+Garamond:ital@1&display=swap";
       document.head.appendChild(link);
     }
 
