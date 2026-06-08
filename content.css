@@ -28,8 +28,8 @@
 /* ── Card — image is the entire visual ── */
 .ks-card {
   position: relative;
-  box-sizing: border-box;   /* height/width are the full box → reliable fit measuring */
-  overflow: hidden;         /* clip any text that can't shrink further */
+  box-sizing: border-box;   /* height is the full box, so overflow clips at the paper edge */
+  overflow: hidden;         /* safety net: text can never cross the paper boundary */
   /* background-image set in JS via chrome.runtime.getURL */
   background-size: 100% 100%;
   background-repeat: no-repeat;
@@ -61,18 +61,32 @@
   text-overflow: ellipsis;
 }
 
-/* ── Note text — soft vintage Baskerville italic; size auto-fit in JS ── */
+/* ── Note text — font-size set dynamically in JS by length ── */
 .ks-text {
-  /* Native Baskerville (light/elegant on Apple) → EB Garamond web fallback
-     (soft & vintage) → Georgia. Deliberately NOT Libre Baskerville (too heavy). */
-  font-family: 'Baskerville', 'Baskerville Old Face', 'EB Garamond', Georgia, 'Times New Roman', serif;
-  font-style: italic;
-  font-weight: 400;
-  font-size: 24px;       /* starting size; JS shrinks it until it fits */
-  line-height: 1.18;     /* tight so lines read as one block, not disjointed */
-  color: #4a2c1a;        /* slightly softer, warmer ink than near-black */
+  color: #3a1f10;
   word-break: break-word;
+  overflow: hidden;
   margin-left: 10px;
+}
+.ks-text.sn-large {
+  font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  font-weight: 400;
+  font-style: italic;
+  font-size: 26px;
+  line-height: 1.25;
+}
+.ks-text.sn-medium {
+  font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  font-weight: 400;
+  font-style: italic;
+  font-size: 18px;
+  line-height: 1.35;
+}
+.ks-text.sn-small {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 /* ── Tutorial card variant — yellow paper background ── */
@@ -105,7 +119,9 @@
 }
 
 /* Tutorial body uses a slightly warmer ink to suit the yellow */
-.ks-card--tutorial .ks-text { color: rgba(58, 40, 0, 0.82); margin-left: 0; font-size: 16px; line-height: 1.4; }
+.ks-card--tutorial .ks-text { color: rgba(58, 40, 0, 0.82); margin-left: 0; }
+.ks-card--tutorial .ks-text.sn-large { font-size: 17px; }
+.ks-card--tutorial .ks-text.sn-medium { font-size: 15px; }
 
 /* ── Close button ── */
 .ks-close {

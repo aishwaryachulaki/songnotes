@@ -153,23 +153,19 @@
     return Math.min(15000, Math.max(4000, 4000 + words * 450));
   }
 
-  // Shrink the text element's font size until the (fixed-size) card no longer
-  // overflows. Works for any note length and word-wrap; replaces the old,
-  // inconsistent character-count tiers.
-  function fitNoteText(card, textEl, maxPx, minPx) {
-    let size = maxPx;
-    textEl.style.fontSize = size + "px";
-    let guard = 60;
-    while (size > minPx && card.scrollHeight > card.clientHeight && guard-- > 0) {
-      size -= 1;
-      textEl.style.fontSize = size + "px";
-    }
+  // Pick font tier based on note length
+  function textSizeClass(len) {
+    if (len < 60)  return "sn-large";   // 28px Playfair
+    if (len < 140) return "sn-medium";  // 20px Playfair
+    return "sn-small";                  // 13.5px system font
   }
 
   function showOverlay(note) {
     const isTutorial = !!note.is_tutorial;
     const sender = note.sender_name || "someone";
-    const raw    = note.note || "";
+    // Trim leading/trailing whitespace so a stray trailing space/newline can't
+    // push the text past the paper or bump it into a larger size tier.
+    const raw    = (note.note || "").trim();
     const text   = raw.length > 260 ? raw.slice(0, 257) + "…" : raw;
 
     // Step number for the tutorial badge (from note field, or legacy "Step N:" prefix)
@@ -177,13 +173,12 @@
     const stepNum     = note.tutorial_step || (legacyMatch ? parseInt(legacyMatch[1], 10) : null);
     const stepTotal   = note.tutorial_total || 10;
 
-    // Inject EB Garamond (italic) once as the soft, vintage web fallback for
-    // platforms without a native Baskerville. Falls back to Georgia if blocked.
-    if (!document.getElementById("sn-notefont")) {
+    // Inject Playfair Display once — falls back to Georgia if Spotify's CSP blocks it
+    if (!document.getElementById("sn-playfair")) {
       const link = document.createElement("link");
-      link.id   = "sn-notefont";
+      link.id   = "sn-playfair";
       link.rel  = "stylesheet";
-      link.href = "https://fonts.googleapis.com/css2?family=EB+Garamond:ital@1&display=swap";
+      link.href = "https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400&display=swap";
       document.head.appendChild(link);
     }
 
@@ -194,7 +189,7 @@
         <button class="ks-close" aria-label="Dismiss">&#x00D7;</button>
         ${isTutorial && stepNum ? `<div class="ks-step-badge">✦ STEP ${stepNum} OF ${stepTotal}</div>` : `<div class="ks-label"></div>`}
         ${isTutorial && note.title ? `<div class="ks-tut-title"></div>` : ""}
-        <div class="ks-text"></div>
+        <div class="ks-text ${textSizeClass(text.length)}"></div>
       </div>
     `;
 
@@ -211,19 +206,9 @@
     } else if (note.title) {
       wrap.querySelector(".ks-tut-title").textContent = note.title;
     }
-    const textEl = wrap.querySelector(".ks-text");
-    textEl.textContent = text;
+    wrap.querySelector(".ks-text").textContent  = text;
     document.body.appendChild(wrap);
     requestAnimationFrame(() => wrap.classList.add("visible"));
-
-    // Auto-fit: shrink the note text until it fits the fixed-size card. This
-    // is reliable regardless of word-wrap (the old char-count tiers weren't).
-    // Re-run once the web font loads so the measurement uses the real metrics.
-    const maxPx = isTutorial ? 16 : 24;
-    fitNoteText(card, textEl, maxPx, 11);
-    if (document.fonts && document.fonts.ready) {
-      document.fonts.ready.then(() => fitNoteText(card, textEl, maxPx, 11)).catch(() => {});
-    }
 
     // Hold-based dismiss timer. The countdown only runs when nothing is
     // holding it: hovering, pinning, OR the song being paused all hold it.
