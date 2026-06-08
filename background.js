@@ -11,8 +11,8 @@ chrome.sidePanel
 // Tutorial notes fire every 7 seconds on ANY currently-playing track
 // (no track_id). IMPORTANT: keep this copy + TUTORIAL_VERSION in sync with
 // popup.js (buildTutorialNotes). popup.js self-heals stale installs on bump.
-const TUTORIAL_TOTAL = 11;
-const TUTORIAL_VERSION = 6;
+const TUTORIAL_TOTAL = 13;
+const TUTORIAL_VERSION = 7;
 function mkNote(id, step, ts, title, text) {
   return { id, timestamp: ts, is_tutorial: true,
            tutorial_step: step, tutorial_total: TUTORIAL_TOTAL,
@@ -24,17 +24,19 @@ function makeTutorialOverlay(active) {
     version: TUTORIAL_VERSION,
     nameCardPending: !!active, // first panel open leads with the name card
     notes: [
-      mkNote("t01", 1,  0,  "Welcome to Keepsake", "These little notes will show you the way. Open the side panel to follow along: tap the Keepsake icon up in your toolbar."),
-      mkNote("t02", 2,  7,  "Start with your name", "It's the signature on every keepsake you send, so whoever opens one knows it came from you."),
-      mkNote("t03", 3,  14, "Who is it for?", "Add their name in the panel. Whoever you're thinking of right now, this one's for them."),
-      mkNote("t04", 4,  21, "Write your note", "Whatever this moment in the song stirs in you, say it right here."),
-      mkNote("t05", 5,  28, "Pin it to the second", "Tap Now to catch the current time, or type the timestamp in yourself if a moment is calling you."),
-      mkNote("t06", 6,  35, "Save it", "Hit Save and it's sealed. Add as many notes as you like, across as many songs."),
-      mkNote("t07", 7,  42, "Add a description", "Scroll to the share panel and leave a little description. It's the first thing they read, before a single note plays."),
-      mkNote("t08", 8,  49, "Share it", "Hit SHARE for your link. Wrote across a few songs? You'll drop in the playlist link first."),
-      mkNote("t09", 9,  56, "Send it off", "To anyone, anywhere. It opens as a quiet little card holding every note you left."),
-      mkNote("t10", 10, 63, "Relive anywhere", "Turn on Cross-device relive and pick a private passphrase. Your keepsakes follow you across devices, and only you can unlock them."),
-      mkNote("t11", 11, 70, "That's everything", "If they add Keepsake, your notes come alive as they listen. Now go make someone's day. ✦"),
+      mkNote("t01", 1,  0,   "Welcome to Keepsake", "These little notes will show you the way. Open the side panel to follow along: tap the Keepsake icon up in your toolbar."),
+      mkNote("t02", 2,  10,  "Good to know", "These notes pop up as the song plays. Pause or rewind anytime and they'll trigger again, so nothing slips by."),
+      mkNote("t03", 3,  20,  "Start with your name", "It's the signature on every keepsake you send, so whoever opens one knows it came from you."),
+      mkNote("t04", 4,  30,  "Who is it for?", "Add their name in the panel. Whoever you're thinking of right now, this one's for them."),
+      mkNote("t05", 5,  40,  "Write your note", "Whatever this moment in the song stirs in you, say it right here."),
+      mkNote("t06", 6,  50,  "Pin it to the second", "Tap Now to catch the current time, or type the timestamp in yourself if a moment is calling you."),
+      mkNote("t07", 7,  60,  "Save it", "Hit Save and it's sealed. Add as many notes as you like, across as many songs."),
+      mkNote("t08", 8,  70,  "Add a description", "Scroll to the share panel and leave a little description. It's the first thing they read, before a single note plays."),
+      mkNote("t09", 9,  80,  "Share it", "Hit SHARE for your link. Wrote across a few songs? You'll drop in the playlist link first."),
+      mkNote("t10", 10, 90,  "Send it off", "To anyone, anywhere. It opens as a quiet little card holding every note you left."),
+      mkNote("t11", 11, 100, "They press play", "If they add Keepsake, your notes come alive as they listen, right on the beat."),
+      mkNote("t12", 12, 110, "Relive anywhere", "Turn on Cross-device relive and pick a private passphrase. Your keepsakes follow you across devices, and only you can unlock them."),
+      mkNote("t13", 13, 120, "That's everything", "Now go make someone's day. ✦"),
     ],
   };
 }
