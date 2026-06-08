@@ -118,6 +118,18 @@
   // firedNotes is keyed per share so multiple shares can each fire independently.
   let firedNotes = new Set(); // entries like "<shareId>::<noteId>"
 
+  // ---- Playback-aware overlay timers ----
+  // While the song is paused, open notes hold on screen (their auto-dismiss
+  // timer freezes) so they can be read; they resume counting down on play.
+  const activeOverlays = new Set();
+  let playbackPaused = false;
+  let samePosTicks = 0; // consecutive ticks with an unchanged position => paused
+  function setPlaybackPaused(paused) {
+    if (paused === playbackPaused) return;
+    playbackPaused = paused;
+    activeOverlays.forEach((o) => (paused ? o.hold("paused") : o.release("paused")));
+  }
+
   // Loads both the user's active share AND the (decoupled) tutorial overlay.
   // The tutorial lives in its own key so it never mixes with — or pollutes —
   // the user's real keepsakes.
@@ -196,30 +208,49 @@
     document.body.appendChild(wrap);
     requestAnimationFrame(() => wrap.classList.add("visible"));
 
-    let pinned = false;
+    // Hold-based dismiss timer. The countdown only runs when nothing is
+    // holding it: hovering, pinning, OR the song being paused all hold it.
     let timer = null;
-    const totalMs = durationFor(text);
+    let remaining = durationFor(text);
+    let countdownStart = 0;
+    const holds = new Set();
+    if (playbackPaused) holds.add("paused"); // shown during a pause → wait to count down
+
     const close = () => {
       if (timer) clearTimeout(timer);
+      activeOverlays.delete(controller);
       wrap.classList.remove("visible");
       setTimeout(() => wrap.remove(), 500);
     };
-    const startTimer = (ms) => {
-      if (pinned) return;
+    const run = () => {
       if (timer) clearTimeout(timer);
-      timer = setTimeout(close, ms);
+      if (holds.size) return;            // held — don't count down
+      countdownStart = Date.now();
+      timer = setTimeout(close, remaining);
     };
+    const hold = (reason) => {
+      holds.add(reason);
+      if (timer) {                       // freeze whatever time is left
+        clearTimeout(timer); timer = null;
+        remaining = Math.max(0, remaining - (Date.now() - countdownStart));
+      }
+    };
+    const release = (reason) => {
+      holds.delete(reason);
+      if (!holds.size) run();
+    };
+    const controller = { hold, release, close };
+    activeOverlays.add(controller);
+
     wrap.querySelector(".ks-close").addEventListener("click", close);
-    wrap.addEventListener("mouseenter", () => { if (timer) clearTimeout(timer); });
-    wrap.addEventListener("mouseleave", () => startTimer(2000));
+    wrap.addEventListener("mouseenter", () => hold("hover"));
+    wrap.addEventListener("mouseleave", () => release("hover"));
     wrap.querySelector(".ks-card").addEventListener("click", (e) => {
       if (e.target.classList.contains("ks-close")) return;
-      pinned = !pinned;
-      wrap.classList.toggle("pinned", pinned);
-      if (pinned && timer) clearTimeout(timer);
-      else startTimer(2500);
+      const pinned = wrap.classList.toggle("pinned");
+      if (pinned) hold("pin"); else release("pin");
     });
-    startTimer(totalMs);
+    run();
   }
 
   // ---- Loop ----
@@ -270,6 +301,14 @@
 
     const pos = getPosition();
     if (pos == null) return;
+
+    // Pause detection: while playing, the position advances every ~1s; a
+    // value frozen across 2+ ticks (~1.6s, longer than the 800ms tick) means
+    // the song is paused. Holds open notes on screen until playback resumes.
+    if (pos === lastPosition) samePosTicks++;
+    else samePosTicks = 0;
+    setPlaybackPaused(samePosTicks >= 2);
+
     // Scrub-back: re-arm notes that come after the new position.
     if (pos < lastPosition - 2) {
       const stillFired = new Set();
