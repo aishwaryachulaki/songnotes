@@ -1083,6 +1083,7 @@ async function reliveShare(id) {
   // Reactivated sent shares open in experience mode (read-only).
   // Unsent shares (no enc_key) open in editing mode as normal.
   share.mode = share.enc_key ? "experience" : "editing";
+  share.relived = true; // came from Previous → "+ New Share" returns it there
   store.shares[id] = share;
   await saveStore(store).catch(console.error);
   activeShare = store.shares[id];
@@ -1441,6 +1442,14 @@ $("copyShare").addEventListener("click", async () => {
     return;
   }
 
+  // ── Tutorial practice: don't really send (no server, no credit). ──
+  if (activeShare?.is_trial) {
+    shareBtn.disabled = false;
+    $("shareInfo").innerHTML =
+      "This is practice, so nothing was sent. In a real share you'd get a link here to send to anyone. ✦";
+    return;
+  }
+
   // ── Step 1: Auth check ──
   const session = await getSession();
   if (!session) {
@@ -1629,9 +1638,6 @@ $("copyShare").addEventListener("click", async () => {
   }).catch(() => {});
 
   // ── Step 8: Finalise local state and show the link ──
-  // A genuinely sent share is no longer a trial — keep it so it isn't
-  // discarded when the tutorial ends.
-  if (activeShare) { activeShare.is_trial = false; store.shares[activeShare.id] = activeShare; }
   // Key lives only in the URL fragment — never stored anywhere server-side.
   try {
     await saveStore(store);
@@ -1666,10 +1672,12 @@ $("copyShare").addEventListener("click", async () => {
 $("resetShare").addEventListener("click", async () => {
   const { store } = await loadStore();
   const current = store.shares[store.active];
-  const isReactivated = !!current?.enc_key;
+  const wasRelived = !!current?.relived;
+  const { ks_tutorial } = await chrome.storage.local.get("ks_tutorial");
+  const tutorialActive = !!(ks_tutorial && ks_tutorial.active);
 
-  // Tailor the confirm message: reactivated shares go *back*, new shares get *moved*.
-  const confirmMsg = isReactivated
+  // Relived letters go *back* to previous; everything else is *moved* there.
+  const confirmMsg = wasRelived
     ? "Return this letter to previous experiences?"
     : "Start a new share? Your current letter will be moved to ‘previous experiences’.";
   if (!confirm(confirmMsg)) return;
@@ -1677,10 +1685,10 @@ $("resetShare").addEventListener("click", async () => {
   await archiveActive(store);
   store.active = null;
 
-  // If we just finished reviewing a reactivated share and there was a working
+  // If we just finished reviewing a relived share and there was a working
   // share open before reactivation, restore it instead of creating a blank.
   const displaced = store.displacedActive;
-  if (isReactivated && displaced && store.shares[displaced]) {
+  if (wasRelived && displaced && store.shares[displaced]) {
     store.active = displaced;
     store.previous = (store.previous || []).filter((x) => x !== displaced);
     store.displacedActive = null;
@@ -1694,6 +1702,9 @@ $("resetShare").addEventListener("click", async () => {
   // Leaving experience mode: the new/restored share must be editable, otherwise
   // the experience banner stays up and the composer stays hidden.
   activeShare.mode = "editing";
+  activeShare.relived = false;
+  // Stay in the practice sandbox while the tutorial is running.
+  if (tutorialActive) activeShare.is_trial = true;
   store.shares[store.active] = activeShare;
 
   await saveStore(store).catch(console.error);
@@ -1711,13 +1722,53 @@ $("resetShare").addEventListener("click", async () => {
 
 $("enterEditMode")?.addEventListener("click", async () => {
   if (!activeShare) return;
-  activeShare.mode = "editing";
   const { store } = await loadStore();
-  store.shares[activeShare.id] = activeShare;
+  const orig = store.shares[activeShare.id];
+
+  if (orig && orig.enc_key) {
+    // Fork-on-edit: a sent/relived letter can't be mutated in place (the
+    // original link must keep working). Return the original to Previous
+    // untouched, and edit a fresh, unsent clone instead. Re-sharing the
+    // clone creates a brand-new link; the original stays as it was.
+    const clonedNotes = (orig.notes || []).map((n) => ({ ...n }));
+    orig.note_count = (orig.notes || []).length;
+    orig.song_count = new Set((orig.notes || []).map((n) => n.track_id)).size;
+    orig.notes = [];
+    orig.mode = "inactive";
+    orig.relived = false;
+    store.previous = [orig.id, ...(store.previous || []).filter((x) => x !== orig.id)];
+
+    const clone = {
+      ...orig,
+      id: shortId(),
+      enc_key: null,
+      imported: false,
+      is_trial: false,
+      relived: false,
+      mode: "editing",
+      note_count: undefined,
+      song_count: undefined,
+      notes: clonedNotes,
+      created_at: Date.now(),
+    };
+    store.shares[clone.id] = clone;
+    store.active = clone.id;
+    activeShare = clone;
+  } else {
+    // Unsent draft — just make it editable in place.
+    activeShare.mode = "editing";
+    store.shares[activeShare.id] = activeShare;
+  }
+
   await saveStore(store).catch(console.error);
+  $("playlistUrl").value = activeShare.playlist_url || "";
+  $("recipientName").value = activeShare.recipient_name || "";
+  if ($("shareDescription")) $("shareDescription").value = activeShare.description || "";
   renderExperienceBanner(); // hides banner, restores composer
+  showComposer(!!senderName);
   renderNotes();
   renderSharePanel().catch(console.error);
+  renderPrevious();
 });
 
 $("importBtn").addEventListener("click", async () => {
