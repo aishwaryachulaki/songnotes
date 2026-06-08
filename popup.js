@@ -1114,6 +1114,7 @@ async function init() {
 
   // Tutorial overlay: self-heal stale copy + manage the trial sandbox.
   let tutorialActive = false;
+  let forceNameCard = false; // one-shot: lead with the name card on first open
   {
     const { ks_tutorial } = await chrome.storage.local.get("ks_tutorial");
     tutorialActive = !!(ks_tutorial && ks_tutorial.active);
@@ -1138,6 +1139,15 @@ async function init() {
     } else {
       // Tutorial not active: clean up any leftover practice shares.
       purgeTrialShares(store);
+    }
+  }
+
+  // Consume the one-shot "lead with the name card" flag (first open / replay only).
+  if (tutorialActive) {
+    const { ks_tutorial: t } = await chrome.storage.local.get("ks_tutorial");
+    if (t && t.nameCardPending) {
+      forceNameCard = true;
+      await chrome.storage.local.set({ ks_tutorial: { ...t, nameCardPending: false } });
     }
   }
 
@@ -1176,8 +1186,9 @@ async function init() {
   if ($("shareDescription")) $("shareDescription").value = activeShare.description || "";
   setMode(activeShare.mode || "editing");
   renderExperienceBanner();
-  // During the tutorial, lead with the name card (tutorial step 2).
-  showComposer(tutorialActive ? false : !!senderName);
+  // On the first tutorial open / replay, lead with the name card (step 2);
+  // afterward, behave normally even while the tutorial is still active.
+  showComposer(forceNameCard ? false : !!senderName);
   renderNotes();
   renderSharePanel().catch(console.error);
   renderPrevious();
@@ -2000,7 +2011,9 @@ function buildTutorialNotes() {
   ];
 }
 function buildTutorialOverlay(active) {
-  return { active: !!active, version: TUTORIAL_VERSION, notes: buildTutorialNotes() };
+  // nameCardPending is a one-shot: the next panel open leads with the name
+  // card (tutorial step 2), then clears so reopens don't keep forcing it.
+  return { active: !!active, version: TUTORIAL_VERSION, nameCardPending: !!active, notes: buildTutorialNotes() };
 }
 
 // Discards every trial (tutorial-practice) share. Practice is never saved.
@@ -2027,8 +2040,10 @@ async function activateTutorial() {
   store.shares[trial.id] = trial;
   store.active = trial.id;
   await saveStore(store);
+  // Replay shows the name card right now, so the pending flag is already
+  // consumed (reopening mid-tutorial won't force it again).
   await chrome.storage.local.set({
-    ks_tutorial: buildTutorialOverlay(true),
+    ks_tutorial: { ...buildTutorialOverlay(true), nameCardPending: false },
     ks_onboarding: { started: true, seen: false },
   });
   activeShare = trial;

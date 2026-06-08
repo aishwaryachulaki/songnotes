@@ -22,6 +22,7 @@ function makeTutorialOverlay(active) {
   return {
     active: !!active,
     version: TUTORIAL_VERSION,
+    nameCardPending: !!active, // first panel open leads with the name card
     notes: [
       mkNote("t01", 1,  0,  "Welcome to Keepsake. These little notes will show you the way. Open the side panel to follow along: tap the Keepsake icon up in your toolbar."),
       mkNote("t02", 2,  7,  "Start with your name. It's the signature on every keepsake you send, so whoever opens one knows it came from you."),
