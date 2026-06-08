@@ -1113,9 +1113,10 @@ async function init() {
   }
 
   // Tutorial overlay: self-heal stale copy + manage the trial sandbox.
+  let tutorialActive = false;
   {
     const { ks_tutorial } = await chrome.storage.local.get("ks_tutorial");
-    const tutorialActive = !!(ks_tutorial && ks_tutorial.active);
+    tutorialActive = !!(ks_tutorial && ks_tutorial.active);
     if (tutorialActive && ks_tutorial.version !== TUTORIAL_VERSION) {
       await chrome.storage.local.set({ ks_tutorial: buildTutorialOverlay(true) });
     }
@@ -1175,7 +1176,8 @@ async function init() {
   if ($("shareDescription")) $("shareDescription").value = activeShare.description || "";
   setMode(activeShare.mode || "editing");
   renderExperienceBanner();
-  showComposer(!!senderName);
+  // During the tutorial, lead with the name card (tutorial step 2).
+  showComposer(tutorialActive ? false : !!senderName);
   renderNotes();
   renderSharePanel().catch(console.error);
   renderPrevious();
@@ -1975,8 +1977,8 @@ function startLiveTracking() {
 // so anything meaningful they make during the tutorial persists like any
 // keepsake, and empty "just testing" shares are discarded by the usual
 // blank-share cleanup. Tutorial notes never mix with or pollute real shares.
-const TUTORIAL_TOTAL = 10;
-const TUTORIAL_VERSION = 4; // bump when copy changes → existing installs self-heal
+const TUTORIAL_TOTAL = 11;
+const TUTORIAL_VERSION = 5; // bump when copy changes → existing installs self-heal
 function makeTutorialNote(id, step, ts, text) {
   return { id, timestamp: ts, is_tutorial: true,
            tutorial_step: step, tutorial_total: TUTORIAL_TOTAL,
@@ -1985,7 +1987,7 @@ function makeTutorialNote(id, step, ts, text) {
 function buildTutorialNotes() {
   return [
     makeTutorialNote("t01", 1,  0,  "Welcome to Keepsake. These little notes will show you the way. Open the side panel to follow along: tap the Keepsake icon up in your toolbar."),
-    makeTutorialNote("t02", 2,  7,  "Start with your name. It's the signature on everything you send, so whoever opens this knows it came from you."),
+    makeTutorialNote("t02", 2,  7,  "Start with your name. It's the signature on every keepsake you send, so whoever opens one knows it came from you."),
     makeTutorialNote("t03", 3,  14, "Who is this one for? Add their name in the panel. A parent, a partner, a fan, someone you adore. Anyone at all."),
     makeTutorialNote("t04", 4,  21, "Now the good part: write your note. Whatever this moment in the song stirs in you, say it here."),
     makeTutorialNote("t05", 5,  28, "Pin it to the second. Tap Now to catch the current time, or type the timestamp in yourself if a moment is calling you."),
@@ -1993,7 +1995,8 @@ function buildTutorialNotes() {
     makeTutorialNote("t07", 7,  42, "Scroll to the share panel and leave a little description. It's the first thing they read, before a single note plays."),
     makeTutorialNote("t08", 8,  49, "Ready? Hit SHARE for your link. Wrote across a few songs? You'll drop in the playlist link first."),
     makeTutorialNote("t09", 9,  56, "Now send it off, to anyone, anywhere. It opens as a quiet little card holding every note you left."),
-    makeTutorialNote("t10", 10, 63, "And if they add Keepsake, your notes come alive as they listen. That's everything. Go make someone's day. ✦"),
+    makeTutorialNote("t10", 10, 63, "Want your keepsakes on every device you use? Turn on Cross-device relive, pick a private passphrase, and they follow you everywhere. Only you can unlock them."),
+    makeTutorialNote("t11", 11, 70, "And if they add Keepsake, your notes come alive as they listen. That's everything. Go make someone's day. ✦"),
   ];
 }
 function buildTutorialOverlay(active) {
@@ -2034,7 +2037,7 @@ async function activateTutorial() {
   if ($("shareDescription")) $("shareDescription").value = "";
   setMode("editing");
   renderExperienceBanner();
-  showComposer(!!senderName);
+  showComposer(false); // tutorial leads with the name card (step 2)
   renderNotes();
   renderSharePanel().catch(console.error);
   renderPrevious();
