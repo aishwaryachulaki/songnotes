@@ -153,11 +153,17 @@
     return Math.min(15000, Math.max(4000, 4000 + words * 450));
   }
 
-  // Pick font tier based on note length
-  function textSizeClass(len) {
-    if (len < 60)  return "sn-large";   // 28px Playfair
-    if (len < 140) return "sn-medium";  // 20px Playfair
-    return "sn-small";                  // 13.5px system font
+  // Shrink the text element's font size until the (fixed-size) card no longer
+  // overflows. Works for any note length and word-wrap; replaces the old,
+  // inconsistent character-count tiers.
+  function fitNoteText(card, textEl, maxPx, minPx) {
+    let size = maxPx;
+    textEl.style.fontSize = size + "px";
+    let guard = 60;
+    while (size > minPx && card.scrollHeight > card.clientHeight && guard-- > 0) {
+      size -= 1;
+      textEl.style.fontSize = size + "px";
+    }
   }
 
   function showOverlay(note) {
@@ -171,12 +177,12 @@
     const stepNum     = note.tutorial_step || (legacyMatch ? parseInt(legacyMatch[1], 10) : null);
     const stepTotal   = note.tutorial_total || 10;
 
-    // Inject Playfair Display once — falls back to Georgia if Spotify's CSP blocks it
-    if (!document.getElementById("sn-playfair")) {
+    // Inject Libre Baskerville (italic) once — falls back to Georgia if Spotify's CSP blocks it
+    if (!document.getElementById("sn-baskerville")) {
       const link = document.createElement("link");
-      link.id   = "sn-playfair";
+      link.id   = "sn-baskerville";
       link.rel  = "stylesheet";
-      link.href = "https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400&display=swap";
+      link.href = "https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital@1&display=swap";
       document.head.appendChild(link);
     }
 
@@ -187,7 +193,7 @@
         <button class="ks-close" aria-label="Dismiss">&#x00D7;</button>
         ${isTutorial && stepNum ? `<div class="ks-step-badge">✦ STEP ${stepNum} OF ${stepTotal}</div>` : `<div class="ks-label"></div>`}
         ${isTutorial && note.title ? `<div class="ks-tut-title"></div>` : ""}
-        <div class="ks-text ${textSizeClass(text.length)}"></div>
+        <div class="ks-text"></div>
       </div>
     `;
 
@@ -204,9 +210,19 @@
     } else if (note.title) {
       wrap.querySelector(".ks-tut-title").textContent = note.title;
     }
-    wrap.querySelector(".ks-text").textContent  = text;
+    const textEl = wrap.querySelector(".ks-text");
+    textEl.textContent = text;
     document.body.appendChild(wrap);
     requestAnimationFrame(() => wrap.classList.add("visible"));
+
+    // Auto-fit: shrink the note text until it fits the fixed-size card. This
+    // is reliable regardless of word-wrap (the old char-count tiers weren't).
+    // Re-run once the web font loads so the measurement uses the real metrics.
+    const maxPx = isTutorial ? 16 : 24;
+    fitNoteText(card, textEl, maxPx, 11);
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => fitNoteText(card, textEl, maxPx, 11)).catch(() => {});
+    }
 
     // Hold-based dismiss timer. The countdown only runs when nothing is
     // holding it: hovering, pinning, OR the song being paused all hold it.
