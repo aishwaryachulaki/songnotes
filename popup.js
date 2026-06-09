@@ -1579,25 +1579,64 @@ $("copyShare").addEventListener("click", async () => {
     activeShare.notes.map(n => encryptNoteFields(n, encKey))
   );
 
-  // ── Step 6: Push encrypted data to Supabase BEFORE consuming credit ──
+  // ── Step 6: Atomically consume a credit + create the share (server-enforced).
+  // ONE rpc = ONE transaction: either a credit is spent AND the share is
+  // created, or neither happens. The credit gate lives on the server now, so a
+  // client can't bypass it by inserting rows directly.
   $("shareInfo").textContent = "Sending…";
-  const metaResult = await pushShareMeta(shareToPush, session.access_token, session.user.id);
-  if (!metaResult.ok) {
-    // Restore old ID so the user's local state is unchanged and they can retry.
+  const p_notes = notesToPush.map((n) => ({
+    track_id:     n.track_id,
+    note:         n.note,                       // already encrypted
+    timestamp:    n.timestamp ?? null,
+    sender_name:  n.sender_name || senderName || "someone",
+    track_title:  n.track_title || null,
+    track_artist: n.track_artist || null,
+    playlist_id:  activeShare.playlist_id || null,
+  }));
+  const { data: shareResult, error: shareErr } = await supabaseRpc("create_share", {
+    p_id:             shareToPush.id,
+    p_share_type:     shareToPush.type,
+    p_playlist_id:    shareToPush.playlist_id || null,
+    p_playlist_url:   shareToPush.playlist_url || null,
+    p_playlist_name:  shareToPush.playlist_name || null,
+    p_sender_name:    shareToPush.sender_name || senderName || "someone",
+    p_recipient_name: shareToPush.recipient_name || null,
+    p_description:    shareToPush.description || null,
+    p_sender_content: shareToPush.sender_content || null,
+    p_notes,
+  }, session.access_token);
+
+  // Roll the local ID swap back so the user can retry without losing anything.
+  const rollbackShare = (msg) => {
     activeShare.id = oldId;
+    activeShare.mode = "editing";
+    activeShare.enc_key = null;
     delete store.shares[newId];
     store.shares[oldId] = activeShare;
     store.active = oldId;
-    await saveStore(store).catch(console.error); // best-effort rollback
-    $("shareInfo").textContent = metaResult.error
-      ? `Couldn't save share: ${metaResult.error}`
-      : "Couldn't reach the server. Check your connection and try again.";
+    saveStore(store).catch(console.error);
+    if (msg) $("shareInfo").textContent = msg;
     shareBtn.disabled = false;
+  };
+
+  if (shareErr || !shareResult?.ok) {
+    const err = shareResult && shareResult.error;
+    if (err === "no_credit") {
+      rollbackShare("");
+      $("shareInfo").innerHTML = `No letters left. <a href="#" id="buyLink" style="color:var(--tangerine);font-weight:600">Buy more →</a>`;
+      document.getElementById("buyLink")?.addEventListener("click", (e) => { e.preventDefault(); openAccountPage(); });
+      return;
+    }
+    if (err === "not_authenticated") { rollbackShare("Your session expired. Please sign in again."); return; }
+    rollbackShare(shareErr
+      ? "Couldn't reach the server. Check your connection and try again."
+      : "Couldn't send your letter. Please try again.");
     return;
   }
 
-  // If the vault is set up + unlocked on this device, also store this letter's
-  // key wrapped, so it can be relived on other devices the user signs into.
+  // Share + credit are committed together. If the vault is set up + unlocked on
+  // this device, also store this letter's key wrapped so it can be relived on
+  // other devices the user signs into.
   (async () => {
     try {
       const mk = await getVaultMasterKey();
@@ -1609,33 +1648,6 @@ $("copyShare").addEventListener("click", async () => {
       }
     } catch (err) { console.warn("Keepsake: vault wrap on send failed", err); }
   })();
-
-  const noteResults = await Promise.all(
-    notesToPush.map(note => pushNote(activeShare, note, session.access_token))
-  );
-  const failedCount = noteResults.filter((ok) => !ok).length;
-  if (failedCount > 0) {
-    // Roll back the ID swap. The orphaned meta row in Supabase under newId has
-    // no annotations attached and is unreachable, so leaving it is harmless.
-    // saveStore was never called with newId, so chrome.storage still holds oldId —
-    // we only need to repair the in-memory references before the user retries.
-    activeShare.id = oldId;
-    activeShare.mode = "editing";
-    activeShare.enc_key = null;
-    delete store.shares[newId];
-    store.shares[oldId] = activeShare;
-    store.active = oldId;
-    await saveStore(store).catch(console.error);
-    $("shareInfo").textContent = `${failedCount} note${failedCount > 1 ? "s" : ""} failed to send. Check your connection and try again.`;
-    shareBtn.disabled = false;
-    return;
-  }
-
-  // ── Step 7: Notes confirmed in Supabase — now consume the credit ──
-  const { data: creditResult, error: creditErr } = await supabaseRpc("use_credit", { p_user_id: session.user.id }, session.access_token);
-  if (creditErr || !creditResult?.ok) {
-    console.warn("Credit deduction failed after successful push:", creditErr);
-  }
 
   // Refresh the credits badge immediately so the user sees the deduction
   // without needing to close and reopen the extension.
