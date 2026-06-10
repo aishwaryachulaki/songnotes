@@ -509,6 +509,21 @@
     });
   });
 
+  // ── Auth methods: Google-only during testing ────────────────────────────────
+  // Email/password + magic link are turned OFF in Supabase Auth for now (so no
+  // Supabase-branded confirmation emails go out; Google pre-verifies the email).
+  // To restore them later: set GOOGLE_ONLY = false AND re-enable Email in
+  // Supabase → Authentication → Providers (ideally with custom SMTP first).
+  const GOOGLE_ONLY = true;
+  if (GOOGLE_ONLY) {
+    const tabs = document.querySelector(".tabs");
+    if (tabs) tabs.style.display = "none"; // only one option — hide the switcher
+    ["panel-email", "panel-magic"].forEach((id) =>
+      document.getElementById(id)?.classList.add("hidden")
+    );
+    document.getElementById("panel-google")?.classList.remove("hidden");
+  }
+
   // Google
   document.getElementById("googleBtn").addEventListener("click", async () => {
     const { error } = await sb.auth.signInWithOAuth({
