@@ -580,8 +580,8 @@
       const t = meta?.share_type;
       if (t === "playlist") return "Playlist";
       if (t === "multi")    return "Multi-song";
-      if (t === "single")   return "Single";
-      return isPlaylist ? "Playlist" : (trackCount > 1 ? "Multi-song" : "Single");
+      if (t === "single")   return "Song";
+      return isPlaylist ? "Playlist" : (trackCount > 1 ? "Multi-song" : "Song");
     })();
     const setText = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
     setText("kcTitle", heroTitle);
