@@ -784,10 +784,14 @@
 
   function renderSent() {
     if (sentShares.length === 0) {
-      return `<div class="empty-state sent-empty">
-        <div class="empty-icon">♪</div>
-        <div class="empty-title">No notes sent yet</div>
-        <div class="empty-sub">Your shared moments will appear here as soon as you send one.</div>
+      return `<div class="shares-grid shares-list sent-list">
+        <div class="share-card share-card--ghost-msg">
+          <div class="ghost-title">Nothing sent yet</div>
+          <div class="ghost-sub">Write a note in the extension and share it — your sent keepsakes will appear here.</div>
+        </div>
+        <div class="share-card share-card--ghost"></div>
+        <div class="share-card share-card--ghost"></div>
+        <div class="share-card share-card--ghost"></div>
       </div>`;
     }
 
