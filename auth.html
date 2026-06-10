@@ -456,6 +456,7 @@
     if (session && (event === "SIGNED_IN" || event === "TOKEN_REFRESHED" || event === "INITIAL_SESSION")) {
       redirecting = true;
       const _authDetail = {
+        event, // "SIGNED_IN" marks a deliberate login (clears any logout intent)
         access_token: session.access_token,
         refresh_token: session.refresh_token,
         expires_at: session.expires_at,

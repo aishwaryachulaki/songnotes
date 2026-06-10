@@ -1337,6 +1337,21 @@ $("signInBtn").addEventListener("click", openAuthPage);
 $("accountLink").addEventListener("click", (e) => { e.preventDefault(); openAccountPage(); });
 $("signOutLink").addEventListener("click", async (e) => {
   e.preventDefault();
+  // Revoke the session server-side (best-effort) so the refresh token dies and
+  // the login can't be silently restored elsewhere.
+  try {
+    const s = await getSession();
+    if (s?.access_token) {
+      await fetch(`${SUPABASE_URL}/auth/v1/logout?scope=global`, {
+        method: "POST",
+        headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${s.access_token}` },
+      });
+    }
+  } catch (_) { /* offline / already-expired — proceed with local logout */ }
+  // Mark "logged out" so any open/next website tab clears its OWN persisted
+  // session (the website holds the real session and would otherwise re-sync us
+  // back in on the next page load). Cleared only by a deliberate sign-in.
+  await chrome.storage.local.set({ ks_logged_out: Date.now() });
   await chrome.storage.local.remove("ks_session");
   // Lock the vault on this device (clears the cached master key). The vault
   // itself stays on the server; the user re-unlocks with their passphrase.
