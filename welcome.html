@@ -38,7 +38,7 @@
     /* Header */
     .site-header {
       display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 40px;
+      margin-bottom: 36px;
     }
     .nav-logo {
       font-family: 'Spectral', Georgia, serif;
@@ -58,75 +58,85 @@
       color: var(--ink-lt); text-decoration: none; opacity: 0.75;
     }
 
-    /* Hero */
-    .hero {
-      background: var(--cream);
-      border-radius: 16px; padding: 36px 36px 30px;
-      margin-bottom: 22px; border: 1.5px solid var(--border);
+    /* Shared card shell */
+    .card {
       position: relative; overflow: hidden;
+      border-radius: 16px; border: 1px solid var(--border);
+      box-shadow: 0 10px 30px rgba(58,36,24,0.10);
+      margin-bottom: 16px;
     }
+
+    /* Hero (title card) — yellow paper + the ONE floral illustration */
+    .hero { background: url('faq-bg-yellow.png') center / cover no-repeat; color: #4a3800; padding: 36px 38px 32px; }
     .hero::after {
-      content: '✦'; position: absolute; right: 28px; top: 26px;
-      font-size: 34px; color: var(--blush); opacity: 0.18; pointer-events: none;
+      content: '✦'; position: absolute; right: 26px; top: 24px;
+      font-size: 30px; color: var(--blush); opacity: 0.45; pointer-events: none;
     }
+    .hero-floral {
+      position: absolute; right: 18px; bottom: -8px;
+      width: 200px; max-width: 32%; opacity: 0.20;
+      pointer-events: none; user-select: none;
+    }
+    .hero-content { position: relative; max-width: 72%; }
     .hero-eyebrow {
       font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700;
       letter-spacing: 0.14em; text-transform: uppercase;
       color: var(--blush); margin-bottom: 10px;
     }
-    .hero h1 { font-size: 30px; font-weight: 700; line-height: 1.2; color: var(--ink); margin-bottom: 12px; }
-    .hero p { font-family: 'Spectral', Georgia, serif; font-style: italic; font-size: 16px; color: var(--ink-mid); }
+    .hero h1 { font-size: 30px; font-weight: 700; line-height: 1.2; margin-bottom: 12px; }
+    .hero p { font-family: 'Spectral', Georgia, serif; font-style: italic; font-size: 16px; opacity: 0.85; }
 
-    /* Steps */
-    .step {
-      background: var(--cream); border: 1.5px solid var(--border);
-      border-radius: 14px; padding: 22px 24px; margin-bottom: 14px;
-      display: flex; gap: 18px; align-items: flex-start;
-    }
+    /* Steps — colored paper cards, NO floral */
+    .step { padding: 22px 24px; display: flex; gap: 18px; align-items: flex-start; }
+    .step--pink   { background: url('faq-bg-pink.png')   center / cover no-repeat; color: #5c2d2d; }
+    .step--olive  { background: url('faq-bg-olive.png')  center / cover no-repeat; color: #363614; }
+    .step--yellow { background: url('faq-bg-yellow.png') center / cover no-repeat; color: #4a3800; }
     .step-num {
       flex-shrink: 0;
       width: 34px; height: 34px; border-radius: 50%;
-      background: rgba(227,104,136,0.10); border: 1.5px solid rgba(227,104,136,0.40);
+      background: rgba(227,104,136,0.12); border: 1.5px solid rgba(227,104,136,0.50);
       color: var(--blush); font-family: 'Lora', Georgia, serif; font-weight: 700;
       font-size: 16px; display: flex; align-items: center; justify-content: center;
     }
-    .step-body { flex: 1; }
-    .step-title { font-size: 17px; font-weight: 700; color: var(--ink); margin-bottom: 5px; }
-    .step-text { font-size: 14px; color: var(--ink-mid); line-height: 1.6; }
+    .step-body { flex: 1; min-width: 0; }
+    .step-title { font-size: 17px; font-weight: 700; color: inherit; margin-bottom: 5px; }
+    .step-text { font-size: 14px; color: inherit; opacity: 0.8; line-height: 1.6; }
     .step-btn {
       display: inline-flex; align-items: center; gap: 6px;
-      margin-top: 12px; padding: 9px 16px; border-radius: 50px;
+      margin-top: 13px; padding: 9px 16px; border-radius: 50px;
       font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 700;
       letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none;
       color: #fff; background: var(--blush);
       box-shadow: 0 4px 14px rgba(227,104,136,0.30);
       transition: filter 0.15s;
     }
-    .step-btn:hover { filter: brightness(1.04); }
+    .step-btn:hover { filter: brightness(1.05); }
     .step-btn--ghost {
-      color: var(--blush); background: rgba(227,104,136,0.07);
-      border: 1.5px solid rgba(227,104,136,0.40); box-shadow: none;
+      color: var(--blush); background: rgba(255,251,244,0.55);
+      border: 1.5px solid rgba(227,104,136,0.45); box-shadow: none;
     }
 
-    /* Toolbar icon hint */
+    /* Toolbar icon hint (step 1) */
     .icon-hint {
       display: inline-flex; align-items: center; gap: 9px;
-      margin-top: 12px; padding: 8px 12px 8px 8px; border-radius: 12px;
-      background: url('faq-bg-yellow.png') center / cover no-repeat;
-      border: 1px solid rgba(74,56,0,0.14);
+      margin-top: 13px; padding: 8px 12px 8px 8px; border-radius: 12px;
+      background: rgba(255,251,244,0.6); border: 1px solid rgba(74,56,0,0.16);
     }
     .icon-hint img { width: 26px; height: 26px; border-radius: 6px; display: block; }
     .icon-hint span {
       font-family: 'Montserrat', sans-serif; font-size: 10.5px; font-weight: 600;
-      letter-spacing: 0.02em; color: #4a3800; line-height: 1.4;
+      letter-spacing: 0.02em; color: #6b3a3a; line-height: 1.4;
     }
 
-    .footer { text-align: center; margin-top: 30px; font-size: 12.5px; color: var(--ink-lt); }
+    .footer { text-align: center; margin-top: 28px; font-size: 12.5px; color: var(--ink-lt); }
     .footer a { color: var(--ink-lt); }
 
     @media (max-width: 560px) {
       html, body { padding: 32px 18px 60px; }
-      .hero h1 { font-size: 25px; }
+      .hero { padding: 28px 22px 26px; }
+      .hero h1 { font-size: 24px; }
+      .hero-content { max-width: 100%; }
+      .hero-floral { opacity: 0.12; width: 130px; }
       .step { padding: 18px 18px; gap: 14px; }
     }
   </style>
@@ -139,13 +149,16 @@
     <a href="notes.html" class="nav-skip">Skip →</a>
   </header>
 
-  <div class="hero">
-    <div class="hero-eyebrow">You're all set up</div>
-    <h1>Welcome to Keepsake ✦</h1>
-    <p>Keepsake lets you pin little notes to moments in a song and send them to someone. Here's how to make your first one — it takes about a minute.</p>
+  <div class="card hero">
+    <img class="hero-floral" src="rose2.png" alt="" aria-hidden="true" />
+    <div class="hero-content">
+      <div class="hero-eyebrow">You're all set up</div>
+      <h1>Welcome to Keepsake ✦</h1>
+      <p>Keepsake lets you pin little notes to moments in a song and send them to someone. Here's how to make your first one — it takes about a minute.</p>
+    </div>
   </div>
 
-  <div class="step">
+  <div class="card step step--pink">
     <div class="step-num">1</div>
     <div class="step-body">
       <div class="step-title">Pin Keepsake to your toolbar</div>
@@ -157,7 +170,7 @@
     </div>
   </div>
 
-  <div class="step">
+  <div class="card step step--olive">
     <div class="step-num">2</div>
     <div class="step-body">
       <div class="step-title">Sign in</div>
@@ -166,7 +179,7 @@
     </div>
   </div>
 
-  <div class="step">
+  <div class="card step step--yellow">
     <div class="step-num">3</div>
     <div class="step-body">
       <div class="step-title">Open the Spotify Web Player &amp; play any song</div>
@@ -175,7 +188,7 @@
     </div>
   </div>
 
-  <div class="step">
+  <div class="card step step--pink">
     <div class="step-num">4</div>
     <div class="step-body">
       <div class="step-title">Click the Keepsake <span style="color:var(--tangerine)">✦</span> icon &amp; follow along</div>
