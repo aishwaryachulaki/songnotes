@@ -206,7 +206,15 @@
     } else if (note.title) {
       wrap.querySelector(".ks-tut-title").textContent = note.title;
     }
-    wrap.querySelector(".ks-text").textContent  = text;
+    const textEl = wrap.querySelector(".ks-text");
+    if (isTutorial) {
+      // Tutorial copy is our own static text — render **bold** markers as <strong>.
+      // HTML-escape first; real notes stay textContent (never innerHTML) for safety.
+      const esc = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      textEl.innerHTML = esc.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+    } else {
+      textEl.textContent = text;
+    }
     document.body.appendChild(wrap);
     requestAnimationFrame(() => wrap.classList.add("visible"));
 
@@ -329,7 +337,7 @@
     if (tutorial) {
       tutorial.notes.forEach((n) => {
         const k = `tutorial::${n.id}`;
-        if (n.timestamp != null && n.timestamp > 0 && !firedNotes.has(k)) {
+        if (n.timestamp != null && !firedNotes.has(k)) {
           if (pos >= n.timestamp && pos <= n.timestamp + 2) { firedNotes.add(k); showOverlay(n); }
         }
       });

@@ -2011,8 +2011,8 @@ function startLiveTracking() {
 // so anything meaningful they make during the tutorial persists like any
 // keepsake, and empty "just testing" shares are discarded by the usual
 // blank-share cleanup. Tutorial notes never mix with or pollute real shares.
-const TUTORIAL_TOTAL = 12;
-const TUTORIAL_VERSION = 8; // bump when copy changes → existing installs self-heal
+const TUTORIAL_TOTAL = 10;
+const TUTORIAL_VERSION = 9; // bump when copy changes → existing installs self-heal
 function makeTutorialNote(id, step, ts, title, text) {
   return { id, timestamp: ts, is_tutorial: true,
            tutorial_step: step, tutorial_total: TUTORIAL_TOTAL,
@@ -2020,18 +2020,16 @@ function makeTutorialNote(id, step, ts, title, text) {
 }
 function buildTutorialNotes() {
   return [
-    makeTutorialNote("t01", 1,  0,   "Welcome to Keepsake", "These little notes will show you the way. Open the side panel to follow along: tap the Keepsake icon up in your toolbar."),
-    makeTutorialNote("t02", 2,  10,  "Good to know", "These notes pop up as the song plays. Pause or rewind anytime and they'll trigger again, so nothing slips by."),
-    makeTutorialNote("t03", 3,  20,  "Start with your name", "It's the signature on every keepsake you send, so whoever opens one knows it came from you."),
-    makeTutorialNote("t04", 4,  30,  "Who is it for?", "Add their name in the panel. Whoever you're thinking of right now, this one's for them."),
-    makeTutorialNote("t05", 5,  40,  "Write your note", "Whatever this moment in the song stirs in you, say it right here."),
-    makeTutorialNote("t06", 6,  50,  "Pin it to the second", "Tap Now to catch the current time, or type the timestamp in yourself if a moment is calling you."),
-    makeTutorialNote("t07", 7,  60,  "Save it", "Hit Save and it's sealed. Add as many notes as you like, across as many songs."),
-    makeTutorialNote("t08", 8,  70,  "Add a description", "Scroll to the share panel and leave a little description. It's the first thing they read, before a single note plays."),
-    makeTutorialNote("t09", 9,  80,  "Share it", "Hit SHARE for your link. Wrote across a few songs? You'll drop in the playlist link first."),
-    makeTutorialNote("t10", 10, 90,  "Send it off", "To anyone, anywhere. It opens as a quiet little card holding every note you left. If they add Keepsake, your notes come alive as they listen."),
-    makeTutorialNote("t11", 11, 100, "Relive anywhere", "Turn on Cross-device relive and pick a private passphrase. Your keepsakes follow you across devices, and only you can unlock them."),
-    makeTutorialNote("t12", 12, 110, "That's everything", "Now go make someone's day. ✦"),
+    makeTutorialNote("t01", 1,  0,  "Welcome to Keepsake", "A few little notes to help you find your way. To begin, open the side panel by clicking the Keepsake icon in your browser toolbar."),
+    makeTutorialNote("t02", 2,  10, "Good to know", "These little notes appear as the song plays. If you pause or rewind, they'll pop up again, so nothing slips by."),
+    makeTutorialNote("t03", 3,  20, "Who is it for?", "Add their name in the panel. Whoever's on your mind right now, this one's for them."),
+    makeTutorialNote("t04", 4,  30, "Write your note", "Whatever this moment in the song stirs in you, write it down here."),
+    makeTutorialNote("t05", 5,  40, "Pin it to the second", "Tap **Now** to catch the current moment, or type in a timestamp if another part of the song is calling you."),
+    makeTutorialNote("t06", 6,  50, "Save it", "Hit **Save note** and it's sealed. Add as many notes as you'd like, across as many songs as you wish."),
+    makeTutorialNote("t07", 7,  60, "Add a description", "Scroll to the share panel and leave a little description. It's the first thing they read, before the music begins."),
+    makeTutorialNote("t08", 8,  70, "Share it", "Hit **Share** to get your link. Wrote across a few songs? You'll drop in the playlist link first."),
+    makeTutorialNote("t09", 9,  80, "Send it off", "To anyone, anywhere. It opens as a quiet little card holding every note you left. Once they install Keepsake, those notes appear as the music plays."),
+    makeTutorialNote("t10", 10, 90, "Relive anywhere", "Turn on **Cross-device Relive** and choose a private passphrase. It securely ties your keepsakes to your account, so they'll be waiting for you even on a new device. Your passphrase stays with you, which means only you can unlock them."),
   ];
 }
 function buildTutorialOverlay(active) {
