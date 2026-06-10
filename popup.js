@@ -1402,6 +1402,11 @@ $("signOutLink").addEventListener("click", async (e) => {
   // Lock the vault on this device (clears the cached master key). The vault
   // itself stays on the server; the user re-unlocks with their passphrase.
   await chrome.storage.local.remove("ks_vault");
+  // Clear the display name on logout — it lives on the account now, so it
+  // re-loads on the next sign-in. A logged-out panel shouldn't show it.
+  await chrome.storage.local.remove("ks_sender");
+  senderName = "";
+  const nameField = $("senderName"); if (nameField) nameField.value = "";
   _session = null;
   _sessionExpired = false;
   $("authGate").classList.remove("hidden");
