@@ -29,7 +29,7 @@
       font-family: 'Lora', Georgia, serif;
       color: var(--ink);
       min-height: 100vh;
-      padding: 48px 40px 80px;
+      padding: 30px 40px 70px;
       line-height: 1.7;
       overscroll-behavior: none;
     }
@@ -38,7 +38,7 @@
     /* Header */
     .site-header {
       display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 36px;
+      margin-bottom: 22px;
     }
     .nav-logo {
       font-family: 'Spectral', Georgia, serif;
@@ -73,11 +73,13 @@
       font-size: 30px; color: var(--blush); opacity: 0.45; pointer-events: none;
     }
     .hero-floral {
-      position: absolute; right: 18px; bottom: -8px;
-      width: 200px; max-width: 32%; opacity: 0.20;
+      position: absolute; right: 26px; top: 50%; transform: translateY(-50%);
+      width: 112px; opacity: 0.28;
       pointer-events: none; user-select: none;
     }
-    .hero-content { position: relative; max-width: 72%; }
+    .hero-content { position: relative; max-width: 76%; }
+    .inline-logo { width: 19px; height: 19px; border-radius: 4px; vertical-align: -4px; margin: 0 1px; }
+    .puzzle-ico { vertical-align: -3px; opacity: 0.85; }
     .hero-eyebrow {
       font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700;
       letter-spacing: 0.14em; text-transform: uppercase;
@@ -129,14 +131,15 @@
     }
 
     .footer { text-align: center; margin-top: 28px; font-size: 12.5px; color: var(--ink-lt); }
-    .footer a { color: var(--ink-lt); }
+    .footer a { color: var(--ink-lt); text-decoration: none; }
+    .footer a:hover { text-decoration: underline; }
 
     @media (max-width: 560px) {
       html, body { padding: 32px 18px 60px; }
       .hero { padding: 28px 22px 26px; }
       .hero h1 { font-size: 24px; }
       .hero-content { max-width: 100%; }
-      .hero-floral { opacity: 0.12; width: 130px; }
+      .hero-floral { opacity: 0.16; width: 80px; right: 14px; }
       .step { padding: 18px 18px; gap: 14px; }
     }
   </style>
@@ -150,11 +153,11 @@
   </header>
 
   <div class="card hero">
-    <img class="hero-floral" src="rose2.png" alt="" aria-hidden="true" />
+    <img class="hero-floral" src="flower.png" alt="" aria-hidden="true" />
     <div class="hero-content">
       <div class="hero-eyebrow">You're all set up</div>
-      <h1>Welcome to Keepsake ✦</h1>
-      <p>Keepsake lets you pin little notes to moments in a song and send them to someone. Here's how to make your first one — it takes about a minute.</p>
+      <h1>Welcome to Keepsake</h1>
+      <p>Keepsake lets you pin little notes to moments in a song and send them to someone. Here's how to make your first one. It takes about a minute.</p>
     </div>
   </div>
 
@@ -162,10 +165,10 @@
     <div class="step-num">1</div>
     <div class="step-body">
       <div class="step-title">Pin Keepsake to your toolbar</div>
-      <div class="step-text">Click the puzzle-piece <strong>⊕ Extensions</strong> icon at the top-right of your browser, find <strong>Keepsake</strong>, and hit the pin so it's always one click away.</div>
+      <div class="step-text">Click the <strong>Extensions</strong> button <svg class="puzzle-ico" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M20.5 11H19V7c0-1.1-.9-2-2-2h-4V3.5C13 2.12 11.88 1 10.5 1S8 2.12 8 3.5V5H4c-1.1 0-1.99.9-1.99 2v3.8H3.5c1.49 0 2.7 1.21 2.7 2.7s-1.21 2.7-2.7 2.7H2V20c0 1.1.9 2 2 2h3.8v-1.5c0-1.49 1.21-2.7 2.7-2.7s2.7 1.21 2.7 2.7V22H17c1.1 0 2-.9 2-2v-4h1.5c1.38 0 2.5-1.12 2.5-2.5S21.88 11 20.5 11z"/></svg> at the top-right of your browser, find <strong>Keepsake</strong>, and hit the pin so it's always one click away.</div>
       <div class="icon-hint">
-        <img src="icon48.png" alt="Keepsake icon" />
-        <span>This is Keepsake — pin it, then click it<br>any time from your toolbar.</span>
+        <img src="icon128.png" alt="Keepsake icon" />
+        <span>This is Keepsake. Pin it, then click it<br>any time from your toolbar.</span>
       </div>
     </div>
   </div>
@@ -191,7 +194,7 @@
   <div class="card step step--pink">
     <div class="step-num">4</div>
     <div class="step-body">
-      <div class="step-title">Click the Keepsake <span style="color:var(--tangerine)">✦</span> icon &amp; follow along</div>
+      <div class="step-title">Click the Keepsake <img class="inline-logo" src="icon128.png" alt="" /> icon &amp; follow along</div>
       <div class="step-text">With a song playing, click the Keepsake icon in your toolbar to open the side panel. A gentle guided tour pops up as the song plays and walks you through writing and sharing your first keepsake.</div>
     </div>
   </div>
