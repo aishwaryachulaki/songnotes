@@ -380,21 +380,29 @@
   let extensionPresent = false;
   window.addEventListener("keepsake:extension_present", () => { extensionPresent = true; }, { once: true });
 
-  // Ask extension for a share's enc_key; resolves with key b64 or null
+  // Ask the extension for a share's enc_key. Resolves with:
+  //   { responded, encKey }
+  // - responded:false  → the extension never answered (not installed/enabled here)
+  // - responded:true, encKey:null → extension is here but doesn't hold this key
+  //   (the letter was created on another device / local storage was cleared)
+  // - responded:true, encKey:"…"  → the key, ready to build the link
   function getKeyFromExtension(shareId) {
     return new Promise((resolve) => {
+      let done = false;
       const handler = (e) => {
         if (e.detail?.shareId === shareId) {
+          done = true;
           window.removeEventListener("keepsake:share_key_response", handler);
-          resolve(e.detail.encKey || null);
+          resolve({ responded: true, encKey: e.detail.encKey || null });
         }
       };
       window.addEventListener("keepsake:share_key_response", handler);
       window.dispatchEvent(new CustomEvent("keepsake:get_share_key", { detail: { shareId } }));
-      // Wait up to 2s — if extension is present it responds in <50ms
+      // Wait up to 2s — if present, the content script responds in <50ms.
       setTimeout(() => {
+        if (done) return;
         window.removeEventListener("keepsake:share_key_response", handler);
-        resolve(null);
+        resolve({ responded: false, encKey: null });
       }, 2000);
     });
   }
@@ -583,17 +591,20 @@
           const shareId = copyBtn.dataset.copy;
           copyBtn.textContent = "…";
           copyBtn.disabled = true;
-          const keyB64 = await getKeyFromExtension(shareId);
-          if (keyB64) {
-            const url = `https://dropakeepsake.com/share.html?id=${shareId}&e=1#k=${keyB64}`;
+          const { responded, encKey } = await getKeyFromExtension(shareId);
+          if (encKey) {
+            const url = `https://dropakeepsake.com/share.html?id=${shareId}&e=1#k=${encKey}`;
             try {
               await navigator.clipboard.writeText(url);
               showToast("Link copied ✦");
             } catch {
-              showToast("Couldn't access clipboard. Try from the extension.");
+              showToast("Couldn't access clipboard. Try again.");
             }
+          } else if (!responded) {
+            showToast("Install or enable the Keepsake extension, then refresh to copy links.");
           } else {
-            showToast("Extension not detected. Open the extension to copy the link.");
+            // Extension is here but the key isn't on this device.
+            showToast("This letter was created on another device, so its link key isn't here. Copy it from that device, or turn on Cross-device relive.");
           }
           copyBtn.textContent = "Link";
           copyBtn.disabled = false;
@@ -612,10 +623,10 @@
   async function tryDecryptLabels() {
     const toDecrypt = sentShares.filter(s => looksEncrypted(s.recipient_name));
     for (const share of toDecrypt) {
-      const keyB64 = await getKeyFromExtension(share.id);
-      if (!keyB64) continue;
+      const { encKey } = await getKeyFromExtension(share.id);
+      if (!encKey) continue;
       try {
-        const cryptoKey = await importEncKey(keyB64);
+        const cryptoKey = await importEncKey(encKey);
         const name = await decryptField(share.recipient_name, cryptoKey);
         if (!name) continue;
         // Update the label on the rendered card
