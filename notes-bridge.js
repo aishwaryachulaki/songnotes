@@ -106,6 +106,32 @@
     });
   });
 
-  // Let the page know the extension is present
+  // ---- First-run onboarding state → drives the welcome cue on notes.html ----
+  // The page shows its "make your first keepsake" module while the tutorial
+  // hasn't been completed (ks_onboarding.seen === false).
+  function emitOnboarding() {
+    chrome.storage.local.get("ks_onboarding", (r) => {
+      const o = r.ks_onboarding || {};
+      window.dispatchEvent(new CustomEvent("keepsake:onboarding_state", {
+        detail: { started: !!o.started, seen: !!o.seen },
+      }));
+    });
+  }
+  // Page-initiated dismiss → finish onboarding everywhere (mirrors the side
+  // panel's dismissTutorial: mark seen + deactivate the tutorial overlay).
+  window.addEventListener("keepsake:dismiss_onboarding", () => {
+    chrome.storage.local.get(["ks_onboarding", "ks_tutorial"], (r) => {
+      const onboarding = { ...(r.ks_onboarding || {}), started: true, seen: true };
+      const tutorial = { ...(r.ks_tutorial || {}), active: false };
+      chrome.storage.local.set({ ks_onboarding: onboarding, ks_tutorial: tutorial }, emitOnboarding);
+    });
+  });
+  // Keep the cue in sync if the tour is finished/dismissed elsewhere.
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === "local" && (changes.ks_onboarding || changes.ks_tutorial)) emitOnboarding();
+  });
+
+  // Let the page know the extension is present + its onboarding state
   window.dispatchEvent(new CustomEvent("keepsake:extension_present"));
+  emitOnboarding();
 })();

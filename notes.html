@@ -328,6 +328,49 @@
     }
     .notice-steps { font-size: 13.5px; line-height: 1.85; opacity: 0.72; }
 
+    /* ── First-run onboarding cue ── */
+    .onboard-card {
+      position: relative; overflow: hidden;
+      background: url('faq-bg-yellow.png') center / cover no-repeat; color: #4a3800;
+      border-radius: 16px; padding: 22px 24px 20px; margin-bottom: 22px;
+      border: 1px solid rgba(74,56,0,0.12);
+    }
+    .onboard-x {
+      position: absolute; top: 12px; right: 12px;
+      width: 26px; height: 26px; border-radius: 50%;
+      border: none; background: rgba(74,56,0,0.08); color: #4a3800;
+      font-size: 13px; cursor: pointer; line-height: 1;
+    }
+    .onboard-x:hover { background: rgba(74,56,0,0.16); }
+    .onboard-eyebrow {
+      font-family: 'Montserrat', sans-serif; font-size: 9px; font-weight: 700;
+      letter-spacing: 0.14em; text-transform: uppercase; color: #b25c00; margin-bottom: 8px;
+    }
+    .onboard-title { font-family: 'Lora', Georgia, serif; font-size: 19px; font-weight: 700; margin-bottom: 14px; }
+    .onboard-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+    .onboard-steps li { display: flex; gap: 12px; align-items: flex-start; font-size: 14px; line-height: 1.55; }
+    .onboard-n {
+      flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%;
+      background: rgba(74,56,0,0.10); border: 1.5px solid rgba(74,56,0,0.30);
+      color: #4a3800; font-family: 'Lora', Georgia, serif; font-weight: 700; font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .onboard-btn {
+      display: inline-flex; align-items: center; gap: 6px; margin-top: 8px;
+      padding: 8px 15px; border-radius: 50px;
+      font-family: 'Montserrat', sans-serif; font-size: 10.5px; font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none;
+      color: #fff; background: var(--rose); box-shadow: 0 4px 12px rgba(217,107,124,0.30);
+    }
+    .onboard-btn:hover { filter: brightness(1.05); }
+    .onboard-hint {
+      display: inline-flex; align-items: center; gap: 8px; margin-top: 8px;
+      padding: 6px 10px 6px 6px; border-radius: 10px;
+      background: rgba(74,56,0,0.06); border: 1px solid rgba(74,56,0,0.14);
+    }
+    .onboard-hint img { width: 24px; height: 24px; border-radius: 5px; display: block; }
+    .onboard-hint span { font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 600; color: #4a3800; line-height: 1.35; }
+
     /* ── Toast ── */
     .toast {
       position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
@@ -395,9 +438,43 @@
     } catch { return null; }
   }
 
-  // ── Extension detection ──
+  // ── Extension detection + first-run onboarding cue ──
   let extensionPresent = false;
-  window.addEventListener("keepsake:extension_present", () => { extensionPresent = true; }, { once: true });
+  let onboardingSeen = null;  // null = unknown; true/false reported by the bridge
+  let pageLoaded = false;     // true once loadAll() has rendered at least once
+  window.addEventListener("keepsake:extension_present", () => {
+    extensionPresent = true;
+    if (pageLoaded) render();
+  }, { once: true });
+  // Only the bridge dispatches this, so receiving it also confirms the extension.
+  window.addEventListener("keepsake:onboarding_state", (e) => {
+    extensionPresent = true;
+    onboardingSeen = e.detail ? !!e.detail.seen : null;
+    if (pageLoaded) render();
+  });
+  // Show the welcome cue only when the extension is here AND the tour isn't done.
+  function onboardingModule() {
+    if (!extensionPresent || onboardingSeen !== false) return "";
+    return `
+      <div class="onboard-card" id="onboardCard">
+        <button class="onboard-x" id="onboardDismiss" aria-label="Dismiss">✕</button>
+        <div class="onboard-eyebrow">✦ New here?</div>
+        <div class="onboard-title">Make your first keepsake</div>
+        <ol class="onboard-steps">
+          <li><span class="onboard-n">1</span>
+            <div>Open the Spotify Web Player and play any song.<br>
+              <a class="onboard-btn" href="https://open.spotify.com" target="_blank" rel="noopener">Open Spotify Web Player →</a>
+            </div>
+          </li>
+          <li><span class="onboard-n">2</span>
+            <div>Click the Keepsake <span style="color:var(--tangerine)">✦</span> icon in your toolbar to open the side panel — a guided tour pops up as the song plays.
+              <span class="onboard-hint"><img src="icon48.png" alt="Keepsake icon" /><span>Pin it &amp; click it —<br>top-right of your browser</span></span>
+            </div>
+          </li>
+        </ol>
+      </div>
+    `;
+  }
 
   // Ask the extension for a share's enc_key. Resolves with:
   //   { responded, encKey }
@@ -548,6 +625,7 @@
       receivedItems = [];
     }
 
+    pageLoaded = true;
     render();
   }
 
@@ -576,6 +654,7 @@
 
     page.innerHTML = `
       ${nav}
+      ${onboardingModule()}
       <div class="section-header"><span>Your notes</span></div>
       ${tabs}
       ${content}
@@ -585,6 +664,13 @@
         <a href="index.html">Home</a>
       </div>
     `;
+
+    // Onboarding cue dismiss → finish the tour everywhere (bridge marks it seen).
+    page.querySelector("#onboardDismiss")?.addEventListener("click", () => {
+      onboardingSeen = true;
+      window.dispatchEvent(new CustomEvent("keepsake:dismiss_onboarding"));
+      render();
+    });
 
     // Tab switching
     page.querySelectorAll(".tab[data-tab]").forEach(btn => {

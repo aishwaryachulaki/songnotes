@@ -51,9 +51,13 @@ function createDemoShare(force = false) {
   });
 }
 
-// Fire on fresh install
+// Fire on fresh install: arm the tutorial + open the getting-started page so the
+// user knows to sign in, open Spotify, play a song, and click the Keepsake icon.
 chrome.runtime.onInstalled.addListener(({ reason }) => {
-  if (reason === "install") createDemoShare();
+  if (reason === "install") {
+    createDemoShare();
+    chrome.tabs.create({ url: "https://dropakeepsake.com/welcome.html" });
+  }
 });
 
 // Cache the most recent track state broadcast by content.js.

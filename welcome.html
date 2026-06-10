@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https:; base-uri 'self'; form-action 'self';" />
+  <script>/* anti-clickjacking: never allow this page to be framed */if (self!==top){try{top.location=self.location.href;}catch(e){document.documentElement.style.visibility='hidden';}}</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <title>Welcome to Keepsake</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@1,400&family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@500;600;700&display=swap" />
+  <style>
+    :root {
+      --butter:   #F4D9A6;
+      --cream:    #FFFBF4;
+      --blush:    #E36888;
+      --rose:     #D96B7C;
+      --tangerine:#F08C21;
+      --ink:      #3a2418;
+      --ink-mid:  #8a5a48;
+      --ink-lt:   #c4977a;
+      --border:   rgba(58,36,24,0.10);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      background: var(--butter) url('background.png') center / cover no-repeat fixed;
+      font-family: 'Lora', Georgia, serif;
+      color: var(--ink);
+      min-height: 100vh;
+      padding: 48px 40px 80px;
+      line-height: 1.7;
+      overscroll-behavior: none;
+    }
+    .page { max-width: 720px; margin: 0 auto; }
+
+    /* Header */
+    .site-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 40px;
+    }
+    .nav-logo {
+      font-family: 'Spectral', Georgia, serif;
+      font-style: italic; font-weight: 400; font-size: 26px;
+      color: var(--blush); text-decoration: none; letter-spacing: -0.01em;
+      display: flex; align-items: center; gap: 5px;
+      text-shadow: 0 1px 12px rgba(140,50,60,0.13);
+    }
+    .nav-logo .logo-spark {
+      font-style: normal; font-family: sans-serif;
+      font-size: 11px; color: var(--tangerine); font-weight: 400;
+      vertical-align: super; line-height: 0;
+    }
+    .nav-skip {
+      font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--ink-lt); text-decoration: none; opacity: 0.75;
+    }
+
+    /* Hero */
+    .hero {
+      background: var(--cream);
+      border-radius: 16px; padding: 36px 36px 30px;
+      margin-bottom: 22px; border: 1.5px solid var(--border);
+      position: relative; overflow: hidden;
+    }
+    .hero::after {
+      content: '✦'; position: absolute; right: 28px; top: 26px;
+      font-size: 34px; color: var(--blush); opacity: 0.18; pointer-events: none;
+    }
+    .hero-eyebrow {
+      font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--blush); margin-bottom: 10px;
+    }
+    .hero h1 { font-size: 30px; font-weight: 700; line-height: 1.2; color: var(--ink); margin-bottom: 12px; }
+    .hero p { font-family: 'Spectral', Georgia, serif; font-style: italic; font-size: 16px; color: var(--ink-mid); }
+
+    /* Steps */
+    .step {
+      background: var(--cream); border: 1.5px solid var(--border);
+      border-radius: 14px; padding: 22px 24px; margin-bottom: 14px;
+      display: flex; gap: 18px; align-items: flex-start;
+    }
+    .step-num {
+      flex-shrink: 0;
+      width: 34px; height: 34px; border-radius: 50%;
+      background: rgba(227,104,136,0.10); border: 1.5px solid rgba(227,104,136,0.40);
+      color: var(--blush); font-family: 'Lora', Georgia, serif; font-weight: 700;
+      font-size: 16px; display: flex; align-items: center; justify-content: center;
+    }
+    .step-body { flex: 1; }
+    .step-title { font-size: 17px; font-weight: 700; color: var(--ink); margin-bottom: 5px; }
+    .step-text { font-size: 14px; color: var(--ink-mid); line-height: 1.6; }
+    .step-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-top: 12px; padding: 9px 16px; border-radius: 50px;
+      font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none;
+      color: #fff; background: var(--blush);
+      box-shadow: 0 4px 14px rgba(227,104,136,0.30);
+      transition: filter 0.15s;
+    }
+    .step-btn:hover { filter: brightness(1.04); }
+    .step-btn--ghost {
+      color: var(--blush); background: rgba(227,104,136,0.07);
+      border: 1.5px solid rgba(227,104,136,0.40); box-shadow: none;
+    }
+
+    /* Toolbar icon hint */
+    .icon-hint {
+      display: inline-flex; align-items: center; gap: 9px;
+      margin-top: 12px; padding: 8px 12px 8px 8px; border-radius: 12px;
+      background: url('faq-bg-yellow.png') center / cover no-repeat;
+      border: 1px solid rgba(74,56,0,0.14);
+    }
+    .icon-hint img { width: 26px; height: 26px; border-radius: 6px; display: block; }
+    .icon-hint span {
+      font-family: 'Montserrat', sans-serif; font-size: 10.5px; font-weight: 600;
+      letter-spacing: 0.02em; color: #4a3800; line-height: 1.4;
+    }
+
+    .footer { text-align: center; margin-top: 30px; font-size: 12.5px; color: var(--ink-lt); }
+    .footer a { color: var(--ink-lt); }
+
+    @media (max-width: 560px) {
+      html, body { padding: 32px 18px 60px; }
+      .hero h1 { font-size: 25px; }
+      .step { padding: 18px 18px; gap: 14px; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <header class="site-header">
+    <a href="index.html" class="nav-logo">keepsake.<span class="logo-spark">✦</span></a>
+    <a href="notes.html" class="nav-skip">Skip →</a>
+  </header>
+
+  <div class="hero">
+    <div class="hero-eyebrow">You're all set up</div>
+    <h1>Welcome to Keepsake ✦</h1>
+    <p>Keepsake lets you pin little notes to moments in a song and send them to someone. Here's how to make your first one — it takes about a minute.</p>
+  </div>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-body">
+      <div class="step-title">Pin Keepsake to your toolbar</div>
+      <div class="step-text">Click the puzzle-piece <strong>⊕ Extensions</strong> icon at the top-right of your browser, find <strong>Keepsake</strong>, and hit the pin so it's always one click away.</div>
+      <div class="icon-hint">
+        <img src="icon48.png" alt="Keepsake icon" />
+        <span>This is Keepsake — pin it, then click it<br>any time from your toolbar.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-body">
+      <div class="step-title">Sign in</div>
+      <div class="step-text">Create your account (or sign in) so your keepsakes are saved to you.</div>
+      <a class="step-btn" href="auth.html">Sign in →</a>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-body">
+      <div class="step-title">Open the Spotify Web Player &amp; play any song</div>
+      <div class="step-text">Keepsake works right on top of Spotify in your browser. Open it and press play on anything you like.</div>
+      <a class="step-btn step-btn--ghost" href="https://open.spotify.com" target="_blank" rel="noopener">Open Spotify Web Player →</a>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-body">
+      <div class="step-title">Click the Keepsake <span style="color:var(--tangerine)">✦</span> icon &amp; follow along</div>
+      <div class="step-text">With a song playing, click the Keepsake icon in your toolbar to open the side panel. A gentle guided tour pops up as the song plays and walks you through writing and sharing your first keepsake.</div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>Keepsake &nbsp;·&nbsp; <a href="index.html">Home</a> &nbsp;·&nbsp; <a href="faq.html">FAQ</a> &nbsp;·&nbsp; <a href="privacy.html">Privacy</a></p>
+  </footer>
+
+</div>
+</body>
+</html>
