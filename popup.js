@@ -932,6 +932,11 @@ async function renderSharePanel() {
 }
 
 async function renderPrevious() {
+  // Previous Experiences was removed from the side panel — past letters are now
+  // relived from the website (notes.html#sent), which drives the extension via
+  // notes-bridge. Kept as a no-op so existing callers don't need to change.
+  return;
+  // eslint-disable-next-line no-unreachable
   const session = await getSession();
   const list = $("previousList");
   const header = $("prevHeader");
