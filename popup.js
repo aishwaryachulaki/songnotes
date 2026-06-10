@@ -64,6 +64,37 @@ async function enforceAccountScope(session) {
   return wiped;
 }
 
+// The sender's display name persists on their ACCOUNT (Supabase user metadata)
+// so it stays constant across logins, account switches, and new devices — while
+// note/description/recipient always start blank. Local ks_sender is just a cache.
+async function saveNameToServer(name) {
+  try {
+    const s = await getSession();
+    if (!s?.access_token) return;
+    await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${s.access_token}`,
+      },
+      body: JSON.stringify({ data: { keepsake_name: name } }),
+    });
+  } catch (_) { /* offline — the local cache still holds it */ }
+}
+async function loadNameFromServer() {
+  try {
+    const s = await getSession();
+    if (!s?.access_token) return "";
+    const r = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${s.access_token}` },
+    });
+    if (!r.ok) return "";
+    const u = await r.json();
+    return (u && u.user_metadata && u.user_metadata.keepsake_name) || "";
+  } catch (_) { return ""; }
+}
+
 async function supabaseRpc(fnName, params, accessToken) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fnName}`, {
     method: "POST",
@@ -1148,6 +1179,16 @@ async function init() {
 
   const { store, sender } = await loadStore();
   senderName = sender;
+  // Name is account-scoped on the server — if the local cache is empty (fresh
+  // login, new device, or cleared by an account switch), pull it back so the
+  // user isn't asked for their name every time.
+  if (!senderName && _scopeSession) {
+    const serverName = await loadNameFromServer();
+    if (serverName) {
+      senderName = serverName;
+      await chrome.storage.local.set({ ks_sender: serverName });
+    }
+  }
   shareOrigin = CONFIGURED_ORIGIN || "";
 
   // Migrate old-design installs: the tutorial used to live as a share in
@@ -1421,6 +1462,7 @@ $("saveName").addEventListener("click", async () => {
   if (!v) return;
   senderName = v;
   await chrome.storage.local.set({ ks_sender: v });
+  saveNameToServer(v); // persist on the account so it survives logins/devices
   if (activeShare) {
     activeShare.sender_name = v;
     const { store } = await loadStore();
