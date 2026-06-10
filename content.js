@@ -211,7 +211,9 @@
       // Tutorial copy is our own static text — render **bold** markers as <strong>.
       // HTML-escape first; real notes stay textContent (never innerHTML) for safety.
       const esc = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-      textEl.innerHTML = esc.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+      textEl.innerHTML = esc
+        .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+        .replace(/\n/g, "<br>");
     } else {
       textEl.textContent = text;
     }
