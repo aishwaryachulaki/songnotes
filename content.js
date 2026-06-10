@@ -189,7 +189,7 @@
         <button class="ks-close" aria-label="Dismiss">&#x00D7;</button>
         ${isTutorial && stepNum ? `<div class="ks-step-badge">✦ STEP ${stepNum} OF ${stepTotal}</div>` : `<div class="ks-label"></div>`}
         ${isTutorial && note.title ? `<div class="ks-tut-title"></div>` : ""}
-        <div class="ks-text ${textSizeClass(text.length)}"></div>
+        <div class="ks-text ${isTutorial ? "ks-tut-text" : textSizeClass(text.length)}"></div>
       </div>
     `;
 

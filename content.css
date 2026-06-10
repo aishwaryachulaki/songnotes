@@ -108,20 +108,28 @@
   margin-bottom: 7px;
 }
 
-/* Tutorial title — bold sans, sits above the italic body for editorial contrast */
+/* Tutorial title — bold sans, sits above the body */
 .ks-tut-title {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   font-weight: 700;
-  font-size: 16px;
-  line-height: 1.2;
+  font-size: 20px;
+  line-height: 1.25;
   color: rgba(58, 40, 0, 0.92);
-  margin-bottom: 5px;
+  margin-bottom: 6px;
 }
 
-/* Tutorial body uses a slightly warmer ink to suit the yellow */
+/* Tutorial body — ALWAYS a clean, readable system font (not the decorative
+   Playfair italic used for real notes) at one consistent, larger size no matter
+   the length, so the guided-tour instructions stay legible. Real notes are
+   untouched and keep their length-based Playfair styling. */
 .ks-card--tutorial .ks-text { color: rgba(58, 40, 0, 0.82); margin-left: 0; }
-.ks-card--tutorial .ks-text.sn-large { font-size: 17px; }
-.ks-card--tutorial .ks-text.sn-medium { font-size: 15px; }
+.ks-text.ks-tut-text {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 16px;
+  line-height: 1.55;
+}
 
 /* ── Close button ── */
 .ks-close {
