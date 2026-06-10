@@ -647,11 +647,38 @@
   let currentAccessToken = null;
   let creditsData = null;
 
+  // Reliable session sync into the extension (the auth-bridge content script
+  // listens on this page). Re-push every 200ms until the bridge confirms, so
+  // landing straight here after login still syncs even if auth.html's dispatch
+  // raced the content script's injection.
+  function pushSessionToExtension(session) {
+    const detail = {
+      access_token: session.access_token,
+      refresh_token: session.refresh_token,
+      expires_at: session.expires_at,
+      user: {
+        id: session.user.id,
+        email: session.user.email,
+        name: session.user.user_metadata?.full_name || session.user.email,
+        avatar: session.user.user_metadata?.avatar_url || null,
+      },
+    };
+    let synced = false;
+    window.addEventListener("keepsake:auth_saved", () => { synced = true; }, { once: true });
+    let tries = 0;
+    (function push() {
+      if (synced || tries++ > 10) return;
+      window.dispatchEvent(new CustomEvent("keepsake:auth", { detail }));
+      setTimeout(push, 200);
+    })();
+  }
+
   (async () => {
     const { data: { session } } = await sb.auth.getSession();
     if (!session) { window.location.href = "auth.html"; return; }
     currentUser = session.user;
     currentAccessToken = session.access_token;
+    pushSessionToExtension(session);
 
     // Warm up the Edge Function in the background so it's ready when user clicks buy
     fetch(`${SUPABASE_URL}/functions/v1/create-razorpay-order`, {
