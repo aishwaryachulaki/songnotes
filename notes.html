@@ -344,25 +344,31 @@
     .onboard-x:hover { background: rgba(74,56,0,0.16); }
     .onboard-eyebrow {
       font-family: 'Montserrat', sans-serif; font-size: 9px; font-weight: 700;
-      letter-spacing: 0.14em; text-transform: uppercase; color: #b25c00; margin-bottom: 8px;
+      letter-spacing: 0.14em; text-transform: uppercase; color: var(--rose); margin-bottom: 8px;
     }
     .onboard-title { font-family: 'Lora', Georgia, serif; font-size: 19px; font-weight: 700; margin-bottom: 14px; }
     .onboard-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
     .onboard-steps li { display: flex; gap: 12px; align-items: flex-start; font-size: 14px; line-height: 1.55; }
     .onboard-n {
       flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%;
-      background: rgba(74,56,0,0.10); border: 1.5px solid rgba(74,56,0,0.30);
-      color: #4a3800; font-family: 'Lora', Georgia, serif; font-weight: 700; font-size: 13px;
+      background: rgba(217,107,124,0.12); border: 1.5px solid rgba(217,107,124,0.50);
+      color: var(--rose); font-family: 'Lora', Georgia, serif; font-weight: 700; font-size: 13px;
       display: flex; align-items: center; justify-content: center;
     }
     .onboard-btn {
-      display: inline-flex; align-items: center; gap: 6px; margin-top: 8px;
-      padding: 8px 15px; border-radius: 50px;
+      display: inline-flex; align-items: center; gap: 6px; margin-top: 10px;
+      padding: 8px 16px; border-radius: 50px;
       font-family: 'Montserrat', sans-serif; font-size: 10.5px; font-weight: 700;
-      letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none;
-      color: #fff; background: var(--rose); box-shadow: 0 4px 12px rgba(217,107,124,0.30);
+      letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none;
+      color: var(--rose); background: rgba(217,107,124,0.08);
+      border: 1.5px solid rgba(217,107,124,0.42);
+      transition: background 0.15s, border-color 0.15s;
     }
-    .onboard-btn:hover { filter: brightness(1.05); }
+    .onboard-btn:hover { background: rgba(217,107,124,0.18); border-color: rgba(217,107,124,0.65); }
+    .onboard-inline-logo {
+      width: 18px; height: 18px; border-radius: 4px; vertical-align: -4px; margin: 0 2px;
+      background: #fff; padding: 1.5px; box-shadow: 0 0 0 1px rgba(58,36,24,0.10);
+    }
     .onboard-hint {
       display: inline-flex; align-items: center; gap: 8px; margin-top: 8px;
       padding: 6px 10px 6px 6px; border-radius: 10px;
@@ -467,8 +473,8 @@
             </div>
           </li>
           <li><span class="onboard-n">2</span>
-            <div>Click the Keepsake <span style="color:var(--tangerine)">✦</span> icon in your toolbar to open the side panel — a guided tour pops up as the song plays.
-              <span class="onboard-hint"><img src="icon48.png" alt="Keepsake icon" /><span>Pin it &amp; click it —<br>top-right of your browser</span></span>
+            <div>Click the Keepsake <img class="onboard-inline-logo" src="icon128.png" alt="" /> icon in your toolbar to open the side panel. A guided tour pops up as the song plays.
+              <span class="onboard-hint"><img src="icon128.png" alt="Keepsake icon" /><span>Pin it &amp; click it<br>top-right of your browser</span></span>
             </div>
           </li>
         </ol>
