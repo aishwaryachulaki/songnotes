@@ -734,7 +734,7 @@
 
     // "Wrong region?" link pre-fills a support email with the user's account
     // email so you can look them up and update country_tier in Supabase.
-    const supportEmail = "aishwaryachulaki@gmail.com";
+    const supportEmail = "hello@dropakeepsake.com";
     const regionSubject = encodeURIComponent("Region correction request");
     const regionBody = encodeURIComponent(`Hi,\n\nMy account email is ${currentUser.email} and I believe my region was detected incorrectly.\n\nMy actual location: [please fill in your country]\n\nThanks`);
     const regionHref = `mailto:${supportEmail}?subject=${regionSubject}&body=${regionBody}`;
@@ -819,6 +819,10 @@
 
       <div class="footer-links">
         <a href="privacy.html" target="_blank">Privacy Policy</a>
+        &nbsp;·&nbsp;
+        <a href="refund.html" target="_blank">Refund &amp; Cancellation</a>
+        &nbsp;·&nbsp;
+        <a href="terms.html" target="_blank">Terms</a>
         &nbsp;·&nbsp;
         <a href="index.html">Home</a>
       </div>
@@ -1067,7 +1071,7 @@
   // Until then, show prices correctly but direct purchase attempts to email.
   function openStripe(amountCents, numCredits, isLifetime, description) {
     const msg = document.getElementById("paymentMsg");
-    const supportEmail = "aishwaryachulaki@gmail.com";
+    const supportEmail = "hello@dropakeepsake.com";
     const subject = encodeURIComponent(`Purchase request: ${description}`);
     const body = encodeURIComponent(`Hi,\n\nI'd like to purchase: ${description}\nMy account email: ${currentUser.email}\n\nThanks`);
     msg.innerHTML = `<div class="msg error">International card payments are coming very soon. In the meantime, email us at <a href="mailto:${supportEmail}?subject=${subject}&body=${body}" style="color:var(--rose);font-weight:600">${supportEmail}</a> and we'll sort it out manually.</div>`;

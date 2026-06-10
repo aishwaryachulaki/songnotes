@@ -40,6 +40,30 @@ async function getSession() {
   return s;
 }
 
+// chrome.storage.local is shared across ALL accounts on this browser, so a new
+// sign-in would otherwise see the previous account's letters, vault (cross-device
+// relive) state, and saved name. We stamp the local data with its owning user id
+// (ks_owner) and, when a DIFFERENT user signs in, wipe the account-scoped keys.
+// We only wipe on an actual account CHANGE — never on same-account sign-out/in —
+// because received letters keep their decrypted notes only in local storage and
+// must survive a re-login. Returns true if a wipe happened.
+async function enforceAccountScope(session) {
+  const uid = session && session.user && session.user.id;
+  if (!uid) return false;
+  const { ks_owner } = await chrome.storage.local.get("ks_owner");
+  let wiped = false;
+  if (ks_owner && ks_owner !== uid) {
+    await chrome.storage.local.remove([
+      "ks_shares", "ks_vault", "ks_sender", "ks_tutorial", "ks_onboarding",
+    ]);
+    wiped = true;
+  }
+  if (ks_owner !== uid) {
+    await chrome.storage.local.set({ ks_owner: uid });
+  }
+  return wiped;
+}
+
 async function supabaseRpc(fnName, params, accessToken) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fnName}`, {
     method: "POST",
@@ -1112,6 +1136,11 @@ async function reliveShare(id) {
 }
 
 async function init() {
+  // Before reading any local data, make sure it belongs to the signed-in
+  // account — wipe it if a different user is now logged in on this browser.
+  const _scopeSession = await getSession();
+  if (_scopeSession) await enforceAccountScope(_scopeSession);
+
   const { store, sender } = await loadStore();
   senderName = sender;
   shareOrigin = CONFIGURED_ORIGIN || "";
@@ -2122,6 +2151,15 @@ chrome.storage.onChanged.addListener((changes, area) => {
   if (changes.ks_session) {
     _session = null; // invalidate in-memory cache so getSession() re-reads
     _sessionExpired = false;
-    refreshAuthUI().catch(console.error);
+    const newSess = changes.ks_session.newValue;
+    if (newSess && newSess.user && newSess.user.id) {
+      // A session was (re)written. If it's a different account than the local
+      // data belongs to, wipe it and reload the panel for a clean slate.
+      enforceAccountScope(newSess)
+        .then((wiped) => (wiped ? location.reload() : refreshAuthUI()))
+        .catch(console.error);
+    } else {
+      refreshAuthUI().catch(console.error);
+    }
   }
 });

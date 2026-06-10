@@ -1,0 +1,94 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../fonts/fonts.css" />
+    <link rel="stylesheet" href="../popup.css" />
+    <style>
+      html, body { margin: 0; }
+      /* keep the cursor/focus rings out of a marketing capture */
+      * { caret-color: transparent !important; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+
+      <!-- Auth bar — signed in -->
+      <div id="authBar" class="auth-bar">
+        <div class="auth-top">
+          <span id="authEmail" class="auth-email">sam@example.com</span>
+          <div class="auth-links">
+            <a class="auth-link">Account</a>
+            <a class="auth-link">Sign out</a>
+          </div>
+        </div>
+        <span id="creditsBadge" class="credits-badge">✧ 3 letters left</span>
+      </div>
+
+      <!-- Now Playing -->
+      <div class="stamp-track">
+        <div class="stamp-eyebrow">✧ NOW PLAYING</div>
+        <div class="track-title">Linger</div>
+        <div class="track-artist">The Cranberries</div>
+        <div class="postmark" aria-hidden="true">
+          <div class="postmark-inner">
+            <div class="postmark-top">KEEPSAKE</div>
+            <svg class="postmark-wave" viewBox="0 0 44 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0 5 C3.5 1 7 9 11 5 C15 1 18.5 9 22 5 C25.5 1 29 9 33 5 C37 1 40.5 9 44 5"
+                    stroke="rgba(58,36,24,0.35)" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+              <path d="M0 8 C3.5 4 7 12 11 8 C15 4 18.5 12 22 8 C25.5 4 29 12 33 8 C37 4 40.5 12 44 8"
+                    stroke="rgba(58,36,24,0.22)" stroke-width="0.9" stroke-linecap="round" fill="none"/>
+            </svg>
+            <div class="postmark-year">2026</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Composer -->
+      <div class="composer-card composer">
+        <div class="composer-header">
+          WRITING AS <strong>Sam</strong> · <a href="#">change</a>
+        </div>
+        <input class="underline-input" type="text" value="Maya" readonly />
+        <div class="note-area">
+          <textarea class="ruled-textarea" rows="5" readonly>This is the part where the whole song cracks open. I always think of that night on the terrace. Wait for it.</textarea>
+        </div>
+        <div class="timestamp-row">
+          <div class="ts-wrap">
+            <svg class="ts-icon" width="13" height="13" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+            <input class="timestamp-input" type="text" value="2:43" readonly />
+          </div>
+          <button class="now-btn">Now</button>
+        </div>
+        <div class="save-row">
+          <button class="save-btn">Save note</button>
+        </div>
+      </div>
+
+      <!-- Notes section -->
+      <div class="section-header"><span>NOTES FOR THIS SONG</span></div>
+      <div class="notes">
+        <div class="note">
+          <div class="meta">0:48</div>
+          <div class="note-text">First time I heard this I was 17. You'd have loved the bridge.</div>
+          <div class="note-actions">
+            <button class="del" title="Delete">×</button>
+            <button class="note-edit" title="Edit">✎</button>
+          </div>
+        </div>
+        <div class="note">
+          <div class="meta">2:43</div>
+          <div class="note-text">This is the part where the whole song cracks open. Wait for it.</div>
+          <div class="note-actions">
+            <button class="del" title="Delete">×</button>
+            <button class="note-edit" title="Edit">✎</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </body>
+</html>

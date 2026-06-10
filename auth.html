@@ -455,19 +455,17 @@
     if (redirecting) return;
     if (session && (event === "SIGNED_IN" || event === "TOKEN_REFRESHED" || event === "INITIAL_SESSION")) {
       redirecting = true;
-      window.dispatchEvent(new CustomEvent("keepsake:auth", {
-        detail: {
-          access_token: session.access_token,
-          refresh_token: session.refresh_token,
-          expires_at: session.expires_at,
-          user: {
-            id: session.user.id,
-            email: session.user.email,
-            name: session.user.user_metadata?.full_name || session.user.email,
-            avatar: session.user.user_metadata?.avatar_url || null,
-          }
+      const _authDetail = {
+        access_token: session.access_token,
+        refresh_token: session.refresh_token,
+        expires_at: session.expires_at,
+        user: {
+          id: session.user.id,
+          email: session.user.email,
+          name: session.user.user_metadata?.full_name || session.user.email,
+          avatar: session.user.user_metadata?.avatar_url || null,
         }
-      }));
+      };
       document.getElementById("card").innerHTML = `
         <div class="success-state">
           <div class="success-icon-wrap">
@@ -480,13 +478,23 @@
           <div class="success-dots"><span></span><span></span><span></span></div>
         </div>
       `;
-      // Wait for the extension bridge to confirm the session is written to
-      // storage before navigating — falls back to 1.5s if bridge isn't present.
-      const fallback = setTimeout(doRedirect, 1500);
+      // Re-dispatch until the extension bridge confirms it saved the session.
+      // A single dispatch can race the content script's injection and be lost
+      // (the bug where the extension didn't "see" the login). Redirect as soon
+      // as it's saved, or after ~2s if the bridge isn't present. notes.html
+      // re-pushes too, so the sync still lands even if we redirect first.
+      let _saved = false;
       window.addEventListener("keepsake:auth_saved", () => {
-        clearTimeout(fallback);
+        _saved = true;
         doRedirect();
       }, { once: true });
+      let _tries = 0;
+      (function _pushAuth() {
+        if (_saved) return;
+        window.dispatchEvent(new CustomEvent("keepsake:auth", { detail: _authDetail }));
+        if (_tries++ > 12) { doRedirect(); return; }
+        setTimeout(_pushAuth, 150);
+      })();
     }
   });
 

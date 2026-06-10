@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://checkout.razorpay.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co https://*.razorpay.com https://lumberjack.razorpay.com https://open.spotify.com; frame-src https://checkout.razorpay.com https://*.razorpay.com https://challenges.cloudflare.com; base-uri 'self'; form-action 'self' https://*.razorpay.com;" />
+  <script>/* anti-clickjacking: never allow this page to be framed */if (self!==top){try{top.location=self.location.href;}catch(e){document.documentElement.style.visibility='hidden';}}</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <title>Refund &amp; Cancellation Policy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@1,400&family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@500;600;700&display=swap" />
+  <style>
+    :root {
+      --butter:   #F4D9A6;
+      --cream:    #FFFBF4;
+      --blush:    #E36888;
+      --tangerine:#F08C21;
+      --ink:      #3a2418;
+      --ink-mid:  #8a5a48;
+      --ink-lt:   #c4977a;
+      --border:   rgba(58,36,24,0.10);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      background: var(--butter) url('background.png') center / cover no-repeat fixed;
+      font-family: 'Lora', Georgia, serif;
+      color: var(--ink);
+      min-height: 100vh;
+      padding: 48px 40px 80px;
+      line-height: 1.75;
+      overscroll-behavior: none;
+    }
+
+    .page {
+      max-width: 760px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    /* ── Header ── */
+    .site-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 48px;
+    }
+    .nav-logo {
+      font-family: 'Spectral', Georgia, serif;
+      font-style: italic; font-weight: 400; font-size: 26px;
+      color: var(--blush); text-decoration: none; letter-spacing: -0.01em;
+      display: flex; align-items: center; gap: 5px;
+      text-shadow: 0 1px 12px rgba(140,50,60,0.13);
+    }
+    .nav-logo .logo-spark {
+      font-style: normal; font-family: sans-serif;
+      font-size: 11px; color: var(--tangerine); font-weight: 400;
+      vertical-align: super; line-height: 0;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      background: var(--cream);
+      border-radius: 16px;
+      padding: 36px 36px 32px;
+      margin-bottom: 32px;
+      border: 1.5px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::after {
+      content: '✦';
+      position: absolute;
+      right: 28px; top: 28px;
+      font-size: 32px;
+      color: var(--blush);
+      opacity: 0.18;
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--blush); margin-bottom: 10px;
+    }
+    .hero h1 {
+      font-size: 26px; font-weight: 700; line-height: 1.25;
+      color: var(--ink); margin-bottom: 14px;
+    }
+    .hero-meta { font-size: 13px; color: var(--ink-mid); }
+
+    /* ── Policy content wrapper ── */
+    .policy-body {
+      background: var(--cream);
+      border-radius: 14px;
+      padding: 40px 44px;
+      margin-bottom: 12px;
+      border: 1.5px solid var(--border);
+    }
+
+    /* ── Footer ── */
+    .footer {
+      text-align: center; margin-top: 32px;
+      font-size: 12.5px; color: var(--ink-lt);
+    }
+    .footer a { color: var(--ink-lt); }
+
+    /* ── Content typography ── */
+    .policy-body h2 {
+      font-size: 17px; font-weight: 700; color: var(--ink);
+      margin-top: 28px; margin-bottom: 10px; line-height: 1.35;
+    }
+    .policy-body h2:first-child { margin-top: 0; }
+    .policy-body h3 {
+      font-size: 15px; font-weight: 700; color: var(--ink);
+      margin-top: 22px; margin-bottom: 8px;
+    }
+    .policy-body p {
+      font-size: 14px; color: var(--ink);
+      line-height: 1.75; margin-bottom: 12px;
+    }
+    .policy-body a { color: var(--tangerine); text-decoration: none; }
+    .policy-body a:hover { text-decoration: underline; }
+    .policy-body ul { margin: 8px 0 14px 20px; padding: 0; }
+    .policy-body li {
+      font-size: 14px; color: var(--ink);
+      margin-bottom: 6px; line-height: 1.65;
+    }
+    ul { list-style-type: square; }
+    ul > li > ul { list-style-type: circle; }
+    .policy-body strong { color: var(--ink); }
+    .callout {
+      background: rgba(240,140,33,0.07);
+      border: 1px solid rgba(240,140,33,0.22);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 8px 0 16px;
+      font-size: 13.5px;
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <header class="site-header">
+    <a href="index.html" class="nav-logo">keepsake.<span class="logo-spark">✦</span></a>
+    <a href="index.html" style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-lt);text-decoration:none;opacity:0.7;">← Home</a>
+  </header>
+
+  <div class="hero">
+    <div class="hero-eyebrow">Legal</div>
+    <h1>Refund &amp; Cancellation Policy</h1>
+    <p class="hero-meta">Last updated: June 10, 2026 &nbsp;·&nbsp; How refunds and cancellations work for Keepsake purchases.</p>
+  </div>
+
+  <div class="policy-body">
+
+    <h2>Overview</h2>
+    <p>This Refund &amp; Cancellation Policy explains the terms under which <strong>Aishwarya Prabhudev Chulaki</strong> (doing business as <strong>Keepsake</strong>, "we," "us," or "our") offers refunds and cancellations for purchases made on <a href="https://dropakeepsake.com">https://dropakeepsake.com</a> ("Website") and through the Keepsake browser extension ("Services"). By making a purchase, you agree to this policy.</p>
+    <p>Keepsake sells <strong>digital products</strong> — "letter credits" that let you create and send keepsake links, and an optional "Lifetime" plan that grants unlimited use. These are delivered to your account <strong>instantly and electronically</strong> at the time of a successful payment. Because the product is digital and delivered immediately, the terms below apply.</p>
+
+    <h2>Letter credit bundles</h2>
+    <p>Letter credit bundles (for example, the 5-, 10-, and 15-letter packs) are <strong>delivered to your account instantly</strong> upon successful payment. As a result, <strong>all sales of credit bundles are final and non-refundable</strong>, except in the limited circumstances below:</p>
+    <ul>
+      <li><strong>Duplicate or accidental charge.</strong> If you were charged more than once for the same purchase, or charged in error, we will refund the duplicate/erroneous charge in full.</li>
+      <li><strong>Payment succeeded but credits were not delivered.</strong> If your payment was completed but the corresponding credits did not appear in your account due to a technical failure on our side, we will either deliver the credits you paid for or, if you prefer, refund that payment.</li>
+    </ul>
+    <p>Outside of these circumstances, purchased credits are non-refundable — including once any credit from a bundle has been used to create or send a keepsake.</p>
+
+    <h2>Lifetime plan</h2>
+    <p>The Lifetime plan is a one-time purchase that grants unlimited use. Because of its higher value, we offer a short cooling-off period:</p>
+    <div class="callout">
+      <strong>48-hour cooling-off:</strong> You may request a full refund of the Lifetime plan within <strong>48 hours</strong> of purchase, <strong>provided you have not yet created or sent any keepsake using it</strong>. Once a keepsake has been created or sent under the Lifetime plan, or once 48 hours have passed, the Lifetime purchase is final and non-refundable.
+    </div>
+    <p>The duplicate-charge and non-delivery exceptions described above also apply to the Lifetime plan.</p>
+
+    <h2>Free credits</h2>
+    <p>New accounts receive a number of complimentary letter credits at no cost. Because these are provided free of charge, they carry no monetary value and are not eligible for any refund or cash equivalent.</p>
+
+    <h2>Cancellations</h2>
+    <p>Keepsake does not sell subscriptions and does not bill you on a recurring basis. All purchases — credit bundles and the Lifetime plan — are <strong>one-time payments</strong>. There is therefore nothing to cancel to stop future charges, because no future or recurring charges are made.</p>
+    <p>You may stop using the Services and delete your account at any time from your <a href="account.html">account page</a>. Deleting your account permanently removes your data, including any remaining credits; deletion does not entitle you to a refund of past purchases, except where this policy otherwise provides.</p>
+
+    <h2>How to request a refund</h2>
+    <p>To request a refund under this policy, email us at <a href="mailto:hello@dropakeepsake.com">hello@dropakeepsake.com</a> from the email address associated with your Keepsake account, and include:</p>
+    <ul>
+      <li>The email address on your account;</li>
+      <li>The Razorpay payment ID or order ID (shown on your payment confirmation and in your purchase history on the account page);</li>
+      <li>The approximate date and amount of the purchase; and</li>
+      <li>A brief description of why you are requesting a refund.</li>
+    </ul>
+    <p>We aim to review and respond to refund requests within a reasonable time after they are received.</p>
+
+    <h2>How approved refunds are processed</h2>
+    <p>Payments on Keepsake are processed by our payment partner, <strong>Razorpay</strong>. Where a refund is approved under this policy, it will be issued to your <strong>original payment method</strong> via Razorpay. Approved refunds are typically processed within <strong>5–7 business days</strong> of approval; the time for the refunded amount to appear in your account may vary depending on your bank or card issuer.</p>
+    <p>If a refund is approved, any credits associated with the refunded purchase will be removed from your account.</p>
+
+    <h2>Changes to this policy</h2>
+    <p>We may update this Refund &amp; Cancellation Policy from time to time for operational, legal, or regulatory reasons. The "Last updated" date at the top of this page indicates when it was last revised. The policy in effect at the time of your purchase applies to that purchase.</p>
+
+    <h2>Contact us</h2>
+    <p>If you have any questions about this policy or a specific purchase, contact us at <a href="mailto:hello@dropakeepsake.com">hello@dropakeepsake.com</a>.</p>
+
+  </div>
+
+  <footer class="footer">
+    <p>Keepsake &nbsp;·&nbsp; <a href="privacy.html">Privacy Policy</a> &nbsp;·&nbsp; <a href="terms.html">Terms</a> &nbsp;·&nbsp; <a href="eula.html">EULA</a> &nbsp;·&nbsp; <a href="cookie-policy.html">Cookies</a></p>
+  </footer>
+
+</div>
+</body>
+</html>

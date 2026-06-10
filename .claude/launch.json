@@ -2,10 +2,10 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "songnotes",
+      "name": "static",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "4321"],
-      "port": 4321
+      "runtimeArgs": ["-m", "http.server", "5599"],
+      "port": 5599
     }
   ]
 }

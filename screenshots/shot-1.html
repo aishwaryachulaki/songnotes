@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../fonts/fonts.css" />
+<style>
+  :root{--butter:#F4D9A6;--cream:#F7E9D3;--ink:#3A2E2A;--ink-mid:#6B5A52;--rose:#D96B7C;--logo:#C04E6A;--tangerine:#F08C21;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{width:1280px;height:800px;overflow:hidden;}
+  .slide{width:1280px;height:800px;position:relative;
+    background:var(--butter) url('../background.png') center / cover no-repeat;
+    font-family:'Lora',Georgia,serif;color:var(--ink);display:flex;align-items:center;
+    padding:0 80px;gap:40px;}
+  .left{width:560px;position:relative;z-index:2;}
+  .brand{display:flex;align-items:baseline;gap:13px;margin-bottom:28px;}
+  .brand .logo{font-family:'Spectral',serif;font-style:italic;font-weight:400;font-size:30px;color:var(--logo);}
+  .brand .logo .spark{font-style:normal;font-family:sans-serif;font-size:13px;color:var(--tangerine);vertical-align:super;line-height:0;margin-left:2px;}
+  .brand .tag{font-family:'Montserrat',sans-serif;font-weight:700;letter-spacing:.2em;font-size:12px;color:var(--ink-mid);text-transform:uppercase;opacity:.65;}
+  h1{font-family:'Spectral',Georgia,serif;font-style:italic;font-weight:400;
+    font-size:74px;line-height:1.04;letter-spacing:-.01em;margin-bottom:26px;}
+  h1 .hl{color:var(--rose);}
+  .sub{font-size:23px;line-height:1.55;color:var(--ink-mid);max-width:480px;}
+  .sub .s{color:var(--rose);}
+  .right{flex:1;position:relative;z-index:2;display:flex;align-items:center;justify-content:center;height:100%;}
+  .device{position:relative;width:430px;height:700px;border-radius:26px;overflow:hidden;background:var(--cream);
+    box-shadow:0 30px 70px -18px rgba(58,36,24,0.45),0 0 0 1px rgba(58,36,24,0.06);transform:rotate(-2deg);}
+  .device iframe{width:340px;height:740px;border:0;display:block;transform:scale(1.27);transform-origin:top left;}
+</style>
+</head>
+<body>
+  <div class="slide">
+    <div class="left">
+      <div class="brand"><span class="logo">keepsake.<span class="spark">✦</span></span><span class="tag">Notes for Spotify</span></div>
+      <h1>Pin a note to <span class="hl">any moment</span> of a song.</h1>
+      <div class="sub">Choose the chorus, the drop, the 47-second mark <span class="s">✦</span> and write what you want someone to feel, right there.</div>
+    </div>
+    <div class="right">
+      <div class="device"><iframe src="_popup-composer.html" scrolling="no"></iframe></div>
+    </div>
+  </div>
+</body>
+</html>
