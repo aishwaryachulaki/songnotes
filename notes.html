@@ -603,8 +603,9 @@
           } else if (!responded) {
             showToast("Install or enable the Keepsake extension, then refresh to copy links.");
           } else {
-            // Extension is here but the key isn't on this device.
-            showToast("This letter was created on another device, so its link key isn't here. Copy it from that device, or turn on Cross-device relive.");
+            // Extension is here, but the key isn't on this device (and wasn't in
+            // the vault when it was last unlocked). Be honest about why.
+            showToast("This letter's link key isn't saved on this device. Keys live on the device that created the letter (and in Cross-device relive, if it was on when you sent it) — letters sent before that can't be recovered.");
           }
           copyBtn.textContent = "Link";
           copyBtn.disabled = false;
