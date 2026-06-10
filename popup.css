@@ -663,62 +663,6 @@ body::before {
 .sp-share-btn:hover { background: rgba(227,104,136,0.18); border-color: rgba(227,104,136,0.65); }
 .sp-share-btn:disabled { opacity: 0.4; cursor: default; }
 
-/* ── Previous Experiences ── */
-.previous-list { display: flex; flex-direction: column; gap: 7px; }
-.prev-item {
-  display: flex; align-items: center; gap: 10px;
-  background: url('faq-bg-olive.png') center / cover no-repeat;
-  border: 1px solid rgba(58,36,24,0.10);
-  border-radius: 12px; padding: 9px 10px;
-  box-shadow:
-    0 1px 3px rgba(58,36,24,0.09),
-    0 4px 10px rgba(58,36,24,0.07);
-}
-.prev-thumb {
-  width: 48px; height: 48px; border-radius: 0;
-  object-fit: contain; flex-shrink: 0;
-  background: transparent;
-}
-.prev-meta { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; }
-.prev-title {
-  font-family: 'Lora', Georgia, serif;
-  font-size: 12px; font-weight: 600; color: var(--ink-2);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.prev-sub {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 9px; color: var(--ink-4); letter-spacing: 0.03em;
-}
-.prev-actions { display: flex; flex-direction: column; gap: 5px; align-items: stretch; flex-shrink: 0; }
-.prev-activate {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 9px; padding: 4px 10px; border-radius: 50px;
-  color: var(--blush); border: 1.5px solid rgba(227,104,136,0.40);
-  background: rgba(227,104,136,0.07); cursor: pointer;
-  font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase; white-space: nowrap;
-  transition: background 0.15s, border-color 0.15s;
-}
-.prev-activate:hover { background: rgba(227,104,136,0.18); border-color: rgba(227,104,136,0.65); }
-.prev-copy {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 9px; padding: 4px 8px; border-radius: 50px;
-  color: var(--blush); border: 1.5px solid rgba(227,104,136,0.40);
-  background: rgba(227,104,136,0.07); cursor: pointer;
-  font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase; white-space: nowrap;
-  transition: background 0.15s, border-color 0.15s;
-}
-.prev-copy:hover { background: rgba(227,104,136,0.18); border-color: rgba(227,104,136,0.65); }
-.prev-more {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 9px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase;
-  background: rgba(227,104,136,0.07); border: 1.5px solid rgba(227,104,136,0.40);
-  border-radius: 50px; color: var(--blush); text-align: center; cursor: pointer;
-  padding: 5px 0; width: 100%;
-  transition: background 0.15s, border-color 0.15s;
-}
-.prev-more:hover { background: rgba(227,104,136,0.18); border-color: rgba(227,104,136,0.65); }
-
-
 /* ── Import block ── */
 .import-block {
   border-top: 1px solid rgba(58,36,24,0.08);
@@ -852,7 +796,6 @@ body::before {
 .composer-card,
 .note,
 .share-card,
-.share-panel,
-.prev-item {
+.share-panel {
   background-size: 100% 100%;
 }

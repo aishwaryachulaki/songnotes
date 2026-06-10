@@ -967,101 +967,6 @@ async function renderPrevious() {
   // relived from the website (notes.html#sent), which drives the extension via
   // notes-bridge. Kept as a no-op so existing callers don't need to change.
   return;
-  // eslint-disable-next-line no-unreachable
-  const session = await getSession();
-  const list = $("previousList");
-  const header = $("prevHeader");
-
-  // Never show previous shares when logged out
-  if (!session) {
-    list.innerHTML = "";
-    if (header) header.style.display = "none";
-    return;
-  }
-
-  const { store } = await loadStore();
-  const allPrev = (store.previous || []).filter((id) => store.shares[id]);
-  const prev = allPrev.slice(0, 3);
-
-  if (!prev.length) {
-    list.innerHTML = "";
-    if (header) header.style.display = "none";
-    return;
-  }
-
-  if (header) header.style.display = "";
-  list.innerHTML = "";
-
-  prev.forEach((id) => {
-    const s = store.shares[id];
-    // Notes may have been stripped after archiving — fall back to saved counts.
-    const noteCount = s.notes.length || s.note_count || 0;
-    const songCount = s.notes.length
-      ? new Set(s.notes.map((n) => n.track_id)).size
-      : (s.song_count || 0);
-    const title = s.recipient_name
-      ? `Notes for ${s.recipient_name}`
-      : "Notes (unknown recipient)";
-    const dateStr = s.created_at
-      ? new Date(s.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })
-      : null;
-    const sub = [
-      `${noteCount} note${noteCount === 1 ? "" : "s"}`,
-      `${songCount} song${songCount === 1 ? "" : "s"}`,
-      dateStr,
-    ].filter(Boolean).join(" · ");
-
-    const row = document.createElement("div");
-    row.className = "prev-item";
-    row.innerHTML = `
-      <img class="prev-thumb" src="prev-thumb.png" alt="" />
-      <div class="prev-meta">
-        <div class="prev-title">${escapeHtml(title)}</div>
-        <div class="prev-sub">${escapeHtml(sub)}</div>
-      </div>
-      <div class="prev-actions">
-        ${s.enc_key ? `<button class="prev-copy" data-id="${id}" title="Copy share link">Copy link</button>` : ""}
-        <button class="prev-activate" data-id="${id}">Relive</button>
-      </div>
-    `;
-    list.appendChild(row);
-  });
-
-  list.querySelectorAll(".prev-copy").forEach((b) =>
-    b.addEventListener("click", async (e) => {
-      const sid = e.currentTarget.dataset.id;
-      const { store: s } = await loadStore();
-      const share = s.shares[sid];
-      if (!share?.enc_key) return;
-      const url = `${shareUrl(share.id)}&e=1#k=${encodeURIComponent(share.enc_key)}`;
-      try {
-        await navigator.clipboard.writeText(url);
-        e.currentTarget.textContent = "Copied!";
-        setTimeout(() => { e.currentTarget.textContent = "Copy link"; }, 2000);
-      } catch {
-        e.currentTarget.textContent = "Copy link";
-      }
-    }),
-  );
-
-  list.querySelectorAll(".prev-activate").forEach((b) =>
-    b.addEventListener("click", async (e) => {
-      const btn = e.currentTarget;
-      btn.disabled = true;
-      btn.textContent = "Loading…";
-      await reliveShare(btn.dataset.id);
-      btn.disabled = false;
-      btn.textContent = "Relive";
-    }),
-  );
-
-  if (allPrev.length > 3) {
-    const more = document.createElement("div");
-    more.className = "prev-more";
-    more.textContent = "View more on your account →";
-    more.addEventListener("click", openAccountPage);
-    list.appendChild(more);
-  }
 }
 
 function showComposer(show) {
@@ -1412,11 +1317,6 @@ $("signOutLink").addEventListener("click", async (e) => {
   $("authGate").classList.remove("hidden");
   $("authBar").classList.add("hidden");
   const vb = $("vaultBlock"); if (vb) vb.style.display = "none";
-  // Clear previous shares from view immediately
-  const list = $("previousList");
-  const header = $("prevHeader");
-  if (list) list.innerHTML = "";
-  if (header) header.style.display = "none";
 });
 
 // Vault: enable / unlock / change passphrase (guarded — element may be absent)
