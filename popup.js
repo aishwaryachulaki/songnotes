@@ -381,6 +381,21 @@ async function vaultUnlock(passphrase) {
     else if (!store.shares[sid].enc_key) store.shares[sid].enc_key = keyMap[sid];
   }
   store.previous = [...prevIds, ...(store.previous || []).filter((id) => !prevIds.includes(id))];
+
+  // Backfill: wrap any key that's present locally (owned/received) but NOT yet
+  // in the vault, so a future storage-clear can't strip a key that was present
+  // on an unlocked device at least once. (Can't recover already-lost keys.)
+  try {
+    const allowed = await fetchOwnedOrReceivedShareIds(session.access_token, session.user.id);
+    const backfill = [];
+    for (const s of Object.values(store.shares || {})) {
+      if (s && s.id && s.enc_key && allowed.has(s.id) && !(s.id in keyMap)) {
+        backfill.push({ user_id: session.user.id, share_id: s.id, wrapped_key: await encryptField(s.enc_key, masterKey) });
+      }
+    }
+    if (backfill.length) await upsertVaultKeys(backfill, session.access_token);
+  } catch (e) { console.warn("Keepsake: vault backfill on unlock failed", e); }
+
   await saveStore(store);
   await saveVaultState({ user_id: session.user.id, enabled: true, masterKeyB64: await exportMasterKey(masterKey) });
 }

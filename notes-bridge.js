@@ -92,6 +92,20 @@
     });
   });
 
+  // ---- Remove a deleted keepsake from this device's local storage ----
+  window.addEventListener("keepsake:remove_share", (e) => {
+    const shareId = e.detail && e.detail.shareId;
+    if (!shareId) return;
+    chrome.storage.local.get("ks_shares", (result) => {
+      const store = result.ks_shares;
+      if (!store || !store.shares || !store.shares[shareId]) return;
+      delete store.shares[shareId];
+      store.previous = (store.previous || []).filter((x) => x !== shareId);
+      if (store.active === shareId) store.active = null;
+      chrome.storage.local.set({ ks_shares: store });
+    });
+  });
+
   // Let the page know the extension is present
   window.dispatchEvent(new CustomEvent("keepsake:extension_present"));
 })();

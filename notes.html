@@ -239,6 +239,11 @@
       opacity: 0.55;
     }
     .btn-sm-outline:hover { background: rgba(58,36,24,0.06); opacity: 0.9; }
+    .btn-sm-remove {
+      background: transparent; border: none; color: inherit;
+      opacity: 0.4; padding: 5px 8px;
+    }
+    .btn-sm-remove:hover { opacity: 0.85; color: #b54848; background: rgba(181,72,72,0.08); }
 
     /* ── Pagination ── */
     .pagination {
@@ -612,11 +617,50 @@
           return;
         }
 
+        // Remove (delete) a keepsake
+        const removeBtn = e.target.closest("[data-remove]");
+        if (removeBtn) {
+          const shareId = removeBtn.dataset.remove;
+          if (!confirm("Remove this keepsake? This permanently deletes it. Any link you've already shared will stop working.")) return;
+          removeBtn.textContent = "…";
+          removeBtn.disabled = true;
+          const ok = await deleteShare(shareId);
+          if (ok) {
+            sentShares = sentShares.filter((s) => s.id !== shareId);
+            // Ask the extension to drop it from local storage + vault too.
+            window.dispatchEvent(new CustomEvent("keepsake:remove_share", { detail: { shareId } }));
+            const card = removeBtn.closest(".share-card");
+            if (card) card.remove();
+            showToast("Removed.");
+            if (!sentShares.length) render(); // show the empty state
+          } else {
+            removeBtn.textContent = "Remove";
+            removeBtn.disabled = false;
+            showToast("Couldn't remove it. Try again.");
+          }
+          return;
+        }
+
         // Relive button — open the song/playlist on Spotify
         const reliveBtn = e.target.closest("[data-relive]");
         if (!reliveBtn) return;
         doRelive(reliveBtn);
       });
+    }
+  }
+
+  // Delete a keepsake the user owns: annotations + share row (+ its vault key).
+  // RLS scopes every delete to the logged-in owner.
+  async function deleteShare(shareId) {
+    try {
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) return false;
+      await sb.from("annotations").delete().eq("share_id", shareId);
+      await sb.from("vault_keys").delete().eq("share_id", shareId);
+      const { error } = await sb.from("shares").delete().eq("id", shareId);
+      return !error;
+    } catch {
+      return false;
     }
   }
 
@@ -722,6 +766,7 @@
               <div class="share-note-count">${noteLabel}</div>
             </div>
             <div class="share-actions">
+              <button class="btn-sm btn-sm-remove" data-remove="${esc(share.id)}" title="Remove this keepsake">Remove</button>
               <button class="btn-sm btn-sm-outline" data-copy="${esc(share.id)}">Link</button>
               ${canRelive ? `<button class="btn-sm" data-relive="${esc(share.id)}" data-spotify="${esc(spotify)}">Relive ✦</button>` : ""}
             </div>
