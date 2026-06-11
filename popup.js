@@ -126,10 +126,10 @@ function freeCreditsRemaining(c) {
 }
 
 function creditsLabel(c) {
-  if (!c) return "0 letters";
+  if (!c) return "0 keepsakes";
   if (c.lifetime) return "∞ Lifetime";
   const total = c.paid_credits + freeCreditsRemaining(c);
-  return `${total} letter${total !== 1 ? "s" : ""}`;
+  return `${total} keepsake${total !== 1 ? "s" : ""}`;
 }
 
 function openAuthPage() {
@@ -1292,7 +1292,7 @@ function renderVaultUI(hasVault, unlocked) {
     $("vaultRow").style.display = "none";
     pass2.style.display = "none";
     change.style.display = "";
-    status.textContent = "On. Your letters relive on any device you sign into. (Sign out to lock this device.)";
+    status.textContent = "On. Your keepsakes relive on any device you sign into. (Sign out to lock this device.)";
   } else if (hasVault && !unlocked) {
     _vaultMode = "unlock";
     summary.textContent = "▸ Cross-device relive · Locked";
@@ -1305,7 +1305,7 @@ function renderVaultUI(hasVault, unlocked) {
     _vaultMode = "off";
     summary.textContent = "▸ Cross-device relive · Off";
     disc.style.display = "";
-    disc.textContent = "Set a passphrase to relive your letters on any device you sign into. Make it long: a few random words you'll remember (12+ characters). It never leaves your device, so we can't see it or reset it; if you forget it, re-set it from a device you're already on. Write it down.";
+    disc.textContent = "Set a passphrase to relive your keepsakes on any device you sign into. Make it long: a few random words you'll remember (12+ characters). It never leaves your device, so we can't see it or reset it; if you forget it, re-set it from a device you're already on. Write it down.";
     $("vaultRow").style.display = "";
     pass2.style.display = "";
     change.style.display = "none";
@@ -1361,7 +1361,7 @@ $("vaultBtn")?.addEventListener("click", async () => {
     btn.disabled = true; status.textContent = "Unlocking…";
     try {
       await vaultUnlock(pass);
-      status.textContent = "Unlocked ✦ Your letters are now on this device.";
+      status.textContent = "Unlocked ✦ Your keepsakes are now on this device.";
       await refreshAuthUI();
       renderPrevious().catch(() => {});
     } catch (err) {
@@ -1509,7 +1509,7 @@ $("copyShare").addEventListener("click", async () => {
   // ── Step 1: Auth check ──
   const session = await getSession();
   if (!session) {
-    $("shareInfo").innerHTML = `Sign in to send letters. <a href="#" id="signInLink" style="color:var(--tangerine);font-weight:600">Sign in</a>`;
+    $("shareInfo").innerHTML = `Sign in to send keepsakes. <a href="#" id="signInLink" style="color:var(--tangerine);font-weight:600">Sign in</a>`;
     document.getElementById("signInLink")?.addEventListener("click", (e) => { e.preventDefault(); openAuthPage(); });
     shareBtn.disabled = false;
     return;
@@ -1538,7 +1538,7 @@ $("copyShare").addEventListener("click", async () => {
     freeCreditsRemaining(credits) > 0
   );
   if (!hasCredit) {
-    $("shareInfo").innerHTML = `No letters left. <a href="#" id="buyLink" style="color:var(--tangerine);font-weight:600">Buy more →</a>`;
+    $("shareInfo").innerHTML = `No keepsakes left. <a href="#" id="buyLink" style="color:var(--tangerine);font-weight:600">Buy more →</a>`;
     document.getElementById("buyLink")?.addEventListener("click", (e) => { e.preventDefault(); openAccountPage(); });
     shareBtn.disabled = false;
     return;
@@ -1666,14 +1666,14 @@ $("copyShare").addEventListener("click", async () => {
     const err = shareResult && shareResult.error;
     if (err === "no_credit") {
       rollbackShare("");
-      $("shareInfo").innerHTML = `No letters left. <a href="#" id="buyLink" style="color:var(--tangerine);font-weight:600">Buy more →</a>`;
+      $("shareInfo").innerHTML = `No keepsakes left. <a href="#" id="buyLink" style="color:var(--tangerine);font-weight:600">Buy more →</a>`;
       document.getElementById("buyLink")?.addEventListener("click", (e) => { e.preventDefault(); openAccountPage(); });
       return;
     }
     if (err === "not_authenticated") { rollbackShare("Your session expired. Please sign in again."); return; }
     rollbackShare(shareErr
       ? "Couldn't reach the server. Check your connection and try again."
-      : "Couldn't send your letter. Please try again.");
+      : "Couldn't send your keepsake. Please try again.");
     return;
   }
 
@@ -1746,8 +1746,8 @@ $("resetShare").addEventListener("click", async () => {
 
   // Relived letters go *back* to previous; everything else is *moved* there.
   const confirmMsg = wasRelived
-    ? "Return this letter to previous experiences?"
-    : "Start a new share? Your current letter will be moved to ‘previous experiences’.";
+    ? "Return this keepsake to previous experiences?"
+    : "Start a new share? Your current keepsake will be moved to ‘previous experiences’.";
   if (!confirm(confirmMsg)) return;
 
   await archiveActive(store);
@@ -1922,7 +1922,7 @@ $("importBtn").addEventListener("click", async () => {
 
   const { store } = await loadStore();
   if (store.active === v) {
-    $("importStatus").textContent = "This letter is already active.";
+    $("importStatus").textContent = "This keepsake is already active.";
     return;
   }
   if (store.shares[v]) {
