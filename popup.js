@@ -1012,7 +1012,7 @@ function renderExperienceBanner() {
       if (editBtn) editBtn.classList.add("hidden");
       if (closeBtn) closeBtn.classList.remove("hidden");
       if (expWho) expWho.textContent =
-        "Play the songs on Spotify and the notes appear at their moments. It's saved to your account, so you can relive it anytime from Received. To exit, just close this banner.";
+        "Press play on Spotify and watch the notes appear as the song plays. It's automatically saved to your account and always available in Received. Close this banner when you're done.";
     } else {
       // Reliving your own sent letter.
       if (badge) badge.textContent = "✧ Experience mode";
