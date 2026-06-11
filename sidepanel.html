@@ -108,8 +108,9 @@
 
       <!-- Experience banner — shown when viewing a reactivated sent share -->
       <div id="experienceBanner" class="experience-banner hidden">
+        <button id="receivedClose" class="exp-close hidden" type="button" aria-label="Exit keepsake">✕</button>
         <div class="exp-top">
-          <span class="exp-badge">✧ Experience mode</span>
+          <span class="exp-badge" id="expBadge">✧ Experience mode</span>
           <button id="enterEditMode" class="exp-edit-btn">Enter Edit Mode</button>
         </div>
         <div id="expWho" class="exp-who"></div>
@@ -128,7 +129,7 @@
       <div id="songIndex" class="song-index"></div>
 
       <!-- Share panel -->
-      <div class="share-panel">
+      <div class="share-panel" id="sharePanel">
 
         <!-- Header row -->
         <div class="sp-header">

@@ -84,8 +84,8 @@
       }
       store.previous = (store.previous || []).filter((x) => x !== shareId);
       store.active = shareId;
-      // Sent letters (have a key) relive read-only; received letters fire popups in editing mode.
-      share.mode = share.enc_key ? "experience" : "editing";
+      // Both sent (your own) and received letters relive read-only in experience mode.
+      share.mode = "experience";
       store.shares[shareId] = share;
 
       chrome.storage.local.set({ ks_shares: store }, () => reliveDone(shareId, true));

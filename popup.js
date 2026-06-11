@@ -839,6 +839,12 @@ async function attachPlaylist() {
 async function renderSharePanel() {
   if (!activeShare) return;
 
+  // Received keepsakes are read-only: hide the whole share/compose panel.
+  const sp = $("sharePanel");
+  const received = isReceivedShare(activeShare);
+  if (sp) sp.style.display = received ? "none" : "";
+  if (received) return;
+
   const notes     = activeShare.notes || [];
   const noteCount = notes.length;
   const uniqueIds = new Set(notes.map((n) => n.track_id).filter(Boolean));
@@ -977,6 +983,11 @@ function showComposer(show) {
   if (show) $("whoami").textContent = senderName;
 }
 
+// A received keepsake (imported from someone else): no enc_key, imported flag set.
+function isReceivedShare(s) {
+  return !!(s && s.imported && !s.enc_key);
+}
+
 function renderExperienceBanner() {
   const banner = $("experienceBanner");
   if (!banner) return;
@@ -986,14 +997,35 @@ function renderExperienceBanner() {
     // Keep composer and name block out of the way.
     $("composer")?.classList.add("hidden");
     $("nameBlock")?.classList.add("hidden");
-    const who = activeShare.recipient_name
-      ? `Notes for ${activeShare.recipient_name}`
-      : "Notes (no recipient set)";
-    const dateStr = activeShare.created_at
-      ? new Date(activeShare.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })
-      : null;
+
+    const received = isReceivedShare(activeShare);
+    banner.classList.toggle("received", received);
+    const badge = $("expBadge");
+    const editBtn = $("enterEditMode");
+    const closeBtn = $("receivedClose");
     const expWho = $("expWho");
-    if (expWho) expWho.textContent = dateStr ? `${who} · sent ${dateStr}` : who;
+
+    if (received) {
+      // Read-only "you received this" view, with a clear way to exit.
+      const sender = activeShare.sender_name || "someone";
+      if (badge) badge.textContent = `✦ A keepsake from ${sender}`;
+      if (editBtn) editBtn.classList.add("hidden");
+      if (closeBtn) closeBtn.classList.remove("hidden");
+      if (expWho) expWho.textContent =
+        "Play the songs on Spotify and the notes appear at their moments. It's saved to your account, so you can relive it anytime from Received. To exit, just close this banner.";
+    } else {
+      // Reliving your own sent letter.
+      if (badge) badge.textContent = "✧ Experience mode";
+      if (editBtn) editBtn.classList.remove("hidden");
+      if (closeBtn) closeBtn.classList.add("hidden");
+      const who = activeShare.recipient_name
+        ? `Notes for ${activeShare.recipient_name}`
+        : "Notes (no recipient set)";
+      const dateStr = activeShare.created_at
+        ? new Date(activeShare.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+        : null;
+      if (expWho) expWho.textContent = dateStr ? `${who} · sent ${dateStr}` : who;
+    }
   } else {
     // Restore normal composer visibility.
     showComposer(!!senderName);
@@ -1790,6 +1822,33 @@ $("discardDraft")?.addEventListener("click", async () => {
   renderNotes();
   renderSharePanel().catch(console.error);
   renderPrevious();
+  notifyContentRefresh();
+});
+
+// Exit a received keepsake: stop its popups but keep it saved (locally + in
+// Received), and return the user to their own composer.
+$("receivedClose")?.addEventListener("click", async () => {
+  const { store } = await loadStore();
+  const id = store.active;
+  if (id && store.shares[id]) {
+    store.shares[id].mode = "inactive"; // stops firing; stays saved for re-relive
+  }
+  store.active = null;
+  ensureActive(store, senderName); // fresh blank share of your own
+  activeShare = store.shares[store.active];
+  activeShare.mode = "editing";
+  activeShare.relived = false;
+  store.shares[store.active] = activeShare;
+  await saveStore(store).catch(console.error);
+
+  $("shareInfo").textContent = "";
+  $("playlistUrl").value = "";
+  $("recipientName").value = "";
+  if ($("shareDescription")) $("shareDescription").value = "";
+  setMode("editing");
+  renderExperienceBanner(); // hides the received banner, restores composer
+  renderNotes();
+  renderSharePanel().catch(console.error);
   notifyContentRefresh();
 });
 

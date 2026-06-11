@@ -63,7 +63,7 @@
 
       store.shares[incomingId] = {
         id: incomingId,
-        mode: "editing", // receiver should hear popups
+        mode: "experience", // received keepsake: read-only, notes still fire
         type: derivedType,
         playlist_id: meta.playlist_id || remoteNotes.find((r) => r.playlist_id)?.playlist_id || null,
         playlist_url: meta.playlist_url || null,
