@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Keepsake",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Attach personal notes to moments in Spotify songs and share them as a link.",
   "homepage_url": "https://dropakeepsake.com/",
   "permissions": ["storage", "activeTab", "tabs", "sidePanel"],
