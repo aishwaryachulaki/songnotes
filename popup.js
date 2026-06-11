@@ -1756,6 +1756,43 @@ $("resetShare").addEventListener("click", async () => {
   notifyContentRefresh();
 });
 
+// Discard the current draft entirely — no credit spent, no trace kept. A draft
+// only ever lives in local storage (it isn't pushed to the server until Share),
+// so deleting it here removes it completely.
+$("discardDraft")?.addEventListener("click", async () => {
+  if (!confirm("Discard this draft? It will be removed completely.")) return;
+  const { store } = await loadStore();
+  const id = store.active;
+  if (id) {
+    delete store.shares[id];
+    store.previous = (store.previous || []).filter((x) => x !== id);
+    if (store.displacedActive === id) store.displacedActive = null;
+  }
+  store.active = null;
+
+  // Start a fresh blank draft so the panel isn't left empty.
+  const { ks_tutorial } = await chrome.storage.local.get("ks_tutorial");
+  const tutorialActive = !!(ks_tutorial && ks_tutorial.active);
+  ensureActive(store, senderName);
+  activeShare = store.shares[store.active];
+  activeShare.mode = "editing";
+  activeShare.relived = false;
+  if (tutorialActive) activeShare.is_trial = true;
+  store.shares[store.active] = activeShare;
+  await saveStore(store).catch(console.error);
+
+  $("shareInfo").textContent = "";
+  $("playlistUrl").value = "";
+  $("recipientName").value = "";
+  if ($("shareDescription")) $("shareDescription").value = "";
+  setMode("editing");
+  renderExperienceBanner();
+  renderNotes();
+  renderSharePanel().catch(console.error);
+  renderPrevious();
+  notifyContentRefresh();
+});
+
 $("enterEditMode")?.addEventListener("click", async () => {
   if (!activeShare) return;
   const { store } = await loadStore();

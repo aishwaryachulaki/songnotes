@@ -486,16 +486,32 @@ body::before {
   line-height: 1;
 }
 
+.sp-actions {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; margin-top: 2px;
+}
 .new-share-btn {
   background: transparent; border: none;
   color: var(--blush);
   font-family: 'Montserrat', sans-serif;
   font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
-  cursor: pointer; padding: 4px 0;
-  text-align: center; width: 100%;
+  cursor: pointer; padding: 4px 2px;
+  width: auto;
   opacity: 0.75; transition: opacity 0.15s;
 }
 .new-share-btn:hover { opacity: 1; }
+.discard-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: transparent;
+  border: 1.5px solid rgba(227,104,136,0.42);
+  color: var(--blush);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+  cursor: pointer; padding: 6px 14px; border-radius: 50px;
+  opacity: 0.85; transition: background 0.15s, opacity 0.15s, border-color 0.15s;
+}
+.discard-btn:hover { opacity: 1; background: rgba(227,104,136,0.10); border-color: rgba(227,104,136,0.62); }
+.discard-btn svg { width: 12px; height: 12px; flex-shrink: 0; }
 
 
 /* ── Share Panel ── */
