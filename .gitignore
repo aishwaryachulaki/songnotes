@@ -7,3 +7,6 @@ supabase/.temp/
 
 # Build artifact — regenerated from source for Chrome Web Store; don't commit
 keepsake-extension.zip
+
+# Internal docs — keep off the public Pages site
+REVIEW.md
