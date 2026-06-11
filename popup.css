@@ -604,8 +604,7 @@ body::before {
 .tutorial-banner-text {
   font-family: 'Lora', Georgia, serif;
   font-size: 12px; line-height: 1.7; color: rgba(74,56,0,0.78);
-  max-width: 30ch;            /* calm measure — text doesn't span the card */
-  text-wrap: balance;         /* even line lengths, no orphaned words */
+  text-wrap: pretty;          /* full width, but avoid an orphaned last word */
   margin: 0;
 }
 /* Helper reads as a quiet postscript: hairline rule above, lighter, italic */
@@ -613,7 +612,7 @@ body::before {
   font-family: 'Lora', Georgia, serif;
   font-style: italic; font-size: 11px; line-height: 1.6;
   color: rgba(74,56,0,0.5);
-  max-width: 30ch; text-wrap: balance;
+  text-wrap: pretty;
   margin: 15px 0 0; padding-top: 13px;
   border-top: 1px solid rgba(74,56,0,0.13);
 }
