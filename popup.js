@@ -1004,7 +1004,6 @@ function renderExperienceBanner() {
     const received = isReceivedShare(activeShare);
     banner.classList.toggle("received", received);
     const badge = $("expBadge");
-    const editBtn = $("enterEditMode");
     const closeBtn = $("receivedClose");
     const expWho = $("expWho");
 
@@ -1012,15 +1011,14 @@ function renderExperienceBanner() {
       // Read-only "you received this" view, with a clear way to exit.
       const sender = activeShare.sender_name || "someone";
       if (badge) badge.textContent = `✦ A keepsake from ${sender}`;
-      if (editBtn) editBtn.classList.add("hidden");
       if (closeBtn) closeBtn.classList.remove("hidden");
       if (expWho) expWho.textContent =
         "Press play on Spotify and watch the notes appear as the song plays. It's automatically saved to your account and always available in Received. Close this banner when you're done.";
     } else {
-      // Reliving your own sent letter.
+      // Reliving your own sent keepsake — read-only, same as a received one.
+      // Exit (✕) starts a fresh share; sent keepsakes are never edited in place.
       if (badge) badge.textContent = "✧ Experience mode";
-      if (editBtn) editBtn.classList.remove("hidden");
-      if (closeBtn) closeBtn.classList.add("hidden");
+      if (closeBtn) closeBtn.classList.remove("hidden");
       const who = activeShare.recipient_name
         ? `Notes for ${activeShare.recipient_name}`
         : "Notes (no recipient set)";
@@ -1855,56 +1853,9 @@ $("receivedClose")?.addEventListener("click", async () => {
   notifyContentRefresh();
 });
 
-$("enterEditMode")?.addEventListener("click", async () => {
-  if (!activeShare) return;
-  const { store } = await loadStore();
-  const orig = store.shares[activeShare.id];
-
-  if (orig && orig.enc_key) {
-    // Fork-on-edit: a sent/relived letter can't be mutated in place (the
-    // original link must keep working). Return the original to Previous
-    // untouched, and edit a fresh, unsent clone instead. Re-sharing the
-    // clone creates a brand-new link; the original stays as it was.
-    const clonedNotes = (orig.notes || []).map((n) => ({ ...n }));
-    orig.note_count = (orig.notes || []).length;
-    orig.song_count = new Set((orig.notes || []).map((n) => n.track_id)).size;
-    orig.notes = [];
-    orig.mode = "inactive";
-    orig.relived = false;
-    store.previous = [orig.id, ...(store.previous || []).filter((x) => x !== orig.id)];
-
-    const clone = {
-      ...orig,
-      id: shortId(),
-      enc_key: null,
-      imported: false,
-      is_trial: false,
-      relived: false,
-      mode: "editing",
-      note_count: undefined,
-      song_count: undefined,
-      notes: clonedNotes,
-      created_at: Date.now(),
-    };
-    store.shares[clone.id] = clone;
-    store.active = clone.id;
-    activeShare = clone;
-  } else {
-    // Unsent draft — just make it editable in place.
-    activeShare.mode = "editing";
-    store.shares[activeShare.id] = activeShare;
-  }
-
-  await saveStore(store).catch(console.error);
-  $("playlistUrl").value = activeShare.playlist_url || "";
-  $("recipientName").value = activeShare.recipient_name || "";
-  if ($("shareDescription")) $("shareDescription").value = activeShare.description || "";
-  renderExperienceBanner(); // hides banner, restores composer
-  showComposer(!!senderName);
-  renderNotes();
-  renderSharePanel().catch(console.error);
-  renderPrevious();
-});
+// Edit-in-place of a sent/relived keepsake was removed: sent keepsakes are
+// read-only. Both received and own relived shares open in experience mode and
+// the only way out is the ✕ (receivedClose), which starts a fresh share.
 
 $("importBtn").addEventListener("click", async () => {
   const raw = $("importId").value.trim();
