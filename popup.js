@@ -983,9 +983,12 @@ function showComposer(show) {
   if (show) $("whoami").textContent = senderName;
 }
 
-// A received keepsake (imported from someone else): no enc_key, imported flag set.
+// A received keepsake: brought in from a pasted share link. The `imported` flag
+// is set only by the import flow; every share the user authors keeps imported:false.
+// (We used to also require !enc_key, but imported shares now store the link's key
+// so they can re-decrypt from Supabase on relive — which made this always false.)
 function isReceivedShare(s) {
-  return !!(s && s.imported && !s.enc_key);
+  return !!(s && s.imported);
 }
 
 function renderExperienceBanner() {
@@ -1963,7 +1966,7 @@ $("importBtn").addEventListener("click", async () => {
 
   const newShare = {
     id: v,
-    mode: "editing",
+    mode: "experience", // received keepsakes are read-only — experience, never edit
     type: decryptedMeta?.share_type || (new Set(decryptedRemote.map((r) => r.track_id)).size > 1 ? "multi" : "single"),
     playlist_id: decryptedMeta?.playlist_id || decryptedRemote.find((r) => r.playlist_id)?.playlist_id || null,
     playlist_url: decryptedMeta?.playlist_url || null,
@@ -2000,8 +2003,9 @@ $("importBtn").addEventListener("click", async () => {
     return;
   }
   activeShare = newShare;
-  setMode("editing");
+  setMode("experience");
   $("importStatus").textContent = `Imported ${remote.length} note${remote.length === 1 ? "" : "s"}.`;
+  renderExperienceBanner(); // show the read-only "A keepsake from …" banner, hide composer
   renderNotes();
   renderSharePanel().catch(console.error);
   renderPrevious();
