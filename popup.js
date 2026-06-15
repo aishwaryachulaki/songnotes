@@ -1012,8 +1012,20 @@ function renderExperienceBanner() {
       const sender = activeShare.sender_name || "someone";
       if (badge) badge.textContent = `✦ A keepsake from ${sender}`;
       if (closeBtn) closeBtn.classList.remove("hidden");
-      if (expWho) expWho.textContent =
-        "Press play on Spotify and watch the notes appear as the song plays. It's automatically saved to your account and always available in Received. Close this banner when you're done.";
+      if (expWho) {
+        // "Saved to your account / Received" is only true when signed in. Default to
+        // the honest signed-out copy, then upgrade once a session is confirmed — so
+        // a signed-out viewer is never told it's saved when it isn't.
+        const PLAY = "Press play on Spotify and watch the notes appear as the song plays.";
+        const TAIL = "Close this banner when you're done.";
+        expWho.textContent = `${PLAY} Sign in at dropakeepsake.com to save it to your Received tab and relive it on any device. ${TAIL}`;
+        getSession().then((s) => {
+          if (!expWho || activeShare?.mode !== "experience") return;
+          if (s) {
+            expWho.textContent = `${PLAY} It's automatically saved to your account and always available in Received. ${TAIL}`;
+          }
+        }).catch(() => {});
+      }
     } else {
       // Reliving your own sent keepsake — read-only, same as a received one.
       // Exit (✕) starts a fresh share; sent keepsakes are never edited in place.
