@@ -1140,6 +1140,24 @@ async function init() {
     if (!ks_tutorial) await chrome.storage.local.set({ ks_tutorial: buildTutorialOverlay(true) });
   }
 
+  // Organic arming: a fresh user who is NOT a recipient gets the make-tutorial the
+  // first time they open the side panel (install no longer arms it for everyone).
+  // Recipients (phase "recipient") and anyone currently holding a received keepsake
+  // are skipped — their tour waits until they've experienced + closed it (see
+  // the receivedClose handler).
+  {
+    const { ks_onboarding, ks_tutorial } = await chrome.storage.local.get(["ks_onboarding", "ks_tutorial"]);
+    const o = ks_onboarding || {};
+    const activeImported = store.active ? !!store.shares[store.active]?.imported : false;
+    const armed = !!(ks_tutorial && ks_tutorial.active);
+    if (o.seen === false && o.phase !== "recipient" && !activeImported && !armed) {
+      await chrome.storage.local.set({
+        ks_tutorial: buildTutorialOverlay(true),
+        ks_onboarding: { ...o, started: true, seen: false, phase: "making" },
+      });
+    }
+  }
+
   // Tutorial overlay: self-heal stale copy + manage the trial sandbox.
   let tutorialActive = false;
   let forceNameCard = false; // one-shot: lead with the name card on first open
@@ -1851,6 +1869,27 @@ $("receivedClose")?.addEventListener("click", async () => {
   renderNotes();
   renderSharePanel().catch(console.error);
   notifyContentRefresh();
+
+  // First time a recipient closes the keepsake they were sent: gently invite them
+  // to make their own, instead of dropping them silently into the composer.
+  const { ks_onboarding } = await chrome.storage.local.get("ks_onboarding");
+  if (ks_onboarding && ks_onboarding.seen === false) {
+    $("makePrompt")?.classList.remove("hidden");
+  }
+});
+
+// Gentle "make your own" prompt shown after a recipient closes their first keepsake.
+$("makePromptStart")?.addEventListener("click", async () => {
+  $("makePrompt")?.classList.add("hidden");
+  await activateTutorial(); // arms the make-tour + fresh trial sandbox
+});
+$("makePromptDismiss")?.addEventListener("click", async () => {
+  $("makePrompt")?.classList.add("hidden");
+  const { ks_onboarding } = await chrome.storage.local.get("ks_onboarding");
+  await chrome.storage.local.set({
+    ks_onboarding: { ...(ks_onboarding || {}), started: true, seen: true, phase: "making" },
+  });
+  await renderTutorialUI(); // reveal the "Replay tutorial" entry point
 });
 
 // Edit-in-place of a sent/relived keepsake was removed: sent keepsakes are
@@ -2119,7 +2158,7 @@ async function activateTutorial() {
   // consumed (reopening mid-tutorial won't force it again).
   await chrome.storage.local.set({
     ks_tutorial: { ...buildTutorialOverlay(true), nameCardPending: false },
-    ks_onboarding: { started: true, seen: false },
+    ks_onboarding: { started: true, seen: false, phase: "making" },
   });
   activeShare = trial;
   $("playlistUrl").value = "";

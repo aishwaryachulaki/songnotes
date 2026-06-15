@@ -92,6 +92,18 @@
   document.documentElement.setAttribute("data-keepsake-installed", "1");
   window.dispatchEvent(new CustomEvent("keepsake:ready"));
 
+  // Being on a share page (with the extension installed) means this person was sent
+  // a keepsake. If they haven't finished onboarding yet, mark them a recipient so the
+  // make-tutorial stays off until they've experienced the keepsake and closed it.
+  chrome.storage.local.get(["ks_onboarding"], (data) => {
+    const o = data.ks_onboarding || {};
+    if (!o.seen && o.phase !== "recipient") {
+      chrome.storage.local.set({
+        ks_onboarding: { started: true, seen: false, ...o, phase: "recipient" },
+      });
+    }
+  });
+
   window.addEventListener("keepsake:import", (e) => {
     inject(e.detail || window.__KS_PAYLOAD);
   });

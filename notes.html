@@ -461,6 +461,7 @@
   // ── Extension detection + first-run onboarding cue ──
   let extensionPresent = false;
   let onboardingSeen = null;  // null = unknown; true/false reported by the bridge
+  let onboardingPhase = null; // "fresh" | "recipient" | "making" (from the bridge)
   let pageLoaded = false;     // true once loadAll() has rendered at least once
   window.addEventListener("keepsake:extension_present", () => {
     extensionPresent = true;
@@ -470,11 +471,14 @@
   window.addEventListener("keepsake:onboarding_state", (e) => {
     extensionPresent = true;
     onboardingSeen = e.detail ? !!e.detail.seen : null;
+    onboardingPhase = e.detail ? (e.detail.phase || null) : null;
     if (pageLoaded) render();
   });
-  // Show the welcome cue only when the extension is here AND the tour isn't done.
+  // Show the "make your first keepsake" cue only when the extension is here, the
+  // tour isn't done, AND this isn't a recipient who hasn't experienced their
+  // keepsake yet — recipients shouldn't be nudged to make one first.
   function onboardingModule() {
-    if (!extensionPresent || onboardingSeen !== false) return "";
+    if (!extensionPresent || onboardingSeen !== false || onboardingPhase === "recipient") return "";
     return `
       <div class="onboard-card" id="onboardCard">
         <button class="onboard-x" id="onboardDismiss" aria-label="Dismiss">✕</button>

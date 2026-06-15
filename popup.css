@@ -816,6 +816,42 @@ body::before {
 /* Notes in read-only mode (experience): no right padding for vanished buttons */
 .note--readonly { padding-right: 10px; }
 
+/* Gentle "make your own" prompt after a recipient closes their first keepsake */
+.make-prompt {
+  position: relative;
+  background: url('faq-bg-pink.png') center / 100% 100% no-repeat;
+  border: 1px solid rgba(58,36,24,0.10);
+  border-radius: 14px;
+  padding: 16px 16px 15px;
+  display: flex; flex-direction: column; gap: 8px;
+  box-shadow:
+    0 2px 4px rgba(58,36,24,0.08),
+    0 6px 18px rgba(58,36,24,0.09),
+    0 12px 32px rgba(58,36,24,0.05);
+}
+.make-prompt.hidden { display: none; }
+.make-prompt-title {
+  font-family: 'Lora', Georgia, serif; font-weight: 700; font-size: 14px; color: var(--ink-2);
+}
+.make-prompt-sub {
+  font-family: 'Lora', Georgia, serif; font-size: 11.5px; color: var(--ink-3); line-height: 1.55;
+}
+.make-prompt-actions { display: flex; align-items: center; gap: 12px; margin-top: 2px; }
+.make-prompt-start {
+  background: var(--blush); border: none; color: #fff; border-radius: 50px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase;
+  padding: 8px 20px; cursor: pointer; transition: filter 0.15s;
+}
+.make-prompt-start:hover { filter: brightness(1.06); }
+.make-prompt-dismiss {
+  background: none; border: none; cursor: pointer;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 10px; font-weight: 600; letter-spacing: 0.04em;
+  color: var(--ink-4); padding: 4px;
+}
+.make-prompt-dismiss:hover { color: var(--ink-2); }
+
 /* Re-share heads-up note in share panel */
 .sp-relink-note {
   font-family: 'Spectral', Georgia, serif;
