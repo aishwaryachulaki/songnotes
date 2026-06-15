@@ -44,15 +44,20 @@ function createDemoShare(force = false) {
   chrome.storage.local.get(["ks_onboarding"], (data) => {
     const onboarding = data.ks_onboarding || {};
     if (!force && onboarding.started) return; // already set up
+    // Tutorial is stored but NOT armed at install — we don't yet know whether this
+    // is an organic install or a recipient who came via a share link. The make-tour
+    // is armed later: organically on first side-panel open (popup.js init), or for a
+    // recipient only after they close the keepsake they were sent (receivedClose).
     chrome.storage.local.set({
-      ks_tutorial: makeTutorialOverlay(true),
-      ks_onboarding: { started: true, seen: false },
+      ks_tutorial: makeTutorialOverlay(false),
+      ks_onboarding: { started: true, seen: false, phase: "fresh" },
     });
   });
 }
 
-// Fire on fresh install: arm the tutorial + open the getting-started page so the
-// user knows to sign in, open Spotify, play a song, and click the Keepsake icon.
+// Fire on fresh install: set up neutral onboarding state + open the getting-started
+// page. welcome.html decides organic vs recipient content from the ks_pending_share
+// breadcrumb; the make-tour is armed later, not here.
 chrome.runtime.onInstalled.addListener(({ reason }) => {
   if (reason === "install") {
     createDemoShare();

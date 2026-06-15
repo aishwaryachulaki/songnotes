@@ -83,10 +83,22 @@
   line-height: 1.35;
 }
 .ks-text.sn-small {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  /* Long notes keep the same Playfair italic as short/medium ones — only the
+     size steps down (further trimmed to fit by JS). Never switch font family;
+     a different typeface popup-to-popup is jarring. */
+  font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
   font-weight: 400;
-  font-size: 13px;
-  line-height: 1.5;
+  font-style: italic;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+/* Safety net: a real note can never spill onto the torn bottom edge, even if
+   the JS shrink-to-fit hasn't run yet (e.g. before Playfair loads). Scoped to
+   real notes so the multi-line tutorial copy is never clipped. */
+.ks-card:not(.ks-card--tutorial) .ks-text {
+  max-height: 104px;
+  overflow: hidden;
 }
 
 /* ── Tutorial card variant — yellow paper background ── */

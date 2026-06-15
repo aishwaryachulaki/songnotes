@@ -287,6 +287,25 @@
       max-width: 62%;
       position: relative; z-index: 1;
     }
+
+    /* Long titles (big playlist names): break unbreakable words so they can't
+       run off the edge, clamp to 3 lines, and reveal the rest on tap. */
+    .js-reveal {
+      display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3;
+      overflow: hidden; overflow-wrap: anywhere; word-break: break-word;
+    }
+    .js-reveal.is-clamped { cursor: pointer; }
+    .js-reveal.title-open {
+      display: block; -webkit-line-clamp: unset; overflow: visible;
+    }
+    .reveal-more {
+      position: relative; z-index: 1;
+      margin-top: 6px; background: none; border: 0; padding: 0;
+      font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700;
+      letter-spacing: .08em; text-transform: uppercase;
+      color: var(--tangerine); opacity: .75; cursor: pointer;
+    }
+    .reveal-more:hover { opacity: 1; }
     .kc-by {
       font-family: 'Lora', Georgia, serif;
       font-style: italic;
@@ -440,7 +459,7 @@
     <article class="keepsake-card">
       <img class="kc-floral" src="poppy.png" alt="" aria-hidden="true" />
       <div class="kc-eyebrow">A keepsake for you</div>
-      <h2 class="kc-title" id="kcTitle"></h2>
+      <h2 class="kc-title js-reveal" id="kcTitle"></h2>
       <div class="kc-divider"><span></span>✦<span></span></div>
       <p class="kc-desc hidden" id="kcDesc"></p>
       <div class="kc-stats">
@@ -546,6 +565,42 @@
     document.getElementById("heroContent").innerHTML = `<div class="state">${html}</div>`;
   }
 
+  // A title that overflows its line-clamp becomes tappable to reveal the full
+  // text in place (with a small "more"/"less" toggle). Idempotent + resize-safe.
+  function wireTitleReveal(root) {
+    (root || document).querySelectorAll(".js-reveal").forEach((el) => {
+      if (!el.dataset.revealWired) {
+        el.dataset.revealWired = "1";
+        el.addEventListener("click", (e) => {
+          if (!el.classList.contains("is-clamped") && !el.classList.contains("title-open")) return;
+          e.stopPropagation();
+          const open = el.classList.toggle("title-open");
+          if (el._moreBtn) el._moreBtn.textContent = open ? "less" : "more";
+        });
+      }
+      if (el.classList.contains("title-open")) return; // leave an opened title alone
+      const truncated = el.scrollHeight > el.clientHeight + 1;
+      el.classList.toggle("is-clamped", truncated);
+      if (truncated && !el._moreBtn) {
+        const more = document.createElement("button");
+        more.type = "button";
+        more.className = "reveal-more";
+        more.textContent = "more";
+        more.addEventListener("click", (e) => { e.stopPropagation(); el.click(); });
+        el.insertAdjacentElement("afterend", more);
+        el._moreBtn = more;
+      } else if (!truncated && el._moreBtn) {
+        el._moreBtn.remove();
+        el._moreBtn = null;
+      }
+    });
+  }
+  let _revealResizeT;
+  window.addEventListener("resize", () => {
+    clearTimeout(_revealResizeT);
+    _revealResizeT = setTimeout(() => wireTitleReveal(), 150);
+  });
+
   function render(shareId, meta, notes) {
     const sender = meta?.sender_name || notes[0]?.sender_name || "someone";
 
@@ -603,7 +658,24 @@
       }
     }
 
+    // Long playlist names: clamp to 3 lines and let the reader tap to reveal.
+    wireTitleReveal();
+    if (document.fonts?.ready) document.fonts.ready.then(() => wireTitleReveal());
+
     window.__KS_PAYLOAD = { share_id: shareId, share: meta || {}, notes };
+
+    // Breadcrumb for the post-install onboarding router (welcome.html): record that
+    // this browser was invited to view a keepsake, so a fresh install arriving from a
+    // share link gets the "how to view" flow instead of "how to make one". Cleared
+    // once the keepsake is imported (they have it now).
+    try {
+      localStorage.setItem("ks_pending_share", JSON.stringify({
+        id: shareId, url: location.href, sender, ts: Date.now(),
+      }));
+    } catch (_) {}
+    window.addEventListener("keepsake:imported", () => {
+      try { localStorage.removeItem("ks_pending_share"); } catch (_) {}
+    }, { once: true });
 
     let detected = false;
 

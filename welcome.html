@@ -156,6 +156,7 @@
     <a href="notes.html" class="nav-skip">Skip →</a>
   </header>
 
+  <div id="organicFlow">
   <div class="card hero">
     <img class="hero-floral" src="flower.png" alt="" aria-hidden="true" />
     <div class="hero-content">
@@ -203,10 +204,77 @@
     </div>
   </div>
 
+  </div><!-- /#organicFlow -->
+
+  <!-- Recipient flow — shown when this browser was sent a keepsake (breadcrumb set by share.html) -->
+  <div id="recipientFlow" style="display:none">
+    <div class="card hero">
+      <img class="hero-floral" src="flower.png" alt="" aria-hidden="true" />
+      <div class="hero-content">
+        <div class="hero-eyebrow">Someone sent you a keepsake</div>
+        <h1>A keepsake is waiting for you</h1>
+        <p>Here's how to open the notes <strong id="rcSender">someone</strong> left for you, right inside the song. It only takes a moment.</p>
+      </div>
+    </div>
+
+    <div class="card step step--pink">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <div class="step-title">Pin Keepsake to your toolbar</div>
+        <div class="step-text">Click the <strong>Extensions</strong> button <svg class="puzzle-ico" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M20.5 11H19V7c0-1.1-.9-2-2-2h-4V3.5C13 2.12 11.88 1 10.5 1S8 2.12 8 3.5V5H4c-1.1 0-1.99.9-1.99 2v3.8H3.5c1.49 0 2.7 1.21 2.7 2.7s-1.21 2.7-2.7 2.7H2V20c0 1.1.9 2 2 2h3.8v-1.5c0-1.49 1.21-2.7 2.7-2.7s2.7 1.21 2.7 2.7V22H17c1.1 0 2-.9 2-2v-4h1.5c1.38 0 2.5-1.12 2.5-2.5S21.88 11 20.5 11z"/></svg> at the top-right of your browser, find <strong>Keepsake</strong>, and pin it so it's one click away.</div>
+        <div class="icon-hint">
+          <img src="icon128.png" alt="Keepsake icon" />
+          <span>This is Keepsake. Pin it, then<br>click it from your toolbar.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card step step--olive">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <div class="step-title">Open your keepsake</div>
+        <div class="step-text">Head back to the keepsake you were sent and click <strong>Import into Keepsake</strong>.</div>
+        <a class="step-btn" id="rcOpenLink" href="#">Open your keepsake →</a>
+      </div>
+    </div>
+
+    <div class="card step step--yellow">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <div class="step-title">Press play and watch</div>
+        <div class="step-text">Open the song on the Spotify Web Player and press play. The notes appear on screen at the exact moments they were pinned.</div>
+        <div class="step-text" style="margin-top:10px;opacity:0.72;font-size:0.92em;">Optional: sign in and your keepsake is saved to your Received tab, so you can relive it any time, on any device.</div>
+      </div>
+    </div>
+  </div><!-- /#recipientFlow -->
+
   <footer class="footer">
     <p>Keepsake &nbsp;·&nbsp; <a href="index.html">Home</a> &nbsp;·&nbsp; <a href="faq.html">FAQ</a> &nbsp;·&nbsp; <a href="privacy.html">Privacy</a></p>
   </footer>
 
 </div>
+
+<script>
+  // Route between the organic "make a keepsake" flow and the recipient "view your
+  // keepsake" flow based on the share.html breadcrumb. Organic is the default so the
+  // page is correct with no JS / no breadcrumb.
+  (function () {
+    var TTL = 2 * 60 * 60 * 1000; // 2 hours — a fresh invite, not a stale one
+    var pending = null;
+    try { pending = JSON.parse(localStorage.getItem("ks_pending_share") || "null"); } catch (_) {}
+    var fresh = pending && pending.url && pending.ts && (Date.now() - pending.ts < TTL);
+    if (!fresh) return; // organic install — leave the make-a-keepsake flow visible
+
+    var organic = document.getElementById("organicFlow");
+    var recipient = document.getElementById("recipientFlow");
+    if (organic) organic.style.display = "none";
+    if (recipient) recipient.style.display = "";
+
+    var senderEl = document.getElementById("rcSender");
+    if (senderEl && pending.sender) senderEl.textContent = pending.sender;
+    var link = document.getElementById("rcOpenLink");
+    if (link) link.href = pending.url;
+  })();
+</script>
 </body>
 </html>

@@ -200,8 +200,22 @@
       font-size: 17px; font-weight: 700; line-height: 1.3;
       margin-bottom: 5px;
       display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+      overflow-wrap: anywhere; word-break: break-word; /* break long unspaced names */
       max-width: 58%; /* stay in left content zone, clear of illustration */
     }
+    /* Tap a truncated title to reveal the full name in place. */
+    .js-reveal.is-clamped { cursor: pointer; }
+    .js-reveal.title-open {
+      display: block; -webkit-line-clamp: unset; overflow: visible;
+    }
+    .reveal-more {
+      max-width: 58%;
+      margin: 0 0 5px; background: none; border: 0; padding: 0;
+      font-family: 'Montserrat', sans-serif; font-size: 9.5px; font-weight: 700;
+      letter-spacing: .08em; text-transform: uppercase;
+      color: inherit; opacity: .6; cursor: pointer;
+    }
+    .reveal-more:hover { opacity: 1; }
     .share-artist {
       font-size: 12px; opacity: 0.52;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -447,6 +461,7 @@
   // ── Extension detection + first-run onboarding cue ──
   let extensionPresent = false;
   let onboardingSeen = null;  // null = unknown; true/false reported by the bridge
+  let onboardingPhase = null; // "fresh" | "recipient" | "making" (from the bridge)
   let pageLoaded = false;     // true once loadAll() has rendered at least once
   window.addEventListener("keepsake:extension_present", () => {
     extensionPresent = true;
@@ -456,11 +471,14 @@
   window.addEventListener("keepsake:onboarding_state", (e) => {
     extensionPresent = true;
     onboardingSeen = e.detail ? !!e.detail.seen : null;
+    onboardingPhase = e.detail ? (e.detail.phase || null) : null;
     if (pageLoaded) render();
   });
-  // Show the welcome cue only when the extension is here AND the tour isn't done.
+  // Show the "make your first keepsake" cue only when the extension is here, the
+  // tour isn't done, AND this isn't a recipient who hasn't experienced their
+  // keepsake yet — recipients shouldn't be nudged to make one first.
   function onboardingModule() {
-    if (!extensionPresent || onboardingSeen !== false) return "";
+    if (!extensionPresent || onboardingSeen !== false || onboardingPhase === "recipient") return "";
     return `
       <div class="onboard-card" id="onboardCard">
         <button class="onboard-x" id="onboardDismiss" aria-label="Dismiss">✕</button>
@@ -635,6 +653,42 @@
     render();
   }
 
+  // A title that overflows its line-clamp becomes tappable to reveal the full
+  // text in place (with a small "more"/"less" toggle). Idempotent + resize-safe.
+  function wireTitleReveal(root) {
+    (root || document).querySelectorAll(".js-reveal").forEach((el) => {
+      if (!el.dataset.revealWired) {
+        el.dataset.revealWired = "1";
+        el.addEventListener("click", (e) => {
+          if (!el.classList.contains("is-clamped") && !el.classList.contains("title-open")) return;
+          e.stopPropagation(); // don't trigger card select / relive
+          const open = el.classList.toggle("title-open");
+          if (el._moreBtn) el._moreBtn.textContent = open ? "less" : "more";
+        });
+      }
+      if (el.classList.contains("title-open")) return; // leave an opened title alone
+      const truncated = el.scrollHeight > el.clientHeight + 1;
+      el.classList.toggle("is-clamped", truncated);
+      if (truncated && !el._moreBtn) {
+        const more = document.createElement("button");
+        more.type = "button";
+        more.className = "reveal-more";
+        more.textContent = "more";
+        more.addEventListener("click", (e) => { e.stopPropagation(); el.click(); });
+        el.insertAdjacentElement("afterend", more);
+        el._moreBtn = more;
+      } else if (!truncated && el._moreBtn) {
+        el._moreBtn.remove();
+        el._moreBtn = null;
+      }
+    });
+  }
+  let _revealResizeT;
+  window.addEventListener("resize", () => {
+    clearTimeout(_revealResizeT);
+    _revealResizeT = setTimeout(() => wireTitleReveal(), 150);
+  });
+
   function render() {
     const page = document.getElementById("page");
 
@@ -711,6 +765,10 @@
 
     // Silently decrypt any encrypted recipient labels using extension keys
     if (activeTab === "sent") tryDecryptLabels();
+
+    // Long playlist names: clamp to 3 lines, tap a truncated title to reveal it.
+    wireTitleReveal(page);
+    if (document.fonts?.ready) document.fonts.ready.then(() => wireTitleReveal(page));
 
     // Received list — relive button
     const receivedList = page.querySelector(".received-list");
@@ -913,7 +971,7 @@
           ${sel ? `<div class="select-check" aria-hidden="true">✓</div>` : ""}
           <div class="share-label">For ${recipient}</div>
           <div class="share-body">
-            <div class="share-track">${displayTitle}</div>
+            <div class="share-track js-reveal">${displayTitle}</div>
             ${displayArtist ? `<div class="share-artist">${displayArtist}</div>` : ""}
           </div>
           <div class="share-footer">
@@ -1011,7 +1069,7 @@
         <div class="share-card">
           <div class="share-label">From ${senderName}</div>
           <div class="share-body">
-            <div class="share-track">${trackTitle}</div>
+            <div class="share-track js-reveal">${trackTitle}</div>
             ${trackArtist ? `<div class="share-artist">${trackArtist}</div>` : ""}
           </div>
           <div class="share-footer">
