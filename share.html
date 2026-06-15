@@ -692,10 +692,12 @@
       btn.textContent = "✧ Import into Keepsake";
       actions.appendChild(btn);
       btn.addEventListener("click", () => {
+        if (btn.disabled) return;            // ignore repeat clicks
+        btn.disabled = true;                 // disable immediately so a keepsake
+        btn.textContent = "✧ Importing…";    // can't be imported twice by spamming
         window.__KS_PAYLOAD = { share_id: shareId, share: meta || {}, notes };
         window.dispatchEvent(new CustomEvent("keepsake:import", { detail: window.__KS_PAYLOAD }));
         window.addEventListener("keepsake:imported", () => {
-          btn.disabled = true;
           btn.textContent = "✧ Imported!";
         }, { once: true });
       });
