@@ -665,6 +665,19 @@
 
     window.__KS_PAYLOAD = { share_id: shareId, share: meta || {}, notes };
 
+    // Breadcrumb for the post-install onboarding router (welcome.html): record that
+    // this browser was invited to view a keepsake, so a fresh install arriving from a
+    // share link gets the "how to view" flow instead of "how to make one". Cleared
+    // once the keepsake is imported (they have it now).
+    try {
+      localStorage.setItem("ks_pending_share", JSON.stringify({
+        id: shareId, url: location.href, sender, ts: Date.now(),
+      }));
+    } catch (_) {}
+    window.addEventListener("keepsake:imported", () => {
+      try { localStorage.removeItem("ks_pending_share"); } catch (_) {}
+    }, { once: true });
+
     let detected = false;
 
     function onExtensionReady() {
