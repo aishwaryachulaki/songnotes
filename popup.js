@@ -1886,6 +1886,11 @@ $("receivedClose")?.addEventListener("click", async () => {
   // to make their own, instead of dropping them silently into the composer.
   const { ks_onboarding } = await chrome.storage.local.get("ks_onboarding");
   if (ks_onboarding && ks_onboarding.seen === false) {
+    // The prompt owns this moment — hide the composer AND the name card so it
+    // stands alone. The tutorial collects the name itself, so showing the name
+    // card next to "Make your own" is redundant.
+    $("composer")?.classList.add("hidden");
+    $("nameBlock")?.classList.add("hidden");
     $("makePrompt")?.classList.remove("hidden");
   }
 });
@@ -1897,6 +1902,7 @@ $("makePromptStart")?.addEventListener("click", async () => {
 });
 $("makePromptDismiss")?.addEventListener("click", async () => {
   $("makePrompt")?.classList.add("hidden");
+  showComposer(!!senderName); // restore the normal composer / name card we hid
   const { ks_onboarding } = await chrome.storage.local.get("ks_onboarding");
   await chrome.storage.local.set({
     ks_onboarding: { ...(ks_onboarding || {}), started: true, seen: true, phase: "making" },
