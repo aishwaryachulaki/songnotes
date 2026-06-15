@@ -113,7 +113,7 @@
     chrome.storage.local.get("ks_onboarding", (r) => {
       const o = r.ks_onboarding || {};
       window.dispatchEvent(new CustomEvent("keepsake:onboarding_state", {
-        detail: { started: !!o.started, seen: !!o.seen, phase: o.phase || null },
+        detail: { started: !!o.started, seen: !!o.seen },
       }));
     });
   }

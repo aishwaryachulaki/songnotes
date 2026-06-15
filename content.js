@@ -153,34 +153,11 @@
     return Math.min(15000, Math.max(4000, 4000 + words * 450));
   }
 
-  // Pick the starting font tier by note length. All tiers are Playfair italic
-  // now — only the size differs — and fitNoteText() trims further if needed.
+  // Pick font tier based on note length
   function textSizeClass(len) {
-    if (len < 60)  return "sn-large";   // 26px Playfair italic
-    if (len < 140) return "sn-medium";  // 18px Playfair italic
-    return "sn-small";                  // 15px Playfair italic (shrunk to fit)
-  }
-
-  // Shrink a real note's font until the whole thing fits in the flat paper above
-  // the torn bottom edge, so no word ever lands on the torn deckle. Keeps the
-  // Playfair italic family — only the size changes. Transform-independent
-  // (uses offset/scrollHeight, not getBoundingClientRect) so it's correct even
-  // while the entry animation's scale transform is mid-flight.
-  function fitNoteText(card) {
-    const textEl = card.querySelector(".ks-text");
-    if (!textEl) return;
-    const padBottom = parseFloat(getComputedStyle(card).paddingBottom) || 0;
-    // Available height = content-box bottom (above the reserved deckle) minus
-    // where the text starts (below the sender label).
-    // 4px breathing room so the last line never kisses the torn edge.
-    const avail = card.clientHeight - padBottom - textEl.offsetTop - 4;
-    if (avail <= 0) return;
-    let size = parseFloat(getComputedStyle(textEl).fontSize) || 18;
-    let guard = 48; // hard cap on iterations
-    while (textEl.scrollHeight > avail && size > 11 && guard-- > 0) {
-      size -= 1;
-      textEl.style.fontSize = size + "px";
-    }
+    if (len < 60)  return "sn-large";   // 28px Playfair
+    if (len < 140) return "sn-medium";  // 20px Playfair
+    return "sn-small";                  // 13.5px system font
   }
 
   function showOverlay(note) {
@@ -242,14 +219,6 @@
     }
     document.body.appendChild(wrap);
     requestAnimationFrame(() => wrap.classList.add("visible"));
-
-    // Real notes: shrink the text to fit above the torn bottom edge. Run now and
-    // again once Playfair loads, since the webfont changes the text's height.
-    if (!isTutorial) {
-      const fit = () => fitNoteText(card);
-      requestAnimationFrame(fit);
-      if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
-    }
 
     // Hold-based dismiss timer. The countdown only runs when nothing is
     // holding it: hovering, pinning, OR the song being paused all hold it.

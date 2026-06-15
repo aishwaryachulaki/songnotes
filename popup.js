@@ -983,12 +983,9 @@ function showComposer(show) {
   if (show) $("whoami").textContent = senderName;
 }
 
-// A received keepsake: brought in from a pasted share link. The `imported` flag
-// is set only by the import flow; every share the user authors keeps imported:false.
-// (We used to also require !enc_key, but imported shares now store the link's key
-// so they can re-decrypt from Supabase on relive — which made this always false.)
+// A received keepsake (imported from someone else): no enc_key, imported flag set.
 function isReceivedShare(s) {
-  return !!(s && s.imported);
+  return !!(s && s.imported && !s.enc_key);
 }
 
 function renderExperienceBanner() {
@@ -1004,6 +1001,7 @@ function renderExperienceBanner() {
     const received = isReceivedShare(activeShare);
     banner.classList.toggle("received", received);
     const badge = $("expBadge");
+    const editBtn = $("enterEditMode");
     const closeBtn = $("receivedClose");
     const expWho = $("expWho");
 
@@ -1011,14 +1009,15 @@ function renderExperienceBanner() {
       // Read-only "you received this" view, with a clear way to exit.
       const sender = activeShare.sender_name || "someone";
       if (badge) badge.textContent = `✦ A keepsake from ${sender}`;
+      if (editBtn) editBtn.classList.add("hidden");
       if (closeBtn) closeBtn.classList.remove("hidden");
       if (expWho) expWho.textContent =
         "Press play on Spotify and watch the notes appear as the song plays. It's automatically saved to your account and always available in Received. Close this banner when you're done.";
     } else {
-      // Reliving your own sent keepsake — read-only, same as a received one.
-      // Exit (✕) starts a fresh share; sent keepsakes are never edited in place.
+      // Reliving your own sent letter.
       if (badge) badge.textContent = "✧ Experience mode";
-      if (closeBtn) closeBtn.classList.remove("hidden");
+      if (editBtn) editBtn.classList.remove("hidden");
+      if (closeBtn) closeBtn.classList.add("hidden");
       const who = activeShare.recipient_name
         ? `Notes for ${activeShare.recipient_name}`
         : "Notes (no recipient set)";
@@ -1138,24 +1137,6 @@ async function init() {
     if (store.active === "ks-tutorial") store.active = null;
     const { ks_tutorial } = await chrome.storage.local.get("ks_tutorial");
     if (!ks_tutorial) await chrome.storage.local.set({ ks_tutorial: buildTutorialOverlay(true) });
-  }
-
-  // Organic arming: a fresh user who is NOT a recipient gets the make-tutorial the
-  // first time they open the side panel (install no longer arms it for everyone).
-  // Recipients (phase "recipient") and anyone currently holding a received keepsake
-  // are skipped — their tour waits until they've experienced + closed it (see
-  // the receivedClose handler).
-  {
-    const { ks_onboarding, ks_tutorial } = await chrome.storage.local.get(["ks_onboarding", "ks_tutorial"]);
-    const o = ks_onboarding || {};
-    const activeImported = store.active ? !!store.shares[store.active]?.imported : false;
-    const armed = !!(ks_tutorial && ks_tutorial.active);
-    if (o.seen === false && o.phase !== "recipient" && !activeImported && !armed) {
-      await chrome.storage.local.set({
-        ks_tutorial: buildTutorialOverlay(true),
-        ks_onboarding: { ...o, started: true, seen: false, phase: "making" },
-      });
-    }
   }
 
   // Tutorial overlay: self-heal stale copy + manage the trial sandbox.
@@ -1869,32 +1850,58 @@ $("receivedClose")?.addEventListener("click", async () => {
   renderNotes();
   renderSharePanel().catch(console.error);
   notifyContentRefresh();
+});
 
-  // First time a recipient closes the keepsake they were sent: gently invite them
-  // to make their own, instead of dropping them silently into the composer.
-  const { ks_onboarding } = await chrome.storage.local.get("ks_onboarding");
-  if (ks_onboarding && ks_onboarding.seen === false) {
-    $("makePrompt")?.classList.remove("hidden");
+$("enterEditMode")?.addEventListener("click", async () => {
+  if (!activeShare) return;
+  const { store } = await loadStore();
+  const orig = store.shares[activeShare.id];
+
+  if (orig && orig.enc_key) {
+    // Fork-on-edit: a sent/relived letter can't be mutated in place (the
+    // original link must keep working). Return the original to Previous
+    // untouched, and edit a fresh, unsent clone instead. Re-sharing the
+    // clone creates a brand-new link; the original stays as it was.
+    const clonedNotes = (orig.notes || []).map((n) => ({ ...n }));
+    orig.note_count = (orig.notes || []).length;
+    orig.song_count = new Set((orig.notes || []).map((n) => n.track_id)).size;
+    orig.notes = [];
+    orig.mode = "inactive";
+    orig.relived = false;
+    store.previous = [orig.id, ...(store.previous || []).filter((x) => x !== orig.id)];
+
+    const clone = {
+      ...orig,
+      id: shortId(),
+      enc_key: null,
+      imported: false,
+      is_trial: false,
+      relived: false,
+      mode: "editing",
+      note_count: undefined,
+      song_count: undefined,
+      notes: clonedNotes,
+      created_at: Date.now(),
+    };
+    store.shares[clone.id] = clone;
+    store.active = clone.id;
+    activeShare = clone;
+  } else {
+    // Unsent draft — just make it editable in place.
+    activeShare.mode = "editing";
+    store.shares[activeShare.id] = activeShare;
   }
-});
 
-// Gentle "make your own" prompt shown after a recipient closes their first keepsake.
-$("makePromptStart")?.addEventListener("click", async () => {
-  $("makePrompt")?.classList.add("hidden");
-  await activateTutorial(); // arms the make-tour + fresh trial sandbox
+  await saveStore(store).catch(console.error);
+  $("playlistUrl").value = activeShare.playlist_url || "";
+  $("recipientName").value = activeShare.recipient_name || "";
+  if ($("shareDescription")) $("shareDescription").value = activeShare.description || "";
+  renderExperienceBanner(); // hides banner, restores composer
+  showComposer(!!senderName);
+  renderNotes();
+  renderSharePanel().catch(console.error);
+  renderPrevious();
 });
-$("makePromptDismiss")?.addEventListener("click", async () => {
-  $("makePrompt")?.classList.add("hidden");
-  const { ks_onboarding } = await chrome.storage.local.get("ks_onboarding");
-  await chrome.storage.local.set({
-    ks_onboarding: { ...(ks_onboarding || {}), started: true, seen: true, phase: "making" },
-  });
-  await renderTutorialUI(); // reveal the "Replay tutorial" entry point
-});
-
-// Edit-in-place of a sent/relived keepsake was removed: sent keepsakes are
-// read-only. Both received and own relived shares open in experience mode and
-// the only way out is the ✕ (receivedClose), which starts a fresh share.
 
 $("importBtn").addEventListener("click", async () => {
   const raw = $("importId").value.trim();
@@ -1956,7 +1963,7 @@ $("importBtn").addEventListener("click", async () => {
 
   const newShare = {
     id: v,
-    mode: "experience", // received keepsakes are read-only — experience, never edit
+    mode: "editing",
     type: decryptedMeta?.share_type || (new Set(decryptedRemote.map((r) => r.track_id)).size > 1 ? "multi" : "single"),
     playlist_id: decryptedMeta?.playlist_id || decryptedRemote.find((r) => r.playlist_id)?.playlist_id || null,
     playlist_url: decryptedMeta?.playlist_url || null,
@@ -1993,9 +2000,8 @@ $("importBtn").addEventListener("click", async () => {
     return;
   }
   activeShare = newShare;
-  setMode("experience");
+  setMode("editing");
   $("importStatus").textContent = `Imported ${remote.length} note${remote.length === 1 ? "" : "s"}.`;
-  renderExperienceBanner(); // show the read-only "A keepsake from …" banner, hide composer
   renderNotes();
   renderSharePanel().catch(console.error);
   renderPrevious();
@@ -2158,7 +2164,7 @@ async function activateTutorial() {
   // consumed (reopening mid-tutorial won't force it again).
   await chrome.storage.local.set({
     ks_tutorial: { ...buildTutorialOverlay(true), nameCardPending: false },
-    ks_onboarding: { started: true, seen: false, phase: "making" },
+    ks_onboarding: { started: true, seen: false },
   });
   activeShare = trial;
   $("playlistUrl").value = "";
