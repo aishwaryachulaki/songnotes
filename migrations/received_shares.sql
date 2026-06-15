@@ -15,6 +15,37 @@ create table if not exists public.received_shares (
   unique(user_id, share_id)
 );
 
+-- ── Self-heal tables created before the unique(user_id, share_id) constraint ──
+-- `create table if not exists` above is a no-op on a pre-existing table, so a
+-- table first created WITHOUT the unique constraint never gains it — and then
+-- `Prefer: resolution=ignore-duplicates` has nothing to conflict on, so repeated
+-- imports pile up duplicate rows (one extra "Received" card each). De-dupe, then
+-- add the constraint if it's missing. Safe to run repeatedly.
+delete from public.received_shares t
+  using (
+    select id,
+           row_number() over (partition by user_id, share_id
+                               order by imported_at, id) as rn
+    from public.received_shares
+  ) d
+  where t.id = d.id and d.rn > 1;
+
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint c
+    where c.conrelid = 'public.received_shares'::regclass
+      and c.contype  = 'u'
+      and c.conkey @> array[
+        (select attnum from pg_attribute where attrelid = c.conrelid and attname = 'user_id'),
+        (select attnum from pg_attribute where attrelid = c.conrelid and attname = 'share_id')
+      ]::smallint[]
+  ) then
+    alter table public.received_shares
+      add constraint received_shares_user_share_unique unique (user_id, share_id);
+  end if;
+end $$;
+
 alter table public.received_shares enable row level security;
 
 -- Each user can only see, add, and remove their own rows.
