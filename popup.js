@@ -1891,6 +1891,9 @@ $("receivedClose")?.addEventListener("click", async () => {
     // card next to "Make your own" is redundant.
     $("composer")?.classList.add("hidden");
     $("nameBlock")?.classList.add("hidden");
+    const sp = $("sharePanel");
+    if (sp) sp.style.display = "none";
+    $("importBlock")?.classList.add("hidden");
     $("makePrompt")?.classList.remove("hidden");
   }
 });
@@ -1902,6 +1905,9 @@ $("makePromptStart")?.addEventListener("click", async () => {
 });
 $("makePromptDismiss")?.addEventListener("click", async () => {
   $("makePrompt")?.classList.add("hidden");
+  const sp2 = $("sharePanel");
+  if (sp2) sp2.style.display = "";
+  $("importBlock")?.classList.remove("hidden");
   showComposer(!!senderName); // restore the normal composer / name card we hid
   const { ks_onboarding } = await chrome.storage.local.get("ks_onboarding");
   await chrome.storage.local.set({
