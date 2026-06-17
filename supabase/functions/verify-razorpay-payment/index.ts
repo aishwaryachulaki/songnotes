@@ -9,22 +9,38 @@ const CORS_HEADERS = {
 
 // Must match the catalog in create-razorpay-order. Credits/lifetime come from
 // HERE (keyed by the stored order's package_id), never from the client.
-const PACKAGES: Record<string, Record<string, { amount_units: number; credits: number; lifetime: boolean }>> = {
+const PACKAGES: Record<string, Record<string, Record<number, { amount_units: number; credits: number; lifetime: boolean }>>> = {
   letters_5: {
-    INR: { amount_units: 14900, credits: 5, lifetime: false },
-    USD: { amount_units: 199, credits: 5, lifetime: false },
+    INR: { 1: { amount_units: 14900, credits: 5, lifetime: false } },
+    USD: {
+      2: { amount_units: 199, credits: 5, lifetime: false },
+      3: { amount_units: 299, credits: 5, lifetime: false },
+      4: { amount_units: 499, credits: 5, lifetime: false },
+    },
   },
   letters_10: {
-    INR: { amount_units: 24900, credits: 10, lifetime: false },
-    USD: { amount_units: 349, credits: 10, lifetime: false },
+    INR: { 1: { amount_units: 24900, credits: 10, lifetime: false } },
+    USD: {
+      2: { amount_units: 349, credits: 10, lifetime: false },
+      3: { amount_units: 549, credits: 10, lifetime: false },
+      4: { amount_units: 899, credits: 10, lifetime: false },
+    },
   },
   letters_15: {
-    INR: { amount_units: 34900, credits: 15, lifetime: false },
-    USD: { amount_units: 499, credits: 15, lifetime: false },
+    INR: { 1: { amount_units: 34900, credits: 15, lifetime: false } },
+    USD: {
+      2: { amount_units: 499, credits: 15, lifetime: false },
+      3: { amount_units: 799, credits: 15, lifetime: false },
+      4: { amount_units: 1299, credits: 15, lifetime: false },
+    },
   },
   lifetime: {
-    INR: { amount_units: 99900, credits: 0, lifetime: true },
-    USD: { amount_units: 999, credits: 0, lifetime: true },
+    INR: { 1: { amount_units: 99900, credits: 0, lifetime: true } },
+    USD: {
+      2: { amount_units: 999, credits: 0, lifetime: true },
+      3: { amount_units: 1699, credits: 0, lifetime: true },
+      4: { amount_units: 2499, credits: 0, lifetime: true },
+    },
   },
 };
 
@@ -80,7 +96,7 @@ serve(async (req) => {
       .eq("order_id", razorpay_order_id)
       .eq("user_id", user.id)
       .eq("status", "created")
-      .select("package_id, amount_units, currency")
+      .select("package_id, amount_units, currency, tier")
       .maybeSingle();
     if (claimErr) { console.error("Order claim failed:", claimErr); return json({ error: "Internal error" }, 500); }
 
@@ -93,8 +109,8 @@ serve(async (req) => {
       return json({ error: "Order not found for this account" }, 400);
     }
 
-    const pkg = PACKAGES[claimed.package_id]?.[claimed.currency || "INR"];
-    if (!pkg) { console.error("Unknown package or currency on order:", claimed.package_id, claimed.currency); return json({ error: "Internal error" }, 500); }
+    const pkg = PACKAGES[claimed.package_id]?.[claimed.currency || "INR"]?.[claimed.tier || 1];
+    if (!pkg) { console.error("Unknown package, currency, or tier on order:", claimed.package_id, claimed.currency, claimed.tier); return json({ error: "Internal error" }, 500); }
 
     // Grant credits with SERVER values only.
     const { error: rpcError } = await admin.rpc("add_credits", {

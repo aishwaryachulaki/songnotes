@@ -981,6 +981,7 @@
           body: JSON.stringify({
             package_id: isLifetime ? "lifetime" : `letters_${numCredits}`,
             currency: currency,
+            tier: activeTier,
           }),
         }
       );

@@ -7,25 +7,41 @@ const CORS_HEADERS = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization, apikey",
 };
 
-// Server-authoritative catalog (INR + USD / Razorpay). The client picks a package_id
-// and currency; it can NEVER set the price or the number of credits.
+// Server-authoritative catalog (INR + 4-tier USD / Razorpay). The client picks a package_id,
+// currency, and tier; it can NEVER set the price or the number of credits.
 // Amount units: paise for INR, cents for USD. Keep in sync with TIERS in account.html.
-const PACKAGES: Record<string, Record<string, { amount_units: number; credits: number; lifetime: boolean }>> = {
+const PACKAGES: Record<string, Record<string, Record<number, { amount_units: number; credits: number; lifetime: boolean }>>> = {
   letters_5: {
-    INR: { amount_units: 14900, credits: 5, lifetime: false },
-    USD: { amount_units: 199, credits: 5, lifetime: false },
+    INR: { 1: { amount_units: 14900, credits: 5, lifetime: false } },
+    USD: {
+      2: { amount_units: 199, credits: 5, lifetime: false },   // Tier 2: Developing
+      3: { amount_units: 299, credits: 5, lifetime: false },   // Tier 3: Mid-income
+      4: { amount_units: 499, credits: 5, lifetime: false },   // Tier 4: High-income
+    },
   },
   letters_10: {
-    INR: { amount_units: 24900, credits: 10, lifetime: false },
-    USD: { amount_units: 349, credits: 10, lifetime: false },
+    INR: { 1: { amount_units: 24900, credits: 10, lifetime: false } },
+    USD: {
+      2: { amount_units: 349, credits: 10, lifetime: false },
+      3: { amount_units: 549, credits: 10, lifetime: false },
+      4: { amount_units: 899, credits: 10, lifetime: false },
+    },
   },
   letters_15: {
-    INR: { amount_units: 34900, credits: 15, lifetime: false },
-    USD: { amount_units: 499, credits: 15, lifetime: false },
+    INR: { 1: { amount_units: 34900, credits: 15, lifetime: false } },
+    USD: {
+      2: { amount_units: 499, credits: 15, lifetime: false },
+      3: { amount_units: 799, credits: 15, lifetime: false },
+      4: { amount_units: 1299, credits: 15, lifetime: false },
+    },
   },
   lifetime: {
-    INR: { amount_units: 99900, credits: 0, lifetime: true },
-    USD: { amount_units: 999, credits: 0, lifetime: true },
+    INR: { 1: { amount_units: 99900, credits: 0, lifetime: true } },
+    USD: {
+      2: { amount_units: 999, credits: 0, lifetime: true },
+      3: { amount_units: 1699, credits: 0, lifetime: true },
+      4: { amount_units: 2499, credits: 0, lifetime: true },
+    },
   },
 };
 
@@ -54,12 +70,16 @@ serve(async (req) => {
     if (authErr || !user) return json({ error: "Not authenticated" }, 401);
 
     const currency = body.currency || "INR"; // Default to INR if not specified
+    const tier = body.tier || 1; // Default to tier 1 (India)
     if (!["INR", "USD"].includes(currency)) {
       return json({ error: "Invalid currency" }, 400);
     }
+    if (![1, 2, 3, 4].includes(tier)) {
+      return json({ error: "Invalid tier" }, 400);
+    }
 
-    const pkg = PACKAGES[body.package_id]?.[currency];
-    if (!pkg) return json({ error: "Unknown package or currency" }, 400);
+    const pkg = PACKAGES[body.package_id]?.[currency]?.[tier];
+    if (!pkg) return json({ error: "Unknown package, currency, or tier" }, 400);
 
     const keyId     = Deno.env.get("RAZORPAY_KEY_ID");
     const keySecret = Deno.env.get("RAZORPAY_KEY_SECRET");
@@ -94,6 +114,7 @@ serve(async (req) => {
       package_id: body.package_id,
       amount_units: pkg.amount_units,
       currency: currency,
+      tier: tier,
       status: "created",
     });
     if (insErr) {
