@@ -943,9 +943,10 @@
 
   // ── Payment routing ──────────────────────────────────────────────────────────
   function handlePurchase(priceUnits, numCredits, isLifetime, description) {
-    if (activeTier === 1) {
+    const tier = TIERS[activeTier];
+    if (tier.payment === "razorpay") {
       openRazorpay(priceUnits, numCredits, isLifetime, description);
-    } else {
+    } else if (tier.payment === "stripe") {
       openStripe(priceUnits, numCredits, isLifetime, description);
     }
   }
