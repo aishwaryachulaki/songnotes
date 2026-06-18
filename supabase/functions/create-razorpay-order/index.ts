@@ -7,14 +7,26 @@ const CORS_HEADERS = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization, apikey",
 };
 
-// Server-authoritative catalog (INR / Razorpay). The client picks a package_id;
-// it can NEVER set the price or the number of credits. Keep in sync with the
-// INR (tier 1) catalog in account.html.
-const PACKAGES: Record<string, { amount_paise: number; credits: number; lifetime: boolean }> = {
-  letters_5:  { amount_paise: 14900, credits: 5,  lifetime: false },
-  letters_10: { amount_paise: 24900, credits: 10, lifetime: false },
-  letters_15: { amount_paise: 34900, credits: 15, lifetime: false },
-  lifetime:   { amount_paise: 99900, credits: 0,  lifetime: true  },
+// Server-authoritative catalog (INR + USD / Razorpay). The client picks a package_id
+// and currency; it can NEVER set the price or the number of credits.
+// Amount units: paise for INR, cents for USD. Keep in sync with TIERS in account.html.
+const PACKAGES: Record<string, Record<string, { amount_units: number; credits: number; lifetime: boolean }>> = {
+  letters_5: {
+    INR: { amount_units: 14900, credits: 5, lifetime: false },
+    USD: { amount_units: 199, credits: 5, lifetime: false },
+  },
+  letters_10: {
+    INR: { amount_units: 24900, credits: 10, lifetime: false },
+    USD: { amount_units: 349, credits: 10, lifetime: false },
+  },
+  letters_15: {
+    INR: { amount_units: 34900, credits: 15, lifetime: false },
+    USD: { amount_units: 499, credits: 15, lifetime: false },
+  },
+  lifetime: {
+    INR: { amount_units: 99900, credits: 0, lifetime: true },
+    USD: { amount_units: 999, credits: 0, lifetime: true },
+  },
 };
 
 function json(obj: unknown, status: number) {
@@ -41,8 +53,13 @@ serve(async (req) => {
     const { data: { user }, error: authErr } = await admin.auth.getUser(token);
     if (authErr || !user) return json({ error: "Not authenticated" }, 401);
 
-    const pkg = PACKAGES[body.package_id];
-    if (!pkg) return json({ error: "Unknown package" }, 400);
+    const currency = body.currency || "INR"; // Default to INR if not specified
+    if (!["INR", "USD"].includes(currency)) {
+      return json({ error: "Invalid currency" }, 400);
+    }
+
+    const pkg = PACKAGES[body.package_id]?.[currency];
+    if (!pkg) return json({ error: "Unknown package or currency" }, 400);
 
     const keyId     = Deno.env.get("RAZORPAY_KEY_ID");
     const keySecret = Deno.env.get("RAZORPAY_KEY_SECRET");
@@ -59,8 +76,8 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        amount: pkg.amount_paise,
-        currency: "INR",
+        amount: pkg.amount_units,
+        currency: currency,
         receipt: `${user.id.slice(0, 8)}_${Date.now()}`,
       }),
     });
@@ -75,7 +92,8 @@ serve(async (req) => {
       order_id: order.id,
       user_id: user.id,
       package_id: body.package_id,
-      amount_paise: pkg.amount_paise,
+      amount_units: pkg.amount_units,
+      currency: currency,
       status: "created",
     });
     if (insErr) {

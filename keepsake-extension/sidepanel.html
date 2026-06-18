@@ -1,0 +1,250 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="fonts/fonts.css" />
+    <link rel="stylesheet" href="popup.css" />
+    <style>
+      /* Side panel overrides — the popup has a fixed 340px width;
+         the side panel should fill whatever width Chrome gives it. */
+      body {
+        width: 100%;
+        min-height: 100vh;
+        overscroll-behavior: none;
+      }
+      .wrap {
+        /* A little more breathing room than the cramped popup */
+        padding: 16px 18px 24px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+
+      <!-- Auth gate — shown when not signed in -->
+      <div id="authGate" class="auth-gate hidden">
+        <div class="auth-gate-text">Sign in to send keepsakes and manage credits.</div>
+        <button id="signInBtn" class="btn primary">Sign in / Create account</button>
+      </div>
+
+      <!-- Auth bar — shown when signed in -->
+      <div id="authBar" class="auth-bar hidden">
+        <div class="auth-top">
+          <span id="authEmail" class="auth-email"></span>
+          <div class="auth-links">
+            <a id="accountLink" href="#" class="auth-link">Account</a>
+            <a id="signOutLink" href="#" class="auth-link">Sign out</a>
+          </div>
+        </div>
+        <span id="creditsBadge" class="credits-badge"></span>
+      </div>
+
+      <!-- Tutorial welcome banner — shown only when tutorial share is active -->
+      <div id="tutorialBanner" class="tutorial-banner hidden">
+        <button id="tutorialCloseBtn" class="tutorial-close-btn" aria-label="Dismiss tutorial">✕</button>
+        <div class="tutorial-banner-head">
+          <span class="tutorial-banner-icon">✦</span>
+          <span class="tutorial-banner-title">Welcome to Keepsake!</span>
+        </div>
+        <p class="tutorial-banner-text">Play any song on Spotify. Pop-ups will guide you through writing and sharing a keepsake.</p>
+        <p class="tutorial-banner-hint">When you're ready, close this note and start sending keepsakes of your own.</p>
+      </div>
+
+      <!-- Now Playing -->
+      <div class="stamp-track">
+        <div class="stamp-eyebrow">✧ NOW PLAYING</div>
+        <div id="trackTitle" class="track-title">Loading…</div>
+        <div id="trackArtist" class="track-artist"></div>
+        <div class="postmark" aria-hidden="true">
+          <div class="postmark-inner">
+            <div class="postmark-top">KEEPSAKE</div>
+            <svg class="postmark-wave" viewBox="0 0 44 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0 5 C3.5 1 7 9 11 5 C15 1 18.5 9 22 5 C25.5 1 29 9 33 5 C37 1 40.5 9 44 5"
+                    stroke="rgba(58,36,24,0.35)" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+              <path d="M0 8 C3.5 4 7 12 11 8 C15 4 18.5 12 22 8 C25.5 4 29 12 33 8 C37 4 40.5 12 44 8"
+                    stroke="rgba(58,36,24,0.22)" stroke-width="0.9" stroke-linecap="round" fill="none"/>
+            </svg>
+            <div class="postmark-year">2026</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Name setup -->
+      <div id="nameBlock" class="composer-card name-block hidden">
+        <label class="field-label">Your name</label>
+        <div class="row">
+          <input id="senderName" type="text" class="underline-input" placeholder="e.g. Sam" />
+          <button id="saveName" class="btn primary">Save</button>
+        </div>
+      </div>
+
+      <!-- Composer -->
+      <div id="composer" class="composer-card composer hidden">
+        <div class="composer-header">
+          WRITING AS <strong id="whoami">…</strong> · <a href="#" id="changeName">change</a>
+        </div>
+        <input id="recipientName" class="underline-input" type="text"
+               placeholder="Recipient name" autocomplete="off" />
+        <div class="note-area">
+          <textarea id="note" class="ruled-textarea"
+                    placeholder="Write a note for this song…" rows="5" maxlength="260"></textarea>
+        </div>
+        <div class="timestamp-row">
+          <div class="ts-wrap">
+            <svg class="ts-icon" width="13" height="13" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+            <input id="ts" class="timestamp-input" type="text"
+                   placeholder="Timestamp (e.g. 1:24), optional" />
+          </div>
+          <button id="useCurrent" class="now-btn">Now</button>
+        </div>
+        <div class="save-row">
+          <button id="save" class="save-btn">Save note</button>
+          <span id="status" class="status"></span>
+        </div>
+      </div>
+
+      <!-- Experience banner — shown when viewing a reactivated sent share -->
+      <div id="experienceBanner" class="experience-banner hidden">
+        <button id="receivedClose" class="exp-close hidden" type="button" aria-label="Exit keepsake">✕</button>
+        <div class="exp-top">
+          <span class="exp-badge" id="expBadge">✧ Experience mode</span>
+          <button id="enterEditMode" class="exp-edit-btn">Enter Edit Mode</button>
+        </div>
+        <div id="expWho" class="exp-who"></div>
+      </div>
+
+      <!-- Notes section -->
+      <div class="section-header">
+        <span>NOTES FOR THIS SONG</span>
+      </div>
+      <div id="notes" class="notes"></div>
+
+      <!-- Songs in this letter -->
+      <div class="section-header" id="songIndexHeader" style="display:none">
+        <span>SONGS IN THIS KEEPSAKE</span>
+      </div>
+      <div id="songIndex" class="song-index"></div>
+
+      <!-- Share panel -->
+      <div class="share-panel" id="sharePanel">
+
+        <!-- Header row -->
+        <div class="sp-header">
+          <div class="sp-title">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+            SHARE WITH <span id="spRecipient" class="sp-recipient">someone</span>
+          </div>
+          <div id="spPill" class="sp-pill sp-pill--needed">● Playlist needed</div>
+        </div>
+
+        <!-- Share-level description (optional, end-to-end encrypted) -->
+        <div class="sp-desc-block">
+          <label class="sp-input-label" for="shareDescription">Description <span class="sp-required">(optional)</span></label>
+          <textarea id="shareDescription" class="sp-desc-input" rows="2" maxlength="200"
+                    placeholder="What is this keepsake about? Shown on the share page."></textarea>
+        </div>
+
+        <!-- State A / C: track or playlist card -->
+        <div id="spCard" class="sp-card hidden">
+          <img id="spThumb" class="sp-thumb" src="" alt="" />
+          <div class="sp-card-info">
+            <div id="spCardTitle" class="sp-card-title"></div>
+            <div id="spCardSub" class="sp-card-sub"></div>
+          </div>
+          <div class="sp-spotify-badge">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+            Spotify
+          </div>
+        </div>
+
+        <!-- State B: playlist input needed -->
+        <div id="spInputSection" class="sp-input-section hidden">
+          <div class="sp-input-label">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+            </svg>
+            Playlist link <span class="sp-required">(required)</span>
+          </div>
+          <div class="sp-input-row">
+            <input id="playlistUrl" class="sp-url-input" type="text" placeholder="Paste Spotify playlist link" autocomplete="off" />
+            <button id="attachBtn" class="sp-attach-btn">Attach</button>
+          </div>
+          <div class="sp-hint">
+            <span class="sp-hint-icon">✦</span>
+            <div class="sp-hint-body">
+              <div class="sp-hint-title">Add a playlist to start sharing</div>
+              <div class="sp-hint-sub">Your notes will be saved here and shared instantly.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Re-share heads-up — shown when editing a previously sent share -->
+        <div id="spReshareNote" class="sp-relink-note hidden">
+          ✦ Re-sharing creates a new link. The original still works.
+        </div>
+
+        <!-- Footer -->
+        <div class="sp-footer">
+          <button id="copyShare" class="sp-share-btn">SHARE</button>
+        </div>
+        <div id="shareInfo" class="share-info"></div>
+        <div class="sp-divider" aria-hidden="true"><span class="sp-divider-sparkle">✦</span></div>
+        <div class="sp-actions">
+          <button id="discardDraft" class="discard-btn" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            Discard draft
+          </button>
+          <button id="resetShare" class="new-share-btn">+ New Share</button>
+        </div>
+
+      </div>
+
+      <!-- Previous Experiences removed — past letters are relived from the
+           website (notes.html#sent), which drives the extension. -->
+
+      <!-- Import block -->
+      <div class="import-block">
+        <details>
+          <summary>▸ Import a shared keepsake</summary>
+          <div class="row" style="margin-top:8px">
+            <input id="importId" type="text" placeholder="Paste share link" />
+            <button id="importBtn" class="btn">Import</button>
+          </div>
+          <div id="importStatus" class="status"></div>
+        </details>
+      </div>
+
+      <!-- Cross-device vault (opt-in, passphrase-locked) -->
+      <div class="import-block" id="vaultBlock" style="display:none">
+        <details>
+          <summary id="vaultSummary">▸ Cross-device relive</summary>
+          <div id="vaultBody" style="margin-top:8px">
+            <div id="vaultDisclaimer" class="status" style="margin-bottom:6px"></div>
+            <div id="vaultRow" class="row">
+              <input id="vaultPass" type="password" class="vault-input" placeholder="Vault passphrase (12+ characters)" autocomplete="off" />
+              <button id="vaultBtn" class="btn">Enable</button>
+            </div>
+            <input id="vaultPass2" type="password" class="vault-input" placeholder="Confirm passphrase" autocomplete="off" style="margin-top:8px" />
+            <a href="#" id="vaultChange" class="auth-link" style="display:none">Change passphrase</a>
+            <div id="vaultStatus" class="status"></div>
+          </div>
+        </details>
+      </div>
+
+      <!-- Replay tutorial -->
+      <div class="import-block" id="replayTutorialBlock" style="display:none">
+        <button id="replayTutorialBtn" class="tutorial-replay-link">✦ Replay tutorial</button>
+      </div>
+
+    </div>
+    <script src="config.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>

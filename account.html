@@ -506,7 +506,7 @@
       ],
     },
     2: {
-      currency: "USD", symbol: "$", payment: "stripe", region: "your region",
+      currency: "USD", symbol: "$", payment: "razorpay", region: "your region",
       lifetime: { price_units: 999, label: "$9.99" },
       bundles: [
         { letters: 5,  price_units: 199, label: "$1.99", name: "A spark",        desc: "For quick thoughts you don't want to lose." },
@@ -515,7 +515,7 @@
       ],
     },
     3: {
-      currency: "USD", symbol: "$", payment: "stripe", region: "your region",
+      currency: "USD", symbol: "$", payment: "razorpay", region: "your region",
       lifetime: { price_units: 1699, label: "$16.99" },
       bundles: [
         { letters: 5,  price_units: 299, label: "$2.99", name: "A spark",        desc: "For quick thoughts you don't want to lose." },
@@ -524,7 +524,7 @@
       ],
     },
     4: {
-      currency: "USD", symbol: "$", payment: "stripe", region: "your region",
+      currency: "USD", symbol: "$", payment: "razorpay", region: "your region",
       lifetime: { price_units: 2499, label: "$24.99" },
       bundles: [
         { letters: 5,  price_units:  499, label:  "$4.99", name: "A spark",        desc: "For quick thoughts you don't want to lose." },
@@ -951,6 +951,8 @@
   }
 
   async function openRazorpay(amountPaise, numCredits, isLifetime, description) {
+    const tier = TIERS[activeTier];
+    const currency = tier.currency; // "INR" for tier 1, "USD" for tiers 2-4
     const msg = document.getElementById("paymentMsg");
     msg.innerHTML = `
       <div class="payment-feedback">
@@ -977,6 +979,7 @@
           // can no longer set the amount or the number of credits.
           body: JSON.stringify({
             package_id: isLifetime ? "lifetime" : `letters_${numCredits}`,
+            currency: currency,
           }),
         }
       );

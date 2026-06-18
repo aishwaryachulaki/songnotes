@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="file:///Users/directory/Desktop/songnotes/fonts/fonts.css" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400&display=swap" />
+<link rel="stylesheet" href="file:///Users/directory/Desktop/songnotes/content.css" />
+<style>
+  :root{--butter:#F4D9A6;--ink:#3A2E2A;--ink-mid:#6B5A52;--rose:#D96B7C;--logo:#C04E6A;--tangerine:#F08C21;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{width:1400px;height:560px;overflow:hidden;}
+  .banner{position:relative;width:1400px;height:560px;overflow:hidden;
+    background:var(--butter) url('file:///Users/directory/Desktop/songnotes/background.png') center / cover no-repeat;
+    font-family:'Lora',Georgia,serif;color:var(--ink);display:flex;align-items:center;padding:0 90px;gap:40px;}
+  .left{width:700px;position:relative;z-index:3;}
+  .brand{display:flex;align-items:baseline;gap:14px;margin-bottom:30px;}
+  .brand .logo{font-family:'Spectral',serif;font-style:italic;font-weight:400;font-size:38px;color:var(--logo);letter-spacing:-.01em;}
+  .brand .logo .spark{font-style:normal;font-family:sans-serif;font-size:15px;color:var(--tangerine);vertical-align:super;line-height:0;margin-left:3px;}
+  .brand .tag{font-family:'Montserrat',sans-serif;font-weight:700;letter-spacing:.2em;font-size:12px;color:var(--ink-mid);text-transform:uppercase;opacity:.6;}
+  h1{font-family:'Spectral',Georgia,serif;font-style:italic;font-weight:400;
+    font-size:58px;line-height:1.06;letter-spacing:-.01em;margin-bottom:24px;max-width:600px;}
+  h1 .hl{color:var(--rose);}
+  .sub{font-size:22px;line-height:1.5;color:var(--ink-mid);max-width:540px;}
+  .sub .s{color:var(--rose);}
+
+  .right{flex:1;position:relative;height:100%;display:flex;align-items:center;justify-content:center;}
+  .floral{position:absolute;right:-70px;bottom:-90px;width:360px;opacity:0.24;pointer-events:none;z-index:1;}
+  .note-pop{position:relative;z-index:2;transform:rotate(3deg) scale(1.02);
+    filter:drop-shadow(0 22px 48px rgba(100,55,35,0.42)) drop-shadow(0 5px 12px rgba(100,55,35,0.2));}
+  .note-pop .ks-card{background-image:url('file:///Users/directory/Desktop/songnotes/floater.png');cursor:default;}
+</style>
+</head>
+<body>
+  <div class="banner">
+    <div class="left">
+      <div class="brand"><span class="logo">keepsake.<span class="spark">✦</span></span><span class="tag">Notes for Spotify</span></div>
+      <h1>Leave a note <span class="hl">inside the music.</span></h1>
+      <div class="sub">Pin a thought to the exact moment a song moves you, then share it. It appears in perfect sync as they listen.</div>
+    </div>
+    <div class="right">
+      <img class="floral" src="file:///Users/directory/Desktop/songnotes/flower.png" alt="" />
+      <div class="note-pop">
+        <div class="ks-card">
+          <button class="ks-close" aria-hidden="true">&#x00D7;</button>
+          <div class="ks-label">✦&nbsp;&nbsp;sam sent you a note</div>
+          <div class="ks-text sn-large">First time I heard this, I was seventeen.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

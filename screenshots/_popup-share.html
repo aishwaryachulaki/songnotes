@@ -6,7 +6,11 @@
     <link rel="stylesheet" href="../popup.css" />
     <style>
       html, body { margin: 0; }
+      .wrap { padding: 16px 18px 24px; }
       * { caret-color: transparent !important; }
+      /* mock album thumb (the real one is an <img>) */
+      .mock-thumb { width: 44px; height: 44px; border-radius: 8px; flex-shrink: 0;
+        background: linear-gradient(135deg,#2e7d6b,#1f5a4d); }
     </style>
   </head>
   <body>
@@ -20,7 +24,7 @@
             <a class="auth-link">Sign out</a>
           </div>
         </div>
-        <span class="credits-badge">✧ 3 letters left</span>
+        <span class="credits-badge">3 keepsakes</span>
       </div>
 
       <div class="stamp-track">
@@ -51,26 +55,49 @@
             <button class="note-edit" title="Edit">✎</button>
           </div>
         </div>
-        <div class="note">
-          <div class="meta">2:43</div>
-          <div class="note-text">This is the part where the whole song cracks open. Wait for it.</div>
-          <div class="note-actions">
-            <button class="del" title="Delete">×</button>
-            <button class="note-edit" title="Edit">✎</button>
-          </div>
-        </div>
       </div>
 
-      <!-- Share stamp -->
-      <div class="share-card">
-        <div class="share-summary">4 notes across 2 songs, for Maya</div>
-        <div class="playlist-wrap">
-          <span class="playlist-icon">🖇</span>
-          <input class="playlist-input" type="text" value="open.spotify.com/playlist/…" readonly />
+      <!-- Share panel (current) -->
+      <div class="share-panel" id="sharePanel">
+        <div class="sp-header">
+          <div class="sp-title">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+            SHARE WITH <span class="sp-recipient">Maya</span>
+          </div>
+          <div class="sp-pill sp-pill--ready">● Ready to share</div>
         </div>
-        <button class="share-btn">Send all notes</button>
-        <div class="share-info">Link copied! <a href="#">dropakeepsake.com/n/8fK2a…</a></div>
-        <button class="new-share-btn">+ New Share</button>
+
+        <div class="sp-desc-block">
+          <label class="sp-input-label">Description <span class="sp-required">(optional)</span></label>
+          <textarea class="sp-desc-input" rows="2" readonly>for the drive home, and every one after it.</textarea>
+        </div>
+
+        <div class="sp-card">
+          <div class="sp-thumb mock-thumb"></div>
+          <div class="sp-card-info">
+            <div class="sp-card-title">Linger</div>
+            <div class="sp-card-sub">The Cranberries</div>
+          </div>
+          <div class="sp-spotify-badge">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+            Spotify
+          </div>
+        </div>
+
+        <div class="sp-footer">
+          <button class="sp-share-btn">SHARE</button>
+        </div>
+        <div class="sp-divider" aria-hidden="true"><span class="sp-divider-sparkle">✦</span></div>
+        <div class="sp-actions">
+          <button class="discard-btn" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            Discard draft
+          </button>
+          <button class="new-share-btn">+ New Share</button>
+        </div>
       </div>
 
     </div>

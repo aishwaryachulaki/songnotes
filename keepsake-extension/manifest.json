@@ -1,0 +1,63 @@
+{
+  "manifest_version": 3,
+  "name": "Keepsake",
+  "version": "1.0",
+  "description": "Attach personal notes to moments in Spotify songs and share them as a link.",
+  "homepage_url": "https://dropakeepsake.com/",
+  "permissions": ["storage", "activeTab", "tabs", "sidePanel"],
+  "host_permissions": [
+    "https://open.spotify.com/*",
+    "https://dropakeepsake.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "action": {
+    "default_icon": { "16": "icon16.png", "32": "icon32.png", "48": "icon48.png", "128": "icon128.png" },
+    "default_title": "Keepsake"
+  },
+  "icons": { "16": "icon16.png", "32": "icon32.png", "48": "icon48.png", "128": "icon128.png" },
+  "web_accessible_resources": [
+    {
+      "resources": ["floater.png", "faq-bg-yellow.png"],
+      "matches": ["https://open.spotify.com/*"]
+    }
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://open.spotify.com/*"],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://dropakeepsake.com/share.html*", "https://dropakeepsake.com/share/*"],
+      "js": ["share-bridge.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://dropakeepsake.com/auth.html*",
+        "https://dropakeepsake.com/auth/*",
+        "https://dropakeepsake.com/account.html*",
+        "https://dropakeepsake.com/account/*",
+        "https://dropakeepsake.com/sent.html*",
+        "https://dropakeepsake.com/sent/*",
+        "https://dropakeepsake.com/received.html*",
+        "https://dropakeepsake.com/received/*",
+        "https://dropakeepsake.com/notes.html*",
+        "https://dropakeepsake.com/notes/*"
+      ],
+      "js": ["auth-bridge.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://dropakeepsake.com/notes.html*", "https://dropakeepsake.com/notes/*"],
+      "js": ["notes-bridge.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

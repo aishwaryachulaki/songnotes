@@ -1,0 +1,158 @@
+/* ── Keepsake Toast ── */
+
+.ks-overlay {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 2147483647;
+  opacity: 0;
+  transform: translateY(-10px) scale(0.96);
+  transition: opacity 380ms cubic-bezier(0.34, 1.56, 0.64, 1),
+              transform 380ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+}
+.ks-overlay.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+  /* drop-shadow follows the PNG alpha channel — torn edge included */
+  filter: drop-shadow(0 16px 40px rgba(100, 55, 35, 0.28))
+          drop-shadow(0 4px 10px rgba(100, 55, 35, 0.12));
+}
+.ks-overlay.pinned.visible {
+  filter: drop-shadow(0 20px 56px rgba(100, 55, 35, 0.35))
+          drop-shadow(0 5px 14px rgba(100, 55, 35, 0.16));
+}
+
+/* ── Card — image is the entire visual ── */
+.ks-card {
+  position: relative;
+  box-sizing: border-box;   /* height is the full box, so overflow clips at the paper edge */
+  overflow: hidden;         /* safety net: text can never cross the paper boundary */
+  /* background-image set in JS via chrome.runtime.getURL */
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-color: transparent;
+
+  /* Dimensions locked to floater.png aspect ratio (1867 × 842) */
+  width: 460px;
+  height: 208px;
+
+  /* Left text area clears the floral on the right (~50% from left) */
+  padding: 30px 210px 48px 30px;
+
+  cursor: pointer;
+  border-radius: 0;
+  box-shadow: none;
+  border: none;
+}
+
+/* ── Sender label ── */
+.ks-label {
+  font-size: 11px;
+  color: rgba(80, 45, 28, 0.52);
+  letter-spacing: 0.03em;
+  margin-bottom: 8px;
+  font-weight: 400;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Note text — font-size set dynamically in JS by length ── */
+.ks-text {
+  color: #3a1f10;
+  word-break: break-word;
+  overflow: hidden;
+  margin-left: 10px;
+}
+.ks-text.sn-large {
+  font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  font-weight: 400;
+  font-style: italic;
+  font-size: 26px;
+  line-height: 1.25;
+}
+.ks-text.sn-medium {
+  font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  font-weight: 400;
+  font-style: italic;
+  font-size: 18px;
+  line-height: 1.35;
+}
+.ks-text.sn-small {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* ── Tutorial card variant — yellow paper background ── */
+.ks-card--tutorial {
+  /* background-image set in JS via chrome.runtime.getURL("faq-bg-yellow.png") */
+  /* Same dimensions as regular card */
+  padding: 22px 24px 22px 22px; /* full-width text, no right floral */
+  border-radius: 14px;
+}
+
+/* Step badge replacing the sender label */
+.ks-step-badge {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(74, 56, 0, 0.55);
+  margin-bottom: 7px;
+}
+
+/* Tutorial title — bold sans, sits above the body */
+.ks-tut-title {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 1.2;
+  color: rgba(58, 40, 0, 0.92);
+  margin-bottom: 5px;
+}
+
+/* Tutorial body — ALWAYS a clean, readable system font (not the decorative
+   Playfair italic used for real notes) at one consistent, larger size no matter
+   the length, so the guided-tour instructions stay legible. Real notes are
+   untouched and keep their length-based Playfair styling. */
+.ks-card--tutorial .ks-text { color: rgba(58, 40, 0, 0.82); margin-left: 0; }
+.ks-text.ks-tut-text {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+/* ── Close button ── */
+.ks-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 26px;
+  height: 26px;
+  border: none;
+  background: transparent;
+  color: rgba(80, 45, 28, 0.38);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background 150ms ease, color 150ms ease;
+  z-index: 10;
+}
+.ks-close:hover {
+  background: rgba(120, 60, 40, 0.10);
+  color: #3d2618;
+}
