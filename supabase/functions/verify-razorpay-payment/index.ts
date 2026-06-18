@@ -9,11 +9,23 @@ const CORS_HEADERS = {
 
 // Must match the catalog in create-razorpay-order. Credits/lifetime come from
 // HERE (keyed by the stored order's package_id), never from the client.
-const PACKAGES: Record<string, { amount_paise: number; credits: number; lifetime: boolean }> = {
-  letters_5:  { amount_paise: 14900, credits: 5,  lifetime: false },
-  letters_10: { amount_paise: 24900, credits: 10, lifetime: false },
-  letters_15: { amount_paise: 34900, credits: 15, lifetime: false },
-  lifetime:   { amount_paise: 99900, credits: 0,  lifetime: true  },
+const PACKAGES: Record<string, Record<string, { amount_units: number; credits: number; lifetime: boolean }>> = {
+  letters_5: {
+    INR: { amount_units: 14900, credits: 5, lifetime: false },
+    USD: { amount_units: 199, credits: 5, lifetime: false },
+  },
+  letters_10: {
+    INR: { amount_units: 24900, credits: 10, lifetime: false },
+    USD: { amount_units: 349, credits: 10, lifetime: false },
+  },
+  letters_15: {
+    INR: { amount_units: 34900, credits: 15, lifetime: false },
+    USD: { amount_units: 499, credits: 15, lifetime: false },
+  },
+  lifetime: {
+    INR: { amount_units: 99900, credits: 0, lifetime: true },
+    USD: { amount_units: 999, credits: 0, lifetime: true },
+  },
 };
 
 function json(obj: unknown, status: number) {
@@ -68,7 +80,7 @@ serve(async (req) => {
       .eq("order_id", razorpay_order_id)
       .eq("user_id", user.id)
       .eq("status", "created")
-      .select("package_id, amount_paise")
+      .select("package_id, amount_units, currency")
       .maybeSingle();
     if (claimErr) { console.error("Order claim failed:", claimErr); return json({ error: "Internal error" }, 500); }
 
@@ -81,8 +93,8 @@ serve(async (req) => {
       return json({ error: "Order not found for this account" }, 400);
     }
 
-    const pkg = PACKAGES[claimed.package_id];
-    if (!pkg) { console.error("Unknown package on order:", claimed.package_id); return json({ error: "Internal error" }, 500); }
+    const pkg = PACKAGES[claimed.package_id]?.[claimed.currency || "INR"];
+    if (!pkg) { console.error("Unknown package or currency on order:", claimed.package_id, claimed.currency); return json({ error: "Internal error" }, 500); }
 
     // Grant credits with SERVER values only.
     const { error: rpcError } = await admin.rpc("add_credits", {
@@ -90,7 +102,8 @@ serve(async (req) => {
       p_credits:      pkg.credits,
       p_lifetime:     pkg.lifetime,
       p_razorpay_id:  razorpay_payment_id,
-      p_amount_paise: claimed.amount_paise,
+      p_amount_units: claimed.amount_units,
+      p_currency:     claimed.currency || "INR",
     });
     if (rpcError) {
       // Roll the order back to 'created' so the user can retry the grant.
