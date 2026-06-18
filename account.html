@@ -236,11 +236,6 @@
       font-size: 9.5px; color: var(--ink-lt); letter-spacing: 0.03em;
       margin-top: -4px;
     }
-    .region-link {
-      color: var(--rose); text-decoration: none; opacity: 0.7;
-      transition: opacity 0.15s;
-    }
-    .region-link:hover { opacity: 1; text-decoration: underline; }
 
     /* ── Purchase history ── */
     .history-card {
@@ -497,7 +492,7 @@
   // price_units = paise for INR (Razorpay), cents for USD (Stripe)
   const TIERS = {
     1: {
-      currency: "INR", symbol: "₹", payment: "razorpay", region: "India",
+      currency: "INR", symbol: "₹", region: "India",
       lifetime: { price_units: 99900, label: "₹999" },
       bundles: [
         { letters: 5,  price_units: 14900, label: "₹149", name: "A spark",        desc: "For quick thoughts you don't want to lose." },
@@ -506,7 +501,7 @@
       ],
     },
     2: {
-      currency: "USD", symbol: "$", payment: "razorpay", region: "your region",
+      currency: "USD", symbol: "$", region: "your region",
       lifetime: { price_units: 999, label: "$9.99" },
       bundles: [
         { letters: 5,  price_units: 199, label: "$1.99", name: "A spark",        desc: "For quick thoughts you don't want to lose." },
@@ -515,7 +510,7 @@
       ],
     },
     3: {
-      currency: "USD", symbol: "$", payment: "razorpay", region: "your region",
+      currency: "USD", symbol: "$", region: "your region",
       lifetime: { price_units: 1699, label: "$16.99" },
       bundles: [
         { letters: 5,  price_units: 299, label: "$2.99", name: "A spark",        desc: "For quick thoughts you don't want to lose." },
@@ -524,7 +519,7 @@
       ],
     },
     4: {
-      currency: "USD", symbol: "$", payment: "razorpay", region: "your region",
+      currency: "USD", symbol: "$", region: "your region",
       lifetime: { price_units: 2499, label: "$24.99" },
       bundles: [
         { letters: 5,  price_units:  499, label:  "$4.99", name: "A spark",        desc: "For quick thoughts you don't want to lose." },
@@ -758,7 +753,7 @@
     // in USD with international card methods.
     const trustLine = activeTier === 1
       ? "🔒 Secure payments · UPI, cards, netbanking"
-      : "🔒 Secure payments · Cards, Apple Pay, Google Pay";
+      : "🔒 Secure payments · Cards";
 
     // No "wrong region?" link: tiers are auto-detected and most users have no
     // idea which tier they're on, so surfacing it only invites tier-gaming.
@@ -939,13 +934,9 @@
   }
 
   // ── Payment routing ──────────────────────────────────────────────────────────
+  // All tiers settle through Razorpay (INR for tier 1, USD for tiers 2-4).
   function handlePurchase(priceUnits, numCredits, isLifetime, description) {
-    const tier = TIERS[activeTier];
-    if (tier.payment === "razorpay") {
-      openRazorpay(priceUnits, numCredits, isLifetime, description);
-    } else if (tier.payment === "stripe") {
-      openStripe(priceUnits, numCredits, isLifetime, description);
-    }
+    openRazorpay(priceUnits, numCredits, isLifetime, description);
   }
 
   async function openRazorpay(amountPaise, numCredits, isLifetime, description) {
@@ -1094,16 +1085,6 @@
         </div>`;
     });
     rzp.open();
-  }
-
-  // Stripe — wired up once the Stripe account is live.
-  // Until then, show prices correctly but direct purchase attempts to email.
-  function openStripe(amountCents, numCredits, isLifetime, description) {
-    const msg = document.getElementById("paymentMsg");
-    const supportEmail = "hello@dropakeepsake.com";
-    const subject = encodeURIComponent(`Purchase request: ${description}`);
-    const body = encodeURIComponent(`Hi,\n\nI'd like to purchase: ${description}\nMy account email: ${currentUser.email}\n\nThanks`);
-    msg.innerHTML = `<div class="msg error">International card payments are coming very soon. In the meantime, email us at <a href="mailto:${supportEmail}?subject=${subject}&body=${body}" style="color:var(--rose);font-weight:600">${supportEmail}</a> and we'll sort it out manually.</div>`;
   }
 </script>
 </body>
