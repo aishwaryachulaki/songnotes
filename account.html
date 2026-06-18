@@ -754,20 +754,17 @@
       </div>
     `).join("");
 
-    const isStripe = tier.payment === "stripe";
-    const trustLine = isStripe
-      ? "🔒 Secure payments · Cards, Apple Pay, Google Pay"
-      : "🔒 Secure payments · UPI, cards, netbanking";
+    // Tier 1 (India) pays in INR via UPI/cards/netbanking; all other tiers pay
+    // in USD with international card methods.
+    const trustLine = activeTier === 1
+      ? "🔒 Secure payments · UPI, cards, netbanking"
+      : "🔒 Secure payments · Cards, Apple Pay, Google Pay";
 
-    // "Wrong region?" link pre-fills a support email with the user's account
-    // email so you can look them up and update country_tier in Supabase.
-    const supportEmail = "hello@dropakeepsake.com";
-    const regionSubject = encodeURIComponent("Region correction request");
-    const regionBody = encodeURIComponent(`Hi,\n\nMy account email is ${currentUser.email} and I believe my region was detected incorrectly.\n\nMy actual location: [please fill in your country]\n\nThanks`);
-    const regionHref = `mailto:${supportEmail}?subject=${regionSubject}&body=${regionBody}`;
+    // No "wrong region?" link: tiers are auto-detected and most users have no
+    // idea which tier they're on, so surfacing it only invites tier-gaming.
     const regionLabel = activeTier === 1
-      ? `Prices shown for India · <a href="${regionHref}" class="region-link">Not in India?</a>`
-      : `Prices adjusted for your region · <a href="${regionHref}" class="region-link">Wrong region?</a>`;
+      ? "Prices shown for India"
+      : "Prices adjusted for your region";
 
     const purchaseRows = purchases.length
       ? purchases.map(p => {
